@@ -1,5 +1,4 @@
 #include "./cpu.h"
-#include "./utils.h"
 
 #include <cstdio>
 
