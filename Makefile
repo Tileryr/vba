@@ -1,9 +1,20 @@
+CC=g++
+CFLAGS=-pedantic
 
-all: cpu.o main.o
-	g++ cpu.o main.o -o emu
+SRC=$(wildcard src/*.cpp)
+OBJ=$(SRC:%.cpp=%.o)
+DEP=$(OBJ:%.o=%.d)
 
-main.o: main.cpp
-	g++ -c main.cpp -o main.o
+EXE=vba
+LIBS=$(addprefix -l,)
 
-cpu.o: cpu.cpp
-	g++ -c cpu.cpp -o cpu.o
+$(EXE): $(OBJ)
+	$(CC) -o $@ $^ $(LIBS)
+
+-include $(DEP)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f $(OBJ) $(DEP) $(EXE)
