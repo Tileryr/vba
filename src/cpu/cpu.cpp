@@ -1,7 +1,6 @@
 #include "./cpu.h"
 #include <cassert>
 #include <cstdlib>
-#include <functional>
 
 ProgramStatusRegister::ProgramStatusRegister() : mode(MODE_USER), t(STATE_ARM), f(false), i(false)
 {
@@ -30,27 +29,27 @@ RegisterSet::RegisterSet()
 
 // Private
 
-RegisterSet ARM7TDMI::mode_to_register_set(OperatingMode mode) 
+RegisterSet * ARM7TDMI::mode_to_register_set(OperatingMode mode) 
 {
     switch (mode) {
         case MODE_USER :
-            return registers_user;
+            return &registers_user;
         case MODE_SYSTEM:
-            return registers_user;
+            return &registers_user;
         case MODE_FIQ:
-            return registers_fiq;
+            return &registers_fiq;
         case MODE_IRQ :
-            return registers_irq;
+            return &registers_irq;
         case MODE_SUPERVISOR:
-            return registers_supervisor;
+            return &registers_supervisor;
         case MODE_ABORT:
-            return registers_abort;
+            return &registers_abort;
         case MODE_UNDEFINED:
-            return registers_undefined;
+            return &registers_undefined;
     }
     assert(false);
 }
-RegisterSet ARM7TDMI::current_register_set() 
+RegisterSet * ARM7TDMI::current_register_set() 
 {
     return mode_to_register_set(cpsr.mode);
 }
@@ -71,24 +70,23 @@ void ARM7TDMI::set_fiq(bool fiq_on)
     cpsr.f = fiq_on ? 0 : 1;
 }
 
-void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int pc_offset)
+void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int priority, int pc_offset)
 {
-    RegisterSet new_register_set = mode_to_register_set(new_mode);
+    RegisterSet * new_register_set = mode_to_register_set(new_mode);
 
-    *new_register_set.registers[REGISTER_LS] = read_register(REGISTER_PC) + pc_offset;
+    *new_register_set->registers[REGISTER_LS] = read_register(REGISTER_PC) + pc_offset;
 
-    new_register_set.spsr = cpsr;
+    new_register_set->spsr = cpsr;
     cpsr.t = STATE_ARM;
     cpsr.mode = new_mode;
     cpsr.i = true;
 
-    bool is_reset = exception_vector == 0x00;
-    if (new_mode == MODE_FIQ || is_reset)
-    {
-        cpsr.f = true;
-    }
-
     write_register(REGISTER_PC, exception_vector);
+};
+
+void ARM7TDMI::return_from_exception() 
+{
+    cpsr = current_register_set()->spsr;
 };
 
 // Public
@@ -124,14 +122,13 @@ Word ARM7TDMI::read_register(int register_number)
         return *registers_user.registers[REGISTER_PC] + 8;
     }
 
-    return *current_register_set().registers[register_number];
+    return *(current_register_set()->registers[register_number]);
 };
 
 void ARM7TDMI::write_register(int register_number, Word register_value)
 {
     assert(register_number < 16);
-    assert(register_number != REGISTER_PC);
-    *current_register_set().registers[register_number] = register_value;
+    *(current_register_set()->registers[register_number]) = register_value;
 };
 
 bool ARM7TDMI::condition_field(int condition_code) 
@@ -175,4 +172,33 @@ bool ARM7TDMI::condition_field(int condition_code)
     }
 
     return condition;
+}
+
+void ARM7TDMI::exception_reset() {
+    trigger_exception(MODE_SUPERVISOR, 0x00, 1, 0);
+    cpsr.f = true;
+}
+void ARM7TDMI::exception_undefined_instruction() {
+    trigger_exception(MODE_UNDEFINED, 0x04, 7, 4);
+}
+void ARM7TDMI::exception_software_interrupt() {
+    trigger_exception(MODE_SUPERVISOR, 0x08, 6, 4);
+}
+void ARM7TDMI::exception_prefetch_abort() {
+    trigger_exception(MODE_ABORT, 0x0C, 5, 8);
+}
+void ARM7TDMI::exception_data_abort() {
+    trigger_exception(MODE_ABORT, 0x10, 2, 12);
+}
+void ARM7TDMI::exception_interrupt() {
+    trigger_exception(MODE_IRQ, 0x18, 4, 8);
+}
+void ARM7TDMI::exception_fast_interrupt() {
+    trigger_exception(MODE_FIQ, 0x1C, 3, 8);
+    cpsr.f = true;
+}
+
+void ARM7TDMI::set_state(CPUState new_state)
+{
+    cpsr.t = new_state;
 }
