@@ -1,5 +1,7 @@
 #include "./cpu.h"
 #include <cassert>
+#include <cstdlib>
+#include <functional>
 
 ProgramStatusRegister::ProgramStatusRegister() : mode(MODE_USER), t(STATE_ARM), f(false), i(false)
 {
@@ -24,15 +26,13 @@ RegisterSet::RegisterSet()
     for (int i = 0; i < 16; i++) {
         registers[i] = (Word *) malloc(sizeof(Word));
     }
-
-    spsr = (ProgramStatusRegister *) malloc(sizeof(ProgramStatusRegister));
 };
 
 // Private
 
-RegisterSet ARM7TDMI::current_register_set() 
+RegisterSet ARM7TDMI::mode_to_register_set(OperatingMode mode) 
 {
-    switch (cpsr.mode) {
+    switch (mode) {
         case MODE_USER :
             return registers_user;
         case MODE_SYSTEM:
@@ -49,6 +49,10 @@ RegisterSet ARM7TDMI::current_register_set()
             return registers_undefined;
     }
     assert(false);
+}
+RegisterSet ARM7TDMI::current_register_set() 
+{
+    return mode_to_register_set(cpsr.mode);
 }
 
 void ARM7TDMI::set_irq(bool irq_on)
@@ -67,12 +71,31 @@ void ARM7TDMI::set_fiq(bool fiq_on)
     cpsr.f = fiq_on ? 0 : 1;
 }
 
+void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int pc_offset)
+{
+    RegisterSet new_register_set = mode_to_register_set(new_mode);
+
+    *new_register_set.registers[REGISTER_LS] = read_register(REGISTER_PC) + pc_offset;
+
+    new_register_set.spsr = cpsr;
+    cpsr.t = STATE_ARM;
+    cpsr.mode = new_mode;
+    cpsr.i = true;
+
+    bool is_reset = exception_vector == 0x00;
+    if (new_mode == MODE_FIQ || is_reset)
+    {
+        cpsr.f = true;
+    }
+
+    write_register(REGISTER_PC, exception_vector);
+};
+
 // Public
 
 ARM7TDMI::ARM7TDMI()
 {
     RegisterSet * register_sets[5] = {&registers_fiq, &registers_irq, &registers_supervisor, &registers_abort, &registers_undefined};
-    free(registers_user.spsr);
 
     for (int i = 0; i < 2; i++) {
         RegisterSet * current = register_sets[i];
@@ -109,7 +132,7 @@ void ARM7TDMI::write_register(int register_number, Word register_value)
     assert(register_number < 16);
     assert(register_number != REGISTER_PC);
     *current_register_set().registers[register_number] = register_value;
-}
+};
 
 bool ARM7TDMI::condition_field(int condition_code) 
 {

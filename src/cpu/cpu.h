@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <string.h>
 #include <sys/types.h>
+#include <uchar.h>
 #include "../utils.h"
 
 typedef u_int8_t  Byte;
@@ -49,7 +50,7 @@ typedef struct RegisterSet {
 
     Word * registers[16];
    
-    ProgramStatusRegister * spsr;
+    ProgramStatusRegister spsr;
 } RegisterSet;
 
 typedef struct ARM7TDMI {
@@ -63,19 +64,27 @@ typedef struct ARM7TDMI {
 
         ProgramStatusRegister cpsr;
 
+        RegisterSet mode_to_register_set(OperatingMode mode);
         RegisterSet current_register_set();
 
         void set_irq(bool irq_on);
 
         void set_fiq(bool fiq_on);
 
+        void trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int pc_offset);
     public:
         ARM7TDMI();
         
+        
+
+
         Word read_register(int register_number);
         
         void write_register(int register_number, Word register_value);
 
+
         bool condition_field(int condition_code);
+
+
 } cpu;
 
