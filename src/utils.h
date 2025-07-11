@@ -1,3 +1,6 @@
+#ifndef UTIL_INCLUDED
+#define UTIL_INCLUDED
+
 #include <sys/types.h>
 
 typedef struct Utils {
@@ -10,3 +13,5 @@ typedef struct Utils {
 
     static int read_bit_range(unsigned int * number, unsigned int bit_range_start, unsigned int bit_range_end);
 } Utils;
+
+#endif

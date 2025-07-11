@@ -1,31 +1,7 @@
-#include "./cpu.h"
+#include "cpu.h"
+
 #include <cassert>
 #include <cstdlib>
-
-ProgramStatusRegister::ProgramStatusRegister() : mode(MODE_USER), t(STATE_ARM), f(false), i(false)
-{
-};
-
-Word ProgramStatusRegister::value() {
-    Word * value = 0;
-    Utils::write_bit(value, 31, n);
-    Utils::write_bit(value, 30, z);
-    Utils::write_bit(value, 29, c);
-    Utils::write_bit(value, 28, v);
-    Utils::write_bit(value, 7, i);
-    Utils::write_bit(value, 6, f);
-    Utils::write_bit(value, 5, t);
-    Utils::write_bit_range(value, 0, 4, mode);
-    return *value;
-};
-
-
-RegisterSet::RegisterSet()
-{
-    for (int i = 0; i < 16; i++) {
-        registers[i] = (Word *) malloc(sizeof(Word));
-    }
-};
 
 // Private
 
@@ -196,9 +172,4 @@ void ARM7TDMI::exception_interrupt() {
 void ARM7TDMI::exception_fast_interrupt() {
     trigger_exception(MODE_FIQ, 0x1C, 3, 8);
     cpsr.f = true;
-}
-
-void ARM7TDMI::set_state(CPUState new_state)
-{
-    cpsr.t = new_state;
 }
