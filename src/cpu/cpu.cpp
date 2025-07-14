@@ -48,25 +48,34 @@ void ARM7TDMI::set_fiq(bool fiq_on)
     cpsr.f = fiq_on ? 0 : 1;
 }
 
-void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int priority, int pc_offset)
+void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int priority, ExceptionReturnType return_mode)
 {
     RegisterSet * new_register_set = mode_to_register_set(new_mode);
+    Word pc_value = read_register(REGISTER_PC);
+    Word ls_value = pc_value;
 
-    *new_register_set->registers[REGISTER_LS] = read_register(REGISTER_PC) + pc_offset;
+    switch (return_mode)
+    {
+        case E_RETURN_NEXT:
+            if (cpsr.t == STATE_ARM)
+                ls_value += 4;
+            else
+                ls_value += 2;
+        case E_RETURN_RETRY:
+            ls_value += 4;
+        case E_RETURN_DATA_ABORT:
+            ls_value += 8;
+    }
+    *new_register_set->registers[REGISTER_LS] = ls_value;
 
     new_register_set->spsr = cpsr;
     cpsr.t = STATE_ARM;
     cpsr.mode = new_mode;
     cpsr.i = true;
+    current_exception_return_type = return_mode;
 
     write_register(REGISTER_PC, exception_vector);
 };
-
-void ARM7TDMI::return_from_exception() 
-{
-    cpsr = current_register_set()->spsr;
-};
-
 // Public
 
 ARM7TDMI::ARM7TDMI()
@@ -152,29 +161,36 @@ bool ARM7TDMI::condition_field(int condition_code)
     return condition;
 }
 
-void ARM7TDMI::exception_reset() {
-    trigger_exception(MODE_SUPERVISOR, 0x00, 1, 0);
-    cpsr.f = true;
-}
-void ARM7TDMI::exception_undefined_instruction() {
-    trigger_exception(MODE_UNDEFINED, 0x04, 7, 4);
-}
-void ARM7TDMI::exception_software_interrupt() {
-    trigger_exception(MODE_SUPERVISOR, 0x08, 6, 4);
-}
-void ARM7TDMI::exception_prefetch_abort() {
-    trigger_exception(MODE_ABORT, 0x0C, 5, 8);
-}
-void ARM7TDMI::exception_data_abort() {
-    trigger_exception(MODE_ABORT, 0x10, 2, 12);
-}
-void ARM7TDMI::exception_interrupt() {
-    trigger_exception(MODE_IRQ, 0x18, 4, 8);
-}
-void ARM7TDMI::exception_fast_interrupt() {
-    trigger_exception(MODE_FIQ, 0x1C, 3, 8);
-    cpsr.f = true;
-}
+void ARM7TDMI::run_exception(Exception exception_type) {
+    switch (exception_type)
+    {
+        case EXCEPTION_RESET:
+            trigger_exception(MODE_SUPERVISOR, 0x00, 1, E_RETURN_NONE);
+            cpsr.f = true;
+            break;
+        case EXCEPTION_UNDEFINED:
+            trigger_exception(MODE_UNDEFINED, 0x04, 7, E_RETURN_NEXT);
+            break;
+        case EXCEPTION_SOFTWARE_INTERRUPT:
+            trigger_exception(MODE_SUPERVISOR, 0x08, 6, E_RETURN_NEXT);
+            break;
+        case EXCEPTION_PREFETCH_ABORT:
+            trigger_exception(MODE_ABORT, 0x0C, 5, E_RETURN_RETRY);
+            break;
+        case EXCEPTION_DATA_ABORT:
+            trigger_exception(MODE_ABORT, 0x10, 2, E_RETURN_DATA_ABORT);
+            break;
+        case EXCEPTION_INTERRUPT:
+            if (cpsr.i) break;
+            trigger_exception(MODE_IRQ, 0x18, 4, E_RETURN_RETRY);
+            break;
+        case EXCEPTION_FAST_INTERRUPT:
+            if (cpsr.f) break;
+            trigger_exception(MODE_FIQ, 0x1C, 3, E_RETURN_RETRY);
+            cpsr.f = true;
+            break;
+    }
+};
 
 void ARM7TDMI::run_next_opcode() 
 {   
@@ -183,17 +199,41 @@ void ARM7TDMI::run_next_opcode()
 
     if (cpsr.t == STATE_ARM) {
         Word opcode = Utils::current_word_at_memory(current_memory_place, ENDIAN_LITTLE);
-        OpcodeType opcode_type = decode_opcode(opcode);
-        
+        OpcodeType opcode_type = decode_opcode_arm(opcode);
+
+        Byte condition_code = Utils::read_bit_range(&opcode, 28, 31);
+        if (condition_field(condition_code) == false) 
+        {
+            return;
+        }
+
         switch (opcode)
         {
-            case BRANCH: opcode_branch(opcode);
-            
+            case BRANCH: opcode_branch(opcode); break;
+            case BX: opcode_branch_exchange(opcode); break;
+
             default:
                 break;
         }
-        
-        
-        
+
+        switch (current_exception_return_type)
+        {
+            case E_RETURN_NEXT:
+                bool is_ALU = opcode_type == ALU;
+                bool is_MOV = Utils::read_bit_range(&opcode, 21, 24) == 0xD;
+                bool S_on = Utils::read_bit(&opcode, 20);
+                bool is_PC_destination = Utils::read_bit_range(&opcode, 12, 15) == REGISTER_PC;
+                bool is_register_op2 = Utils::read_bit(&opcode, 25) == 0;
+                bool op2_is_ls = Utils::read_bit_range(&opcode, 0, 3) == REGISTER_LS;
+
+                if (is_ALU && is_MOV && S_on && is_PC_destination && is_register_op2 && op2_is_ls)
+                {
+                    cpsr = current_register_set()->spsr;
+                }
+            default:
+                break;
+        }
     }   
+
+    
 }

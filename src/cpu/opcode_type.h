@@ -4,6 +4,8 @@
 enum OpcodeType
 {
     BRANCH,
+    BX,
+    ALU,
     MULTIPLY
 };
 

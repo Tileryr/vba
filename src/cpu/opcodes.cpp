@@ -20,3 +20,25 @@ void ARM7TDMI::opcode_branch(Word opcode)
     Word new_address = pc_with_prefetch_offset + offset;
     write_register(REGISTER_PC, new_address);
 }
+
+void ARM7TDMI::opcode_branch_exchange(Word opcode)
+{
+    Word register_number = Utils::read_bit_range(&opcode, 0, 3);
+    Word register_value = read_register(register_number);
+    bool bit_one = Utils::read_bit(&register_number, 0);
+
+    if (bit_one)
+    {
+        cpsr.t = STATE_THUMB;
+        write_register(REGISTER_PC, register_value - 1);
+    } else 
+    {
+        cpsr.t = STATE_ARM;
+        write_register(REGISTER_PC, register_value);
+    }
+}
+
+void ARM7TDMI::opcode_software_interrupt(Word opcode)
+{
+    run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
+}
