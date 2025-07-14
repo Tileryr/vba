@@ -1,4 +1,6 @@
 #include "cpu.h"
+#include "opcode_type.h"
+#include "../utils.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -95,7 +97,7 @@ Word ARM7TDMI::read_register(int register_number)
     if (register_number == REGISTER_PC)
     {
         // TODO: Once memory is added chnage offset to emulate pipeling.
-        return *registers_user.registers[REGISTER_PC] + 8;
+        return *registers_user.registers[REGISTER_PC] + 0;
     }
 
     return *(current_register_set()->registers[register_number]);
@@ -172,4 +174,26 @@ void ARM7TDMI::exception_interrupt() {
 void ARM7TDMI::exception_fast_interrupt() {
     trigger_exception(MODE_FIQ, 0x1C, 3, 8);
     cpsr.f = true;
+}
+
+void ARM7TDMI::run_next_opcode() 
+{   
+    Word pc = read_register(REGISTER_PC);
+    Byte * current_memory_place = &memory[pc];
+
+    if (cpsr.t == STATE_ARM) {
+        Word opcode = Utils::current_word_at_memory(current_memory_place, ENDIAN_LITTLE);
+        OpcodeType opcode_type = decode_opcode(opcode);
+        
+        switch (opcode)
+        {
+            case BRANCH: opcode_branch(opcode);
+            
+            default:
+                break;
+        }
+        
+        
+        
+    }   
 }

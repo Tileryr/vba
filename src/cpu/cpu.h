@@ -4,6 +4,7 @@
 #include "cpu_types.h"
 #include "psr.h"
 #include "register.h"
+#include "opcode_type.h"
 
 #include "../utils.h"
 
@@ -28,11 +29,15 @@ typedef struct ARM7TDMI {
         void trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int priority, int pc_offset);
         void return_from_exception();
 
+        OpcodeType decode_opcode(Word opcode);
+
+        void opcode_branch(Word opcode);
     public:
         ARM7TDMI();
 
+        Byte * memory;
+
         Word read_register(int register_number);
-        
         void write_register(int register_number, Word register_value);
 
         bool condition_field(int condition_code);
@@ -45,6 +50,8 @@ typedef struct ARM7TDMI {
         void exception_data_abort();
         void exception_interrupt();
         void exception_fast_interrupt();
+
+        void run_next_opcode();
 } cpu;
 
 #endif
