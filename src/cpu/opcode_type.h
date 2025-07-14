@@ -5,6 +5,8 @@ enum OpcodeType
 {
     BRANCH,
     BX,
+    SWI,
+    UNDEFINED,
     ALU,
     MULTIPLY
 };

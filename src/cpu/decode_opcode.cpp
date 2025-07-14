@@ -16,4 +16,9 @@ OpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     {
         return SWI;
     }
+    if (Utils::read_bit_range(&opcode, 25, 27) == 0b011
+    ||  Utils::read_bit(&opcode, 4) == 0b1)
+    {
+        return UNDEFINED;
+    }
 }

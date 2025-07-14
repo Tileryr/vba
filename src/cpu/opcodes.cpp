@@ -42,3 +42,9 @@ void ARM7TDMI::opcode_software_interrupt(Word opcode)
 {
     run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
 }
+
+void ARM7TDMI::opcode_undefined_intruction(Word opcode)
+{
+    run_exception(EXCEPTION_UNDEFINED);
+}
+

@@ -211,7 +211,8 @@ void ARM7TDMI::run_next_opcode()
         {
             case BRANCH: opcode_branch(opcode); break;
             case BX: opcode_branch_exchange(opcode); break;
-
+            case SWI: opcode_software_interrupt(opcode); break;
+            case UNDEFINED:
             default:
                 break;
         }
