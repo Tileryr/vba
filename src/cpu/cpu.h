@@ -52,6 +52,7 @@ typedef struct ARM7TDMI {
         void opcode_branch_exchange(Word opcode);
         void opcode_software_interrupt(Word opcode);
         void opcode_undefined_intruction(Word opcode);
+        void opcode_data_processing(Word opcode);
     public:
         ARM7TDMI();
 

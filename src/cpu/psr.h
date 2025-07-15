@@ -22,10 +22,10 @@ typedef struct ProgramStatusRegister {
     ProgramStatusRegister();
     Word value();
     // Flags
-    bool n;
-    bool z;
-    bool c;
-    bool v;
+    bool n; // Negative
+    bool z; // Zero
+    bool c; // Carry
+    bool v; // Overflow
 
     bool i; // IRQ Disable;
     bool f; // FIQ Disable;

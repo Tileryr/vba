@@ -1,4 +1,6 @@
 #include "./utils.h"
+#include <cstdio>
+#include <assert.h>
 
 void Utils::write_bit(unsigned int * number, unsigned int bit_number, bool bit_value) 
 {
@@ -36,6 +38,23 @@ int Utils::sign_extend(int base_number, int bits_in_base) {
     return (base_number ^ mask) - mask;
 };
 
+int Utils::arithmetic_right_shift(int number, unsigned int shift_amount) {
+    return number >> shift_amount;
+}
+
+unsigned int Utils::logical_right_shift(int number, unsigned int shift_amount, unsigned int bit_size) {
+    unsigned int mask = ((1 << bit_size) - 1);
+    unsigned int unsigned_number = number & mask;
+    return (unsigned_number >> shift_amount);
+}
+
+int Utils::rotate_right(unsigned int number, unsigned int rotate_amount, unsigned int bit_size) {
+    int right_shifted_number = number >> rotate_amount;
+    int rotated_bits = number << (bit_size - rotate_amount);
+    int result = right_shifted_number | rotated_bits;
+    result = result & ((1 << bit_size) - 1);
+    return result;
+}
 
 Word Utils::make_word(Byte byte_1, Byte byte_2, Byte byte_3, Byte byte_4)
 {
@@ -56,5 +75,7 @@ Word Utils::current_word_at_memory(Byte * memory, Endian endian_type)
     {
         return make_word(memory[0], memory[1], memory[2], memory[3]);
     }
+
+    assert(false);
 }
 

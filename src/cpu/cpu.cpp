@@ -212,14 +212,16 @@ void ARM7TDMI::run_next_opcode()
             case BRANCH: opcode_branch(opcode); break;
             case BX: opcode_branch_exchange(opcode); break;
             case SWI: opcode_software_interrupt(opcode); break;
-            case UNDEFINED:
+            case UNDEFINED: opcode_undefined_intruction(opcode); break;
+
+            case ALU: break;
             default:
                 break;
         }
 
         switch (current_exception_return_type)
         {
-            case E_RETURN_NEXT:
+            case E_RETURN_NEXT: {
                 bool is_ALU = opcode_type == ALU;
                 bool is_MOV = Utils::read_bit_range(&opcode, 21, 24) == 0xD;
                 bool S_on = Utils::read_bit(&opcode, 20);
@@ -231,6 +233,7 @@ void ARM7TDMI::run_next_opcode()
                 {
                     cpsr = current_register_set()->spsr;
                 }
+            }
             default:
                 break;
         }

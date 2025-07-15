@@ -7,6 +7,8 @@ enum OpcodeType
     BX,
     SWI,
     UNDEFINED,
+
+    
     ALU,
     MULTIPLY
 };
