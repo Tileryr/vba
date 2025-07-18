@@ -1,8 +1,10 @@
+#include <cstdio>
+#include <limits.h>
+
 #include "cpu.h"
 #include "opcode_type.h"
 #include "cpu_types.h"
-
-#include <cstdio>
+#include "alu.h"
 
 void ARM7TDMI::opcode_branch(Word opcode)
 {
@@ -60,7 +62,6 @@ void ARM7TDMI::opcode_data_processing(Word opcode)
     Byte destination_register = Utils::read_bit_range(&opcode, 12, 15);
     Word second_operand;
 
-    
     if (!immediate_operand_2) // Register OP2
     {
         enum ShiftType {
@@ -117,8 +118,9 @@ void ARM7TDMI::opcode_data_processing(Word opcode)
     }
 
 
-    Byte first_register_value = read_register(first_operand_register);
-    Word result;
+    Word first_register_value = read_register(first_operand_register);
+    u_int64_t result;
+    CPUMATH alu;
 
     bool set_destination = true;
     switch (intruction)
@@ -129,23 +131,23 @@ void ARM7TDMI::opcode_data_processing(Word opcode)
         case 0x1: // EOR
             result = first_register_value ^ second_operand;
             break;
-        case 0x2: // SUB
-            result = first_register_value - second_operand;
+        case 0x2: // SUB 
+            result = alu.subtract(1, first_register_value, second_operand);
             break;
         case 0x3: // RSB
-            result = second_operand - first_register_value;
+            result = alu.subtract(1, second_operand, first_register_value);
             break;
         case 0x4: // ADD
-            result = first_register_value + second_operand;
+            result = alu.add(2, first_register_value, second_operand);
             break;
         case 0x5: // ADC
-            result = first_register_value + second_operand + cpsr.c;
+            result = alu.add(3, first_register_value, second_operand, cpsr.c);
             break;
         case 0x6: // SBC
-            result = first_register_value - second_operand + (cpsr.c - 1);
+            result = alu.subtract(2, first_register_value, second_operand, -(cpsr.c - 1));
             break;
         case 0x7: // RSC
-            result = second_operand - first_register_value + (cpsr.c - 1);
+            result = alu.subtract(2, second_operand, first_register_value, -(cpsr.c - 1));
             break;
         case 0x8: // TST
             result = first_operand_register & second_operand;
@@ -156,11 +158,11 @@ void ARM7TDMI::opcode_data_processing(Word opcode)
             set_destination = false;
             break;
         case 0xA: // CMP
-            result = first_operand_register - second_operand;
+            result = alu.subtract(1, first_register_value, second_operand);
             set_destination = false;
             break;
         case 0xB: // CMN
-            result = first_operand_register + second_operand;
+            result = alu.add(2, first_register_value, second_operand);
             set_destination = false;
             break;
         case 0xC: // ORR
@@ -179,10 +181,24 @@ void ARM7TDMI::opcode_data_processing(Word opcode)
             printf("Instruction out of range (ALU)");
     }
 
+    int64_t result_signed = result;
+    Word result_word = result & 0xFFFF'FFFF;
+
     if (set_destination) 
     {
-        write_register(destination_register, result);
+        write_register(destination_register, result_word);
     }
     
+    if (!set_destination && set_condition_codes)
+    {
+        cpsr.c = alu.carry_flag;
+        cpsr.z = result == 0;
+        cpsr.n = Utils::read_bit(&result_word, 31);
+        if (result_signed > INT_MAX || result_signed < INT_MIN)
+            cpsr.v = 1;
+        else
+            cpsr.v = 0;
+
+    }
 }
 

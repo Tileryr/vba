@@ -192,7 +192,7 @@ void ARM7TDMI::run_exception(Exception exception_type) {
     }
 };
 
-void ARM7TDMI::run_next_opcode() 
+void ARM7TDMI::run_next_opcode()
 {   
     Word pc = read_register(REGISTER_PC);
     Byte * current_memory_place = &memory[pc];

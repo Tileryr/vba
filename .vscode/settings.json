@@ -1,6 +1,12 @@
 {
     "files.associations": {
         "limits": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "bit": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "cmath": "cpp",
+        "new": "cpp",
+        "cstdio": "cpp"
     }
 }
