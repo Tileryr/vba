@@ -201,7 +201,7 @@ void ARM7TDMI::run_next_opcode()
         Word opcode = Utils::current_word_at_memory(current_memory_place, ENDIAN_LITTLE);
         OpcodeType opcode_type = decode_opcode_arm(opcode);
 
-        Byte condition_code = Utils::read_bit_range(&opcode, 28, 31);
+        Byte condition_code = Utils::read_bit_range(opcode, 28, 31);
         if (condition_field(condition_code) == false) 
         {
             return;
@@ -223,11 +223,11 @@ void ARM7TDMI::run_next_opcode()
         {
             case E_RETURN_NEXT: {
                 bool is_ALU = opcode_type == ALU;
-                bool is_MOV = Utils::read_bit_range(&opcode, 21, 24) == 0xD;
-                bool S_on = Utils::read_bit(&opcode, 20);
-                bool is_PC_destination = Utils::read_bit_range(&opcode, 12, 15) == REGISTER_PC;
-                bool is_register_op2 = Utils::read_bit(&opcode, 25) == 0;
-                bool op2_is_ls = Utils::read_bit_range(&opcode, 0, 3) == REGISTER_LS;
+                bool is_MOV = Utils::read_bit_range(opcode, 21, 24) == 0xD;
+                bool S_on = Utils::read_bit(opcode, 20);
+                bool is_PC_destination = Utils::read_bit_range(opcode, 12, 15) == REGISTER_PC;
+                bool is_register_op2 = Utils::read_bit(opcode, 25) == 0;
+                bool op2_is_ls = Utils::read_bit_range(opcode, 0, 3) == REGISTER_LS;
 
                 if (is_ALU && is_MOV && S_on && is_PC_destination && is_register_op2 && op2_is_ls)
                 {

@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <assert.h>
 
-void Utils::write_bit(unsigned int * number, unsigned int bit_number, bool bit_value) 
+void Utils::write_bit(Word * number, unsigned int bit_number, bool bit_value) 
 {
     if (bit_value == 0)
         *number = *number & (~(1 << bit_number));
@@ -10,20 +10,20 @@ void Utils::write_bit(unsigned int * number, unsigned int bit_number, bool bit_v
         *number = *number | (1 << bit_number);
 }
 
-bool Utils::read_bit(unsigned int * number, unsigned int bit_number) 
+bool Utils::read_bit(u_int64_t number, unsigned int bit_number) 
 {
-    return (*number >> bit_number) & 1;
+    return (number >> bit_number) & 1;
 }
 
-void Utils::write_bit_range(unsigned int * number, unsigned int bit_range_start, unsigned int bit_range_end, unsigned int bit_value) 
+void Utils::write_bit_range(Word * number, unsigned int bit_range_start, unsigned int bit_range_end, unsigned int bit_value) 
 {
     for (int i = 0; i < bit_range_end + 1; i++)
     {
-        write_bit(number, bit_range_start + i, read_bit(&bit_value, i));
+        write_bit(number, bit_range_start + i, read_bit(bit_value, i));
     }
 }
 
-int Utils::read_bit_range(unsigned int * number, unsigned int bit_range_start, unsigned int bit_range_end) 
+int Utils::read_bit_range(u_int64_t number, unsigned int bit_range_start, unsigned int bit_range_end) 
 {
     int result = 0;
     for (int i = 0; i < bit_range_end + 1; i++)
@@ -48,7 +48,7 @@ unsigned int Utils::logical_right_shift(int number, unsigned int shift_amount, u
     return (unsigned_number >> shift_amount);
 }
 
-int Utils::rotate_right(unsigned int number, unsigned int rotate_amount, unsigned int bit_size) {
+unsigned int Utils::rotate_right(unsigned int number, unsigned int rotate_amount, unsigned int bit_size) {
     int right_shifted_number = number >> rotate_amount;
     int rotated_bits = number << (bit_size - rotate_amount);
     int result = right_shifted_number | rotated_bits;

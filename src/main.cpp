@@ -6,7 +6,7 @@
 #include <cstdio>
 
 struct ARM7TDMI ArmCPU;
-CPUMATH alu;
+CpuALU alu;
 
 int main(int argc, char **argv )
 {   
