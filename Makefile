@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-pedantic
 
-SRC=$(wildcard src/*.cpp) $(wildcard src/cpu/*.cpp)
+SRC=$(wildcard src/*.cpp) $(wildcard src/cpu/*.cpp) $(wildcard src/cpu/opcodes/*.cpp)
 OBJ=$(SRC:%.cpp=%.o)
 DEP=$(OBJ:%.o=%.d)
 

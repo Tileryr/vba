@@ -48,31 +48,19 @@ void ARM7TDMI::set_fiq(bool fiq_on)
     cpsr.f = fiq_on ? 0 : 1;
 }
 
-void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int priority, ExceptionReturnType return_mode)
+void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_vector, unsigned int saved_pc_offset, int priority)
 {
     RegisterSet * new_register_set = mode_to_register_set(new_mode);
     Word pc_value = read_register(REGISTER_PC);
     Word ls_value = pc_value;
 
-    switch (return_mode)
-    {
-        case E_RETURN_NEXT:
-            if (cpsr.t == STATE_ARM)
-                ls_value += 4;
-            else
-                ls_value += 2;
-        case E_RETURN_RETRY:
-            ls_value += 4;
-        case E_RETURN_DATA_ABORT:
-            ls_value += 8;
-    }
+    ls_value += saved_pc_offset;
     *new_register_set->registers[REGISTER_LS] = ls_value;
 
     new_register_set->spsr = cpsr;
     cpsr.t = STATE_ARM;
     cpsr.mode = new_mode;
     cpsr.i = true;
-    current_exception_return_type = return_mode;
 
     write_register(REGISTER_PC, exception_vector);
 };
@@ -165,32 +153,37 @@ void ARM7TDMI::run_exception(Exception exception_type) {
     switch (exception_type)
     {
         case EXCEPTION_RESET:
-            trigger_exception(MODE_SUPERVISOR, 0x00, 1, E_RETURN_NONE);
+            trigger_exception(MODE_SUPERVISOR, 0x00, 0, 1);
             cpsr.f = true;
             break;
         case EXCEPTION_UNDEFINED:
-            trigger_exception(MODE_UNDEFINED, 0x04, 7, E_RETURN_NEXT);
+            trigger_exception(MODE_UNDEFINED, 0x04, 4, 7);
             break;
         case EXCEPTION_SOFTWARE_INTERRUPT:
-            trigger_exception(MODE_SUPERVISOR, 0x08, 6, E_RETURN_NEXT);
+            trigger_exception(MODE_SUPERVISOR, 0x08, 4, 6);
             break;
         case EXCEPTION_PREFETCH_ABORT:
-            trigger_exception(MODE_ABORT, 0x0C, 5, E_RETURN_RETRY);
+            trigger_exception(MODE_ABORT, 0x0C, 4, 5);
             break;
         case EXCEPTION_DATA_ABORT:
-            trigger_exception(MODE_ABORT, 0x10, 2, E_RETURN_DATA_ABORT);
+            trigger_exception(MODE_ABORT, 0x10, 8, 2);
             break;
         case EXCEPTION_INTERRUPT:
             if (cpsr.i) break;
-            trigger_exception(MODE_IRQ, 0x18, 4, E_RETURN_RETRY);
+            trigger_exception(MODE_IRQ, 0x18, 4, 4);
             break;
         case EXCEPTION_FAST_INTERRUPT:
             if (cpsr.f) break;
-            trigger_exception(MODE_FIQ, 0x1C, 3, E_RETURN_RETRY);
+            trigger_exception(MODE_FIQ, 0x1C, 4, 3);
             cpsr.f = true;
             break;
     }
 };
+
+void ARM7TDMI::warn(char* msg)
+{
+    return;
+}
 
 void ARM7TDMI::run_next_opcode()
 {   
@@ -213,31 +206,12 @@ void ARM7TDMI::run_next_opcode()
             case BX: opcode_branch_exchange(opcode); break;
             case SWI: opcode_software_interrupt(opcode); break;
             case UNDEFINED: opcode_undefined_intruction(opcode); break;
-
-            case ALU: break;
-            default:
-                break;
-        }
-
-        switch (current_exception_return_type)
-        {
-            case E_RETURN_NEXT: {
-                bool is_ALU = opcode_type == ALU;
-                bool is_MOV = Utils::read_bit_range(opcode, 21, 24) == 0xD;
-                bool S_on = Utils::read_bit(opcode, 20);
-                bool is_PC_destination = Utils::read_bit_range(opcode, 12, 15) == REGISTER_PC;
-                bool is_register_op2 = Utils::read_bit(opcode, 25) == 0;
-                bool op2_is_ls = Utils::read_bit_range(opcode, 0, 3) == REGISTER_LS;
-
-                if (is_ALU && is_MOV && S_on && is_PC_destination && is_register_op2 && op2_is_ls)
-                {
-                    cpsr = current_register_set()->spsr;
-                }
-            }
+            case ALU: opcode_data_processing(opcode); break;
+            case MULTIPLY: opcode_multiply(opcode); break;
+            case MULTIPLY_LONG: opcode_multiply_long(opcode); break;
             default:
                 break;
         }
     }   
-
-    
 }
+

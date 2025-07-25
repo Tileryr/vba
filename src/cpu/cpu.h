@@ -18,13 +18,6 @@ enum Exception {
     EXCEPTION_FAST_INTERRUPT
 };
 
-enum ExceptionReturnType {
-    E_RETURN_NONE,
-    E_RETURN_NEXT,
-    E_RETURN_RETRY,
-    E_RETURN_DATA_ABORT
-};
-
 typedef struct ARM7TDMI {
     public:
         RegisterSet registers_user;
@@ -35,7 +28,6 @@ typedef struct ARM7TDMI {
         RegisterSet registers_undefined;
 
         ProgramStatusRegister cpsr;
-        ExceptionReturnType current_exception_return_type;
 
         RegisterSet * mode_to_register_set(OperatingMode mode);
         RegisterSet * current_register_set();
@@ -44,7 +36,7 @@ typedef struct ARM7TDMI {
 
         void set_fiq(bool fiq_on);
 
-        void trigger_exception(OperatingMode new_mode, unsigned int exception_vector, int priority, ExceptionReturnType return_mode);
+        void trigger_exception(OperatingMode new_mode, unsigned int exception_vector, unsigned int saved_pc_offset, int priority);
 
         OpcodeType decode_opcode_arm(Word opcode);
 
@@ -53,6 +45,10 @@ typedef struct ARM7TDMI {
         void opcode_software_interrupt(Word opcode);
         void opcode_undefined_intruction(Word opcode);
         void opcode_data_processing(Word opcode);
+        void opcode_multiply(Word opcode);
+        void opcode_multiply_long(Word opcode);
+        
+        void warn(char* msg);
     public:
         ARM7TDMI();
 

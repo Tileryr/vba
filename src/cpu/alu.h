@@ -2,6 +2,7 @@
 #define ALU_INCLUDED
 
 #include <stdint.h>
+#include "cpu_types.h"
 
 typedef struct ArithmaticLogicUnit {
     bool carry_flag;

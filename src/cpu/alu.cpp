@@ -36,7 +36,7 @@ Word ArithmaticLogicUnit::subtract(int total_subtrahends, Word base, ...)
     u_int64_t result = base;
     va_list addends;
 
-    va_start(addends, total_subtrahends);
+    va_start(addends, base);
     for (int i = 0; i < total_subtrahends; i++)
     {
         Word arg = va_arg(addends, Word);

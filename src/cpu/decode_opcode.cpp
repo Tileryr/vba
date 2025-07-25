@@ -21,9 +21,18 @@ OpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     {
         return UNDEFINED;
     }
-
     if (Utils::read_bit_range(opcode, 26, 27) == 0b00)
     {
         return ALU;
+    }
+    if (Utils::read_bit_range(opcode, 22, 27) == 0b000000
+    &&  Utils::read_bit_range(opcode, 4,  7 ) == 0b1001)
+    {
+        return MULTIPLY_LONG;
+    }
+    if (Utils::read_bit_range(opcode, 23, 27) == 0b00001
+    &&  Utils::read_bit_range(opcode, 4,  7 ) == 0b1001)
+    {
+        return MULTIPLY_LONG;
     }
 }
