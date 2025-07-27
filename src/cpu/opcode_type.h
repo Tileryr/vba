@@ -7,11 +7,12 @@ enum OpcodeType
     BX,
     SWI,
     UNDEFINED,
-
     
     ALU,
     MULTIPLY,
     MULTIPLY_LONG,
+
+    PSR_TRANSFER
 };
 
 #endif

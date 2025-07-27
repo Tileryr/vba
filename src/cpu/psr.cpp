@@ -19,3 +19,13 @@ Word ProgramStatusRegister::value() {
     return *value;
 };
 
+void ProgramStatusRegister::write_value(Word value) {
+    n = Utils::read_bit(value, 31);
+    z = Utils::read_bit(value, 30);
+    c = Utils::read_bit(value, 29);
+    v = Utils::read_bit(value, 28);
+    i = Utils::read_bit(value, 7);
+    f = Utils::read_bit(value, 6);
+    t = (CPUState)Utils::read_bit(value, 5);
+    mode = (OperatingMode)Utils::read_bit_range(value, 0, 4);
+} 

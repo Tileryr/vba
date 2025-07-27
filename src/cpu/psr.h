@@ -21,6 +21,7 @@ enum OperatingMode {
 typedef struct ProgramStatusRegister {
     ProgramStatusRegister();
     Word value();
+    void write_value(Word value);
     // Flags
     bool n; // Negative
     bool z; // Zero

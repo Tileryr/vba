@@ -10,6 +10,7 @@
 #include "./opcodes/data_processing.h"
 #include "./opcodes/multiply.h"
 #include "./opcodes/multiply_long.h"
+#include "./opcodes/psr_transfer.h"
 
 void ARM7TDMI::opcode_branch(Word opcode)
 {
@@ -178,3 +179,25 @@ void ARM7TDMI::opcode_multiply_long(Word opcode)
         cpsr.v = rand() & 1;
     }
 }
+ 
+void ARM7TDMI::opcode_psr_transfer(Word opcode)
+{
+    OpcodePsrTransfer psr_transfer = OpcodePsrTransfer(opcode);
+    PSR * target_psr = psr_transfer.psr == 0 
+        ? &cpsr 
+        : &current_register_set()->spsr;
+
+    if (psr_transfer.is_msr_instruction) {
+        if (psr_transfer.only_write_flag) {
+             if (psr_transfer.immediate_operand) {
+
+            }
+        } else {
+            
+        }
+    } else { // MRS
+        Byte destination_register = psr_transfer.register_destination;
+        write_register(destination_register, target_psr->value());  
+    }
+
+};
