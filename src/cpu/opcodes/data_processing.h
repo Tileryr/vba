@@ -90,7 +90,7 @@ typedef struct OpcodeDataProcess {
 
     Word calculate_immediate_op2( Byte immediate, unsigned int ror_shift);
     u_int64_t calculate_instruction(InstructionType instruction, Word rn, Word op2, bool c_flag);
-    Word shift_op2(Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag);
+    static Word shift_op2(CpuALU alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag);
     void set_psr_flags(PSR * psr, u_int64_t result, OperationClass operation_class);
 
     Byte get_op_2_register_shift_amount(bool shift_by_register, Word shift_register_value);

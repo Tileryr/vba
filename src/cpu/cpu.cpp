@@ -191,7 +191,7 @@ void ARM7TDMI::run_next_opcode()
     Byte * current_memory_place = &memory[pc];
 
     if (cpsr.t == STATE_ARM) {
-        Word opcode = Utils::current_word_at_memory(current_memory_place, ENDIAN_LITTLE);
+        Word opcode = Utils::current_word_at_memory(current_memory_place, endian_type);
         OpcodeType opcode_type = decode_opcode_arm(opcode);
 
         Byte condition_code = Utils::read_bit_range(opcode, 28, 31);
@@ -209,6 +209,8 @@ void ARM7TDMI::run_next_opcode()
             case ALU: opcode_data_processing(opcode); break;
             case MULTIPLY: opcode_multiply(opcode); break;
             case MULTIPLY_LONG: opcode_multiply_long(opcode); break;
+            case PSR_TRANSFER: opcode_psr_transfer(opcode); break;
+            case SINGLE_DATA_TRANSFER: opcode_single_data_transfer(opcode); break;
             default:
                 break;
         }

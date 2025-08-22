@@ -60,7 +60,7 @@ Word OpcodeDataProcess::calculate_immediate_op2( Byte immediate, unsigned int ro
         return rotated_immediate;
 }
 
-Word OpcodeDataProcess::shift_op2(Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag)
+Word OpcodeDataProcess::shift_op2(CpuALU alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag)
 {
     switch (bit_shift_type)
     {

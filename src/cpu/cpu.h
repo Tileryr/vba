@@ -20,6 +20,8 @@ enum Exception {
 
 typedef struct ARM7TDMI {
     public:
+        const Endian endian_type = ENDIAN_LITTLE;
+        
         RegisterSet registers_user;
         RegisterSet registers_fiq;
         RegisterSet registers_irq;
@@ -48,6 +50,7 @@ typedef struct ARM7TDMI {
         void opcode_multiply(Word opcode);
         void opcode_multiply_long(Word opcode);
         void opcode_psr_transfer(Word opcode);
+        void opcode_single_data_transfer(Word opcode);
         
         void warn(char* msg);
     public:

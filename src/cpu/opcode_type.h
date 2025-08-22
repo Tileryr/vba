@@ -12,7 +12,8 @@ enum OpcodeType
     MULTIPLY,
     MULTIPLY_LONG,
 
-    PSR_TRANSFER
+    PSR_TRANSFER,
+    SINGLE_DATA_TRANSFER
 };
 
 #endif
