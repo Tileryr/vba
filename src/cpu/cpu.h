@@ -51,7 +51,7 @@ typedef struct ARM7TDMI {
         void opcode_multiply_long(Word opcode);
         void opcode_psr_transfer(Word opcode);
         void opcode_single_data_transfer(Word opcode);
-        
+        void opcode_half_word_signed_data_transfer(Word opcode);
         void warn(char* msg);
     public:
         ARM7TDMI();

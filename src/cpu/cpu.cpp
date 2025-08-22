@@ -211,6 +211,7 @@ void ARM7TDMI::run_next_opcode()
             case MULTIPLY_LONG: opcode_multiply_long(opcode); break;
             case PSR_TRANSFER: opcode_psr_transfer(opcode); break;
             case SINGLE_DATA_TRANSFER: opcode_single_data_transfer(opcode); break;
+            case HALF_WORD_SIGNED_DATA_TRANSFER: opcode_half_word_signed_data_transfer(opcode); break;
             default:
                 break;
         }

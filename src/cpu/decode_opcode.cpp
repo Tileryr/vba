@@ -35,4 +35,16 @@ OpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     {
         return MULTIPLY_LONG;
     }
+    if (Utils::read_bit_range(opcode, 27, 26) == 0b00
+    &&  Utils::read_bit_range(opcode, 24, 23) == 0b10
+    &&  Utils::read_bit(opcode, 20) == 0b0
+    ) {
+        return PSR_TRANSFER;
+    }
+    if (Utils::read_bit_range(opcode, 26, 27) == 0b01) {
+        return SINGLE_DATA_TRANSFER;
+    }
+    if (Utils::read_bit_range(opcode, 25, 27) == 0b000) {
+        return HALF_WORD_SIGNED_DATA_TRANSFER;
+    }
 }

@@ -12,6 +12,7 @@
 #include "./opcodes/multiply_long.h"
 #include "./opcodes/psr_transfer.h"
 #include "./opcodes/single_data_transfer.h"
+#include "./opcodes/half_word_signed_data_transfer.h"
 
 void ARM7TDMI::opcode_branch(Word opcode)
 {
@@ -216,9 +217,13 @@ void ARM7TDMI::opcode_psr_transfer(Word opcode)
 void ARM7TDMI::opcode_single_data_transfer(Word opcode)
 {
     OpcodeSingleDataTransfer data_transfer = OpcodeSingleDataTransfer(opcode);
-    Word address;
+    
     Word offset;
 
+    if (data_transfer.offset_register == REGISTER_PC) {
+        warn("Single Data Transfer - Offset register == PC");
+    }
+    
     if (data_transfer.i == 1) { // Offset = Shifted Register
         Word offset_register_value = read_register(data_transfer.offset_register);
         OpcodeDataProcess::BitShiftType shift_type = static_cast<OpcodeDataProcess::BitShiftType>(data_transfer.register_shift_type);
@@ -227,39 +232,7 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
         offset = data_transfer.offset_immediate;
     }
 
-    Word offseted_base_register;
-    Word base_register_value = read_register(data_transfer.base_register);
-
-    if (data_transfer.base_register == REGISTER_PC) {
-        if (data_transfer.w) {
-            warn("Single Data Transfer - Base register == PC && writeback");
-        }
-        base_register_value += 8;
-    }
-    if (data_transfer.offset_register == REGISTER_PC) {
-        warn("Single Data Transfer - Offset register == PC");
-    }
-
-    if (data_transfer.u == 0) { // Down - Subtract
-        offseted_base_register = base_register_value - offset;
-    } else { // Up - Add
-        offseted_base_register = base_register_value + offset;
-    }
-
-    if (data_transfer.p == 1) { // Pre-Indexed
-        address = offseted_base_register;
-    } else {
-        address = base_register_value;
-    }
-
-    if (data_transfer.w == 1) { // Write-back
-        write_register(
-            data_transfer.base_register, 
-            address
-        );
-    }
-
-    Word word_at_address;
+    Word address = data_transfer.calculate_address(this, offset);
 
     // For little endian only
     if (data_transfer.l == 0) { // Store
@@ -267,7 +240,7 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
         if (data_transfer.source_destination_register == REGISTER_PC) {
             stored_register += 12;
         }
-        
+
         if (data_transfer.b == 1) { // Byte
             Byte stored_byte = stored_register & 0xFF;
             memory[address] = stored_byte;
@@ -296,11 +269,59 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
             );
         }
     }
+}
+void ARM7TDMI::opcode_half_word_signed_data_transfer(Word opcode) {
+    OpcodeHalfWordSignedDataTransfer data_transfer = OpcodeHalfWordSignedDataTransfer(opcode);
 
-    if (data_transfer.p == 0) { // Post-indexed
-        write_register(
-            data_transfer.base_register, 
-            offseted_base_register
-        );
+    Word offset;
+
+    if (data_transfer.offset_register == REGISTER_PC) {
+        warn("Single Data Transfer - Offset register == PC");
     }
+
+    if (data_transfer.i == 0) { // Register Offset
+        offset = read_register(data_transfer.offset_register);
+    } else { // Immediate Offset
+        offset = (data_transfer.immediate_high_nibble << 4) || data_transfer.immediate_low_nibble;
+    }
+
+    Word address = data_transfer.calculate_address(this, offset);
+
+    // For little endian
+    if (data_transfer.l == 0) { // Store
+        Word stored_register = read_register(data_transfer.source_destination_register);
+        if (data_transfer.source_destination_register == REGISTER_PC) {
+            stored_register += 12;
+        }
+
+        if (data_transfer.s == 0) { // Unsigned
+            if (data_transfer.h == 0) { // Byte || Reserved for SWP
+
+            } else { // Halfword || STRH
+                HalfWord selected_halfword = stored_register & 0xFFFF;
+                memory[address + 0] = (selected_halfword >> 0) & 0xFF;
+                memory[address + 1] = (selected_halfword >> 8) & 0xFF;
+            }
+        } else { // Signed
+            warn("Half-Word signed data transfer - Storing signed value");
+        }
+    } else { // Load
+        if (data_transfer.s == 0) { // Unsigned
+            if (data_transfer.h == 0) { // Byte || Reserved for SWP
+
+            } else { // Halfword || LDRH
+                HalfWord selected_halfword = memory[address] || (memory[address + 1] << 8);
+                write_register(data_transfer.source_destination_register, selected_halfword);
+            }
+        } else { // Signed
+            if (data_transfer.h == 0) { // Byte || LDRSB
+                Byte selected_byte = memory[address];
+                write_register(data_transfer.source_destination_register, Utils::sign_extend(selected_byte, 8));
+            } else { // Halfword || LDRSH
+                HalfWord selected_halfword = memory[address] || (memory[address + 1] << 8);
+                write_register(data_transfer.source_destination_register, Utils::sign_extend(selected_halfword, 16));
+            }
+        }
+    }
+    
 }
