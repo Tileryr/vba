@@ -230,6 +230,7 @@ void ARM7TDMI::run_next_opcode()
             case SINGLE_DATA_TRANSFER: opcode_single_data_transfer(opcode); break;
             case HALF_WORD_SIGNED_DATA_TRANSFER: opcode_half_word_signed_data_transfer(opcode); break;
             case BLOCK_DATA_TRANSFER: opcode_block_data_transfer(opcode); break;
+            case SWAP: opcode_swap(opcode); break;
             default:
                 break;
         }

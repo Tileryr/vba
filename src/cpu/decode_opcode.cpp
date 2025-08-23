@@ -50,4 +50,8 @@ OpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     if (Utils::read_bit_range(opcode, 25, 27) == 0b100) {
         return BLOCK_DATA_TRANSFER;
     }
+    if (Utils::read_bit_range(opcode, 23, 27) == 0b00010 &&
+        Utils::read_bit_range(opcode, 4,  11) == 0b00001001) {
+        return SWAP;
+    }
 }

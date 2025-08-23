@@ -14,6 +14,7 @@
 #include "./opcodes/single_data_transfer.h"
 #include "./opcodes/half_word_signed_data_transfer.h"
 #include "./opcodes/block_data_transfer.h"
+#include "./opcodes/swap.h"
 
 void ARM7TDMI::opcode_branch(Word opcode)
 {
@@ -219,16 +220,16 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
 {
     OpcodeSingleDataTransfer data_transfer = OpcodeSingleDataTransfer(opcode);
     
-    Word offset;
-
     if (data_transfer.offset_register == REGISTER_PC) {
         warn("Single Data Transfer - Offset register == PC");
     }
-    
+
+    Word offset;
+
     if (data_transfer.i == 1) { // Offset = Shifted Register
         Word offset_register_value = read_register(data_transfer.offset_register);
         OpcodeDataProcess::BitShiftType shift_type = static_cast<OpcodeDataProcess::BitShiftType>(data_transfer.register_shift_type);
-        offset = OpcodeDataProcess::shift_op2(CpuALU(), offset_register_value, data_transfer.register_shift_amount, shift_type, cpsr.c);
+        offset = OpcodeDataProcess::shift_op2(CpuALU(), offset_register_value, data_transfer.register_shift_amount, shift_type, cpu->cpsr.c);
     } else { // Offset = immediate value
         offset = data_transfer.offset_immediate;
     }
@@ -237,34 +238,9 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
 
     // For little endian only
     if (data_transfer.l == 0) { // Store
-        Word stored_register = read_register(data_transfer.source_destination_register);
-        if (data_transfer.source_destination_register == REGISTER_PC) {
-            stored_register += 12;
-        }
-
-        if (data_transfer.b == 1) { // Byte
-            Byte stored_byte = stored_register & 0xFF;
-            memory[address] = stored_byte;
-        } else { // Word
-            Word aligned_address = address & (~0b11);
-            write_word_to_memory(aligned_address, stored_register);
-        }
+        data_transfer.store(this, address, data_transfer.source_destination_register, data_transfer.b);
     } else { // Load
-        if (data_transfer.b == 1) { // Byte
-            write_register(
-            data_transfer.source_destination_register,
-            memory[address]
-            );
-        } else { // Word
-            u_int16_t aligned_offset = address % 4;
-            Word aligned_address = address & (~0b11);
-            Word word_at_address = read_word_from_memory(aligned_address);
-            Word rotated_word_at_address = CpuALU().rotate_right(word_at_address, (4 - aligned_offset) * 8); // Rotate it so that the first byte is the target byte in the address. 
-            write_register(
-                data_transfer.source_destination_register,
-                rotated_word_at_address
-            );
-        }
+        data_transfer.load(this, address, data_transfer.source_destination_register, data_transfer.b);
     }
 }
 
@@ -325,7 +301,7 @@ void ARM7TDMI::opcode_half_word_signed_data_transfer(Word opcode) {
 }
 
 void ARM7TDMI::opcode_block_data_transfer(Word opcode) {
-    BlockDataTransfer data_transfer = BlockDataTransfer(opcode);
+    OpcodeBlockDataTransfer data_transfer = OpcodeBlockDataTransfer(opcode);
     Word base_address = read_register(data_transfer.base_register);
     
     if (is_priviledged() && data_transfer.s == 1) {
@@ -381,7 +357,11 @@ void ARM7TDMI::opcode_block_data_transfer(Word opcode) {
             if (stored_register_is_base_register && first_stored_register) {
                 write_word_to_memory(current_address, base_address);
             } else {
-                write_word_to_memory(current_address, *target_register_set->registers[i]);
+                Word register_value = *target_register_set->registers[i];
+                if (i == REGISTER_PC) {
+                    register_value += 12;
+                }
+                write_word_to_memory(current_address, register_value);
             }
 
         } else { // Load | Memory -> Register
@@ -397,3 +377,18 @@ void ARM7TDMI::opcode_block_data_transfer(Word opcode) {
     }
 }
 
+void ARM7TDMI::opcode_swap(Word opcode) {
+    OpcodeSwap swap = OpcodeSwap(opcode);
+    if (swap.base_register == REGISTER_PC ||
+        swap.source_register == REGISTER_PC ||
+        swap.destination_register == REGISTER_PC
+    ) {
+        warn("Swap -- PC is a register");
+    }
+
+    Word address = read_register(swap.base_register);
+    Word swap_address_value = read_word_from_memory(address);
+
+    OpcodeSingleDataTransfer::store(this, address, swap.source_register, swap.b); // Register -> Memory
+    OpcodeSingleDataTransfer::load(this, address, swap_address_value, swap.destination_register, swap.b); // Memory -> Register
+}

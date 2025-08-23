@@ -14,6 +14,10 @@ typedef struct OpcodeSingleDataTransfer : DataTransfer {
     // if (i == 1) 
     unsigned int register_shift_amount : 5; // 11 - 7
     unsigned int register_shift_type : 2; // 6 - 5
+
+    void static load(ARM7TDMI * cpu, Word address, Byte destination_register, bool byte);
+    void static load(ARM7TDMI * cpu, Word address, Word value, Byte destination_register, bool byte);
+    void static store(ARM7TDMI * cpu, Word address, Byte source_register, bool byte);
 } OpcodeSingleDataTransfer;
 
 #endif

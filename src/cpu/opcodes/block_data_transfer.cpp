@@ -1,7 +1,7 @@
 #include "block_data_transfer.h"
 #include "../../utils.h"
 
-BlockDataTransfer::BlockDataTransfer(Word opcode) {
+OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(Word opcode) {
     p = Utils::read_bit(opcode, 24);
     u = Utils::read_bit(opcode, 23);
     s = Utils::read_bit(opcode, 22);

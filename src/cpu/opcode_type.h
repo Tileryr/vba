@@ -16,6 +16,7 @@ enum OpcodeType
     SINGLE_DATA_TRANSFER,
     HALF_WORD_SIGNED_DATA_TRANSFER,
     BLOCK_DATA_TRANSFER,
+    SWAP,
 };
 
 #endif

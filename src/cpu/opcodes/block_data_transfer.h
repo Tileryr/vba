@@ -3,9 +3,9 @@
 
 #include "../cpu_types.h"
 
-typedef struct BlockDataTransfer
+typedef struct OpcodeBlockDataTransfer
 {
-    BlockDataTransfer(Word opcode);
+    OpcodeBlockDataTransfer(Word opcode);
     unsigned int p : 1; // 24
     unsigned int u : 1; // 23
     unsigned int s : 1; // 22
@@ -14,6 +14,6 @@ typedef struct BlockDataTransfer
 
     unsigned int base_register : 4; // 16 - 19
     unsigned int register_list : 16; // 0 - 15
-} BlockDataTransfer;
+} OpcodeBlockDataTransfer;
 
 #endif
