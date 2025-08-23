@@ -47,4 +47,7 @@ OpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     if (Utils::read_bit_range(opcode, 25, 27) == 0b000) {
         return HALF_WORD_SIGNED_DATA_TRANSFER;
     }
+    if (Utils::read_bit_range(opcode, 25, 27) == 0b100) {
+        return BLOCK_DATA_TRANSFER;
+    }
 }

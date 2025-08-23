@@ -27,6 +27,7 @@ RegisterSet * ARM7TDMI::mode_to_register_set(OperatingMode mode)
     }
     assert(false);
 }
+
 RegisterSet * ARM7TDMI::current_register_set() 
 {
     return mode_to_register_set(cpsr.mode);
@@ -64,6 +65,18 @@ void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_
 
     write_register(REGISTER_PC, exception_vector);
 };
+
+Word ARM7TDMI::read_word_from_memory(Word address) {
+    return Utils::current_word_at_memory(&memory[address], endian_type);
+}
+
+void ARM7TDMI::write_word_to_memory(Word address, Word value) {
+    memory[address + 0] = (value >> 0) & 0xFF;
+    memory[address + 1] = (value >> 8) & 0xFF;
+    memory[address + 2] = (value >> 16) & 0xFF;
+    memory[address + 3] = (value >> 24) & 0xFF;
+}
+
 // Public
 
 ARM7TDMI::ARM7TDMI()
@@ -149,6 +162,10 @@ bool ARM7TDMI::condition_field(int condition_code)
     return condition;
 }
 
+bool ARM7TDMI::is_priviledged() {
+    return cpsr.mode != MODE_USER;
+}
+
 void ARM7TDMI::run_exception(Exception exception_type) {
     switch (exception_type)
     {
@@ -180,7 +197,7 @@ void ARM7TDMI::run_exception(Exception exception_type) {
     }
 };
 
-void ARM7TDMI::warn(char* msg)
+void ARM7TDMI::warn(const char * msg)
 {
     return;
 }
@@ -212,6 +229,7 @@ void ARM7TDMI::run_next_opcode()
             case PSR_TRANSFER: opcode_psr_transfer(opcode); break;
             case SINGLE_DATA_TRANSFER: opcode_single_data_transfer(opcode); break;
             case HALF_WORD_SIGNED_DATA_TRANSFER: opcode_half_word_signed_data_transfer(opcode); break;
+            case BLOCK_DATA_TRANSFER: opcode_block_data_transfer(opcode); break;
             default:
                 break;
         }

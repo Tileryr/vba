@@ -13,6 +13,7 @@
 #include "./opcodes/psr_transfer.h"
 #include "./opcodes/single_data_transfer.h"
 #include "./opcodes/half_word_signed_data_transfer.h"
+#include "./opcodes/block_data_transfer.h"
 
 void ARM7TDMI::opcode_branch(Word opcode)
 {
@@ -246,11 +247,7 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
             memory[address] = stored_byte;
         } else { // Word
             Word aligned_address = address & (~0b11);
-            memory[address + 0] = (stored_register >> 0) & 0xFF;
-            memory[address + 1] = (stored_register >> 8) & 0xFF;
-            memory[address + 2] = (stored_register >> 16) & 0xFF;
-            memory[address + 3] = (stored_register >> 24) & 0xFF;
-            Utils::current_word_at_memory(&memory[aligned_address], endian_type);
+            write_word_to_memory(aligned_address, stored_register);
         }
     } else { // Load
         if (data_transfer.b == 1) { // Byte
@@ -261,7 +258,7 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
         } else { // Word
             u_int16_t aligned_offset = address % 4;
             Word aligned_address = address & (~0b11);
-            Word word_at_address = Utils::current_word_at_memory(&memory[aligned_address], endian_type);
+            Word word_at_address = read_word_from_memory(aligned_address);
             Word rotated_word_at_address = CpuALU().rotate_right(word_at_address, (4 - aligned_offset) * 8); // Rotate it so that the first byte is the target byte in the address. 
             write_register(
                 data_transfer.source_destination_register,
@@ -270,6 +267,7 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
         }
     }
 }
+
 void ARM7TDMI::opcode_half_word_signed_data_transfer(Word opcode) {
     OpcodeHalfWordSignedDataTransfer data_transfer = OpcodeHalfWordSignedDataTransfer(opcode);
 
@@ -325,3 +323,77 @@ void ARM7TDMI::opcode_half_word_signed_data_transfer(Word opcode) {
     }
     
 }
+
+void ARM7TDMI::opcode_block_data_transfer(Word opcode) {
+    BlockDataTransfer data_transfer = BlockDataTransfer(opcode);
+    Word base_address = read_register(data_transfer.base_register);
+    
+    if (is_priviledged() && data_transfer.s == 1) {
+        warn("Block Data Transfer - not priviledged && s == 1");
+    }
+    if (data_transfer.base_register == REGISTER_PC) {
+        warn("Block Data Transfer - base_register == PC");
+    }
+
+    Word write_back_address = base_address;
+    bool pc_in_transfer_list = false;
+    for (int i = 0; i < 16; i++) {
+        bool transfer_register = Utils::read_bit(data_transfer.register_list, i);
+        if (transfer_register) {
+            write_back_address += data_transfer.u ? 4 : -4;
+            if (i = 15) {
+                pc_in_transfer_list = true;
+            }
+        }
+    }
+
+    Word current_address = base_address;
+
+    if (data_transfer.u == 0) { // Down
+        current_address = write_back_address;
+    }
+
+    bool pre_increment = data_transfer.u ? data_transfer.p : !data_transfer.p;
+
+    RegisterSet * target_register_set = current_register_set();
+    if ((data_transfer.s == 1) && (!pc_in_transfer_list) || (data_transfer.l == 0)) {
+        target_register_set = &registers_user;
+        if (data_transfer.w == 1) {
+            warn("Block Data Transfer - writeback and using user register bank");
+        }
+    }
+
+    if (data_transfer.w == 1) {
+        write_register(data_transfer.base_register, write_back_address);
+    }
+
+    for (int i = 0; i < 16; i++) {
+        bool transfer_register = Utils::read_bit(data_transfer.register_list, i);
+        if (!transfer_register) {continue;}
+
+        if (pre_increment == 1) {
+            current_address += 4;
+        }
+
+        if (data_transfer.l == 0) { // Store | Register -> Memory
+            bool stored_register_is_base_register = i == data_transfer.base_register;
+            bool first_stored_register = Utils::read_bit_range(data_transfer.register_list, 0, i - 1) == 0;
+            if (stored_register_is_base_register && first_stored_register) {
+                write_word_to_memory(current_address, base_address);
+            } else {
+                write_word_to_memory(current_address, *target_register_set->registers[i]);
+            }
+
+        } else { // Load | Memory -> Register
+            *target_register_set->registers[i] = read_word_from_memory(current_address);
+            if (data_transfer.s == 1 && i == REGISTER_PC) {
+                cpsr = current_register_set()->spsr;
+            }
+        }
+
+        if (pre_increment == 0) {
+            current_address += 4;
+        }
+    }
+}
+

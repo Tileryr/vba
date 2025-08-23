@@ -19,6 +19,10 @@ int main(int argc, char **argv )
     bool c = 0;
 
     Word result = alu.subtract(2, 5, 5, -c + 1);
-    printf("%d", result);
+    
+    for (int i = 0; i < 16; i++) {
+        printf("%d", Utils::read_bit(0b1010101010101010, i));
+    }
+    
     return 0;
 }

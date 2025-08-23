@@ -1,6 +1,8 @@
 #ifndef CPU_INCLUDED
 #define CPU_INCLUDED
 
+#include <string>
+
 #include "cpu_types.h"
 #include "psr.h"
 #include "register.h"
@@ -42,6 +44,11 @@ typedef struct ARM7TDMI {
 
         OpcodeType decode_opcode_arm(Word opcode);
 
+        void warn(const char * msg);
+
+        Word read_word_from_memory(Word address);
+        void write_word_to_memory(Word address, Word value);
+        
         void opcode_branch(Word opcode);
         void opcode_branch_exchange(Word opcode);
         void opcode_software_interrupt(Word opcode);
@@ -52,7 +59,7 @@ typedef struct ARM7TDMI {
         void opcode_psr_transfer(Word opcode);
         void opcode_single_data_transfer(Word opcode);
         void opcode_half_word_signed_data_transfer(Word opcode);
-        void warn(char* msg);
+        void opcode_block_data_transfer(Word opcode);
     public:
         ARM7TDMI();
 
@@ -62,7 +69,7 @@ typedef struct ARM7TDMI {
         void write_register(int register_number, Word register_value);
 
         bool condition_field(int condition_code);
-
+        bool is_priviledged();
         // Exception Functions
         void run_exception(Exception exception_type);
         void run_next_opcode();

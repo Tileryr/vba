@@ -18,10 +18,10 @@ typedef struct DataTransfer
     unsigned int source_destination_register : 4; // 15-12
 
     unsigned int offset_register : 4; // 3 - 0
-    
+
     Word calculate_address(ARM7TDMI * cpu, Word offset);
 
-};
+} DataTransfer;
 
 
 #endif
