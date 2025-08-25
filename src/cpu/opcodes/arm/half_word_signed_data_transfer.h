@@ -1,7 +1,7 @@
 #ifndef OPCODE_HALF_WORD_SIGNED_DATA_TRANSFER_INCLUDED
 #define OPCODE_HALF_WORD_SIGNED_DATA_TRANSFER_INCLUDED
 
-#include "../cpu_types.h"
+#include "src/cpu/cpu_types.h"
 #include "./data_transfer.h"
 typedef struct OpcodeHalfWordSignedDataTransfer : DataTransfer {
     OpcodeHalfWordSignedDataTransfer(Word opcode);

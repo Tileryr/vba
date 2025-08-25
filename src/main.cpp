@@ -69,20 +69,37 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 static void render() {
     Word vram_address_start = 0x06000000;
 
-    // SDL_SetRenderDrawColor(renderer, 128, 128, 128, SDL_ALPHA_OPAQUE);
-    // SDL_RenderPoint(renderer, 12, 12);
-    for (int y = 0; y < 160; y++) {
-        for (int x = 0; x < 240; x++) {
-            HalfWord color = cpu->read_halfword_from_memory(vram_address_start + (x*2) * y);
+    // MODE 4
+    Byte * vram = cpu->memory_region(VRAM_START);
+    Byte * background_palette = cpu->memory_region(BG_PALETTE_RAM_START);
 
-            Byte r = Utils::read_bit_range(color, 0,  4);
-            Byte g = Utils::read_bit_range(color, 5,  9);
-            Byte b = Utils::read_bit_range(color, 10, 14);
+    for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            Byte palette_color = background_palette[(y*SCREEN_WIDTH) + x];
 
-            SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
+            Byte r = Utils::read_bit_range(palette_color, 0,  4);
+            Byte g = Utils::read_bit_range(palette_color, 5,  9);
+            Byte b = Utils::read_bit_range(palette_color, 10, 14);
+
+            SDL_SetRenderDrawColor(renderer, r << 3, g << 3, b << 3, SDL_ALPHA_OPAQUE);
             SDL_RenderPoint(renderer, x, y);
         }
     }
+    
+
+    // MODE 3
+    // for (int y = 0; y < 160; y++) {
+    //     for (int x = 0; x < 240; x++) {
+    //         HalfWord color = cpu->read_halfword_from_memory(vram_address_start + (x*2) * y);
+
+    //         Byte r = Utils::read_bit_range(color, 0,  4);
+    //         Byte g = Utils::read_bit_range(color, 5,  9);
+    //         Byte b = Utils::read_bit_range(color, 10, 14);
+
+    //         SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
+    //         SDL_RenderPoint(renderer, x, y);
+    //     }
+    // }
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {

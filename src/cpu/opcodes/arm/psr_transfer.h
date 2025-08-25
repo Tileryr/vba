@@ -1,7 +1,7 @@
 #ifndef OPCODE_PSR_TRANSFER_INCLUDED
 #define OPCODE_PSR_TRANSFER_INCLUDED
 
-#include "../cpu_types.h"
+#include "src/cpu/cpu_types.h"
 
 typedef struct OpcodePsrTransfer {
     OpcodePsrTransfer(Word opcode);

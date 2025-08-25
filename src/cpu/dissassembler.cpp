@@ -1,10 +1,9 @@
 #include "SDL3/SDL.h"
 #include "cpu.h"
 
-char * ARM7TDMI::dissassemble_opcode(Word opcode) {
-    OpcodeType opcode_type = decode_opcode_arm(opcode);
-    switch (opcode_type)
-    {
+std::string ARM7TDMI::dissassemble_opcode(Word opcode) {
+    ArmOpcodeType opcode_type = decode_opcode_arm(opcode);
+    switch (opcode_type) {
         case BRANCH:
             return "branch";
             break;
@@ -17,7 +16,6 @@ char * ARM7TDMI::dissassemble_opcode(Word opcode) {
         case UNDEFINED:
             return "UNDEFINED";
             break;
-        
         case ALU:
             return "alu";
             break;

@@ -1,7 +1,5 @@
 #include "data_processing.h"
-#include "../../utils.h"
-#include "../cpu_types.h"
-#include "../alu.h"
+#include "src/utils.h"
 
 #include <limits.h>
 

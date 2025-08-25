@@ -1,8 +1,8 @@
 #include "single_data_transfer.h"
-#include "../../utils.h"
-#include "../cpu.h"
-#include "./data_processing.h"
-#include "../alu.h"
+#include "src/utils.h"
+#include "src/cpu/cpu.h"
+#include "src/cpu/opcodes/arm/data_processing.h"
+#include "src/cpu/alu.h"
 
 OpcodeSingleDataTransfer::OpcodeSingleDataTransfer(Word opcode) : DataTransfer(opcode) {
     i = Utils::read_bit(opcode, 25);

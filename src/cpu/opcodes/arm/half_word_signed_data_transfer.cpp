@@ -1,5 +1,5 @@
 #include "half_word_signed_data_transfer.h"
-#include "../../utils.h"
+#include "src/utils.h"
 OpcodeHalfWordSignedDataTransfer::OpcodeHalfWordSignedDataTransfer(Word opcode) : DataTransfer(opcode) {
     i = Utils::read_bit(opcode, 22);
     s = Utils::read_bit(opcode, 6);

@@ -1,7 +1,7 @@
 #ifndef OPCODE_MULTIPLY_LONG_INCLUDED
 #define OPCODE_MULTIPLY_LONG_INCLUDED
 
-#include "../cpu_types.h"
+#include "../../cpu_types.h"
 
 typedef struct OpcodeMultiplyLong {
     OpcodeMultiplyLong(Word opcode);

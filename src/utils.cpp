@@ -17,7 +17,7 @@ bool Utils::read_bit(u_int64_t number, unsigned int bit_number)
 
 void Utils::write_bit_range(Word * number, unsigned int bit_range_start, unsigned int bit_range_end, unsigned int bit_value) 
 {
-    for (int i = 0; i < bit_range_end + 1; i++)
+    for (int i = 0; i < (bit_range_end - bit_range_start) + 1; i++)
     {
         write_bit(number, bit_range_start + i, read_bit(bit_value, i));
     }

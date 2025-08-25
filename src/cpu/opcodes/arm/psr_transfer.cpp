@@ -1,5 +1,5 @@
 #include "psr_transfer.h"
-#include "../../utils.h"
+#include "src/utils.h"
 
 OpcodePsrTransfer::OpcodePsrTransfer(Word opcode)
 {

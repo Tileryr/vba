@@ -1,7 +1,7 @@
 #ifndef OPCODE_MULTIPLY_INCLUDED
 #define OPCODE_MULTIPLY_INCLUDED
 
-#include "../cpu_types.h"
+#include "src/cpu/cpu_types.h"
 
 typedef struct OpcodeMultiply {
     OpcodeMultiply(Word opcode);

@@ -1,8 +1,8 @@
 #ifndef DATA_TRANSFER_INCLUDED
 #define DATA_TRANSFER_INCLUDED
 
-#include "../cpu_types.h"
-#include "../cpu.h"
+#include "src/cpu/cpu_types.h"
+#include "src/cpu/cpu.h"
 
 typedef struct DataTransfer
 {

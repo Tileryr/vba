@@ -1,5 +1,5 @@
-#include "./swap.h"
-#include "../../utils.h"
+#include "src/cpu/opcodes/arm/swap.h"
+#include "src/utils.h"
 
 OpcodeSwap::OpcodeSwap(Word opcode) {
     b = Utils::read_bit(opcode, 22);

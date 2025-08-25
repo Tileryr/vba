@@ -1,5 +1,5 @@
 #include "data_transfer.h"
-#include "../cpu.h"
+#include "src/cpu/cpu.h"
 
 DataTransfer::DataTransfer(Word opcode) {
     p = Utils::read_bit(opcode, 24);

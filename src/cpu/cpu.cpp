@@ -1,5 +1,4 @@
 #include "cpu.h"
-#include "opcode_type.h"
 #include "../utils.h"
 
 #include <cassert>
@@ -177,6 +176,10 @@ bool ARM7TDMI::is_priviledged() {
     return cpsr.mode != MODE_USER;
 }
 
+Byte * ARM7TDMI::memory_region(Word address) {
+    return &memory[address];
+}
+
 void ARM7TDMI::skip_bios() {
     for (Word i = 0x3007E00; i < 0x3008000; i++) {
         memory[i] = 0x0;
@@ -247,7 +250,7 @@ void ARM7TDMI::run_next_opcode()
 
     Word end_run = 0x50;
 
-    if (pc == 0x8001d68) {
+    if (pc == 0x8001d4c) {
         SDL_Log("FAILED: TEST %d", read_register(12));
         stop();
         return;
@@ -256,9 +259,9 @@ void ARM7TDMI::run_next_opcode()
 
     if (cpsr.t == STATE_ARM) {
         Word opcode = Utils::current_word_at_memory(current_memory_place, endian_type);
-        OpcodeType opcode_type = decode_opcode_arm(opcode);
+        ArmOpcodeType opcode_type = decode_opcode_arm(opcode);
 
-        SDL_Log("pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode(opcode), read_register(0));
+        SDL_Log("pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode(opcode).c_str(), read_register(0));
         
         Byte condition_code = Utils::read_bit_range(opcode, 28, 31);
         if (condition_field(condition_code) == false) {
@@ -284,7 +287,9 @@ void ARM7TDMI::run_next_opcode()
                 break;
         }
 
-        write_register(REGISTER_PC, read_register(REGISTER_PC) + 4);
+        if (opcode_type != BRANCH && opcode_type != BX) {
+            write_register(REGISTER_PC, read_register(REGISTER_PC) + 4);
+        }
     }   
 }
 

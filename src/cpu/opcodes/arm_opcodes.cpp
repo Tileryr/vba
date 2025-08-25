@@ -2,23 +2,24 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#include "cpu.h"
-#include "opcode_type.h"
-#include "cpu_types.h"
-#include "alu.h"
+#include "../cpu_types.h"
+#include "../alu.h"
+#include "../cpu.h"
 
-#include "./opcodes/data_processing.h"
-#include "./opcodes/multiply.h"
-#include "./opcodes/multiply_long.h"
-#include "./opcodes/psr_transfer.h"
-#include "./opcodes/single_data_transfer.h"
-#include "./opcodes/half_word_signed_data_transfer.h"
-#include "./opcodes/block_data_transfer.h"
-#include "./opcodes/swap.h"
+#include "opcode_types.h"
+
+#include "./arm/data_processing.h"
+#include "./arm/multiply.h"
+#include "./arm/multiply_long.h"
+#include "./arm/psr_transfer.h"
+#include "./arm/single_data_transfer.h"
+#include "./arm/half_word_signed_data_transfer.h"
+#include "./arm/block_data_transfer.h"
+#include "./arm/swap.h"
 
 void ARM7TDMI::opcode_branch(Word opcode)
 {
-    Word pc_with_prefetch_offset = read_register(REGISTER_PC) + 4; // Other 4 is accounted for after when incrementing instruction
+    Word pc_with_prefetch_offset = read_register(REGISTER_PC) + 8; // Other 4 is accounted for after when incrementing instruction
     int32_t offset = Utils::read_bit_range(opcode, 0, 23);
     bool link_bit = Utils::read_bit(opcode, 24);
 

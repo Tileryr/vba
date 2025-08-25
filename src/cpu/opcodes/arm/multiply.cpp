@@ -1,5 +1,5 @@
 #include "multiply.h"
-#include "../../utils.h"
+#include "src/utils.h"
 
 OpcodeMultiply::OpcodeMultiply(Word opcode)
 {

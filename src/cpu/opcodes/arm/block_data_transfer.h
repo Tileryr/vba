@@ -1,7 +1,7 @@
 #ifndef OPCODE_BLOCK_DATA_TRANSFER_INCLUDED
 #define OPCODE_BLOCK_DATA_TRANSFER_INCLUDED
 
-#include "../cpu_types.h"
+#include "src/cpu/cpu_types.h"
 
 typedef struct OpcodeBlockDataTransfer
 {

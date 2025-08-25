@@ -1,5 +1,5 @@
 #include "multiply_long.h"
-#include "../../utils.h"
+#include "src/utils.h"
 
 OpcodeMultiplyLong::OpcodeMultiplyLong(Word opcode)
 {

@@ -6,9 +6,17 @@
 #include "cpu_types.h"
 #include "psr.h"
 #include "register.h"
-#include "opcode_type.h"
+#include "./opcodes/opcode_types.h"
 
 #include "../utils.h"
+
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 160
+
+#define VRAM_START 0x06000000
+
+#define BG_PALETTE_RAM_START 0x05000000
+#define OBJ_PALETTE_RAM_START 0x05000200
 
 #define GAMEPAK_ROM_START 0x08000000
 
@@ -44,8 +52,9 @@ typedef struct ARM7TDMI {
 
         void trigger_exception(OperatingMode new_mode, unsigned int exception_vector, unsigned int saved_pc_offset, int priority);
 
-        char * dissassemble_opcode(Word opcode);
-        OpcodeType decode_opcode_arm(Word opcode);
+        std::string dissassemble_opcode(Word opcode);
+        ArmOpcodeType decode_opcode_arm(Word opcode);
+        ThumbOpcodeType decode_opcode_thumb(HalfWord opcode);
 
         void warn(const char * msg);
 
@@ -81,6 +90,7 @@ typedef struct ARM7TDMI {
         void run_exception(Exception exception_type);
         void run_next_opcode();
 
+        Byte * memory_region(Word address);
         void skip_bios();
 } ARM7TDMI;
 

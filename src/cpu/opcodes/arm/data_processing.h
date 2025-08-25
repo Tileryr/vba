@@ -1,9 +1,9 @@
 #ifndef OPCODE_DATA_PROCESSING_INCLUDED
 #define OPCODE_DATA_PROCESSING_INCLUDED
 
-#include "../alu.h"
-#include "../cpu_types.h"
-#include "../psr.h"
+#include "../../alu.h"
+#include "../../cpu_types.h"
+#include "../../psr.h"
 
 enum class DataProcessingInstructionType 
 {

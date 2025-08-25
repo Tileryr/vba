@@ -1,5 +1,5 @@
 #include "block_data_transfer.h"
-#include "../../utils.h"
+#include "src/utils.h"
 
 OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(Word opcode) {
     p = Utils::read_bit(opcode, 24);

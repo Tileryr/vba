@@ -1,7 +1,7 @@
 #ifndef OPCODE_SINGLE_DATA_TRANSFER_INCLUDED
 #define OPCODE_SINGLE_DATA_TRANSFER_INCLUDED
 
-#include "../cpu_types.h"
+#include "src/cpu/cpu_types.h"
 #include "./data_transfer.h"
 typedef struct OpcodeSingleDataTransfer : DataTransfer {
     OpcodeSingleDataTransfer(Word opcode);
