@@ -18,7 +18,7 @@
 
 void ARM7TDMI::opcode_branch(Word opcode)
 {
-    Word pc_with_prefetch_offset = read_register(REGISTER_PC) + 8;
+    Word pc_with_prefetch_offset = read_register(REGISTER_PC) + 4; // Other 4 is accounted for after when incrementing instruction
     int32_t offset = Utils::read_bit_range(opcode, 0, 23);
     bool link_bit = Utils::read_bit(opcode, 24);
 
@@ -28,7 +28,7 @@ void ARM7TDMI::opcode_branch(Word opcode)
     if (link_bit)
     {
         Word return_address = pc_with_prefetch_offset - 4;
-        write_register(REGISTER_LS, return_address);
+        write_register(REGISTER_LR, return_address);
     }
 
     Word new_address = pc_with_prefetch_offset + offset;
@@ -39,7 +39,7 @@ void ARM7TDMI::opcode_branch_exchange(Word opcode)
 {
     Word register_number = Utils::read_bit_range(opcode, 0, 3);
     Word register_value = read_register(register_number);
-    bool bit_one = Utils::read_bit(register_number, 0);
+    bool bit_one = Utils::read_bit(register_value, 0);
 
     if (bit_one)
     {
@@ -80,7 +80,7 @@ void ARM7TDMI::opcode_data_processing(Word opcode)
         op2 = opcode_class.calculate_immediate_op2(opcode_class.operand_2_immediate, opcode_class.immediate_ror_shift * 2);
     } 
 
-    if (rn == REGISTER_PC) {
+    if (opcode_class.rn == REGISTER_PC) {
         rn += opcode_class.calculate_pc_prefetch_offset();
     }
 
@@ -229,7 +229,7 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
     if (data_transfer.i == 1) { // Offset = Shifted Register
         Word offset_register_value = read_register(data_transfer.offset_register);
         OpcodeDataProcess::BitShiftType shift_type = static_cast<OpcodeDataProcess::BitShiftType>(data_transfer.register_shift_type);
-        offset = OpcodeDataProcess::shift_op2(CpuALU(), offset_register_value, data_transfer.register_shift_amount, shift_type, cpu->cpsr.c);
+        offset = OpcodeDataProcess::shift_op2(CpuALU(), offset_register_value, data_transfer.register_shift_amount, shift_type, cpsr.c);
     } else { // Offset = immediate value
         offset = data_transfer.offset_immediate;
     }
@@ -317,7 +317,7 @@ void ARM7TDMI::opcode_block_data_transfer(Word opcode) {
         bool transfer_register = Utils::read_bit(data_transfer.register_list, i);
         if (transfer_register) {
             write_back_address += data_transfer.u ? 4 : -4;
-            if (i = 15) {
+            if (i == 15) {
                 pc_in_transfer_list = true;
             }
         }

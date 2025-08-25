@@ -26,9 +26,9 @@ void Utils::write_bit_range(Word * number, unsigned int bit_range_start, unsigne
 int Utils::read_bit_range(u_int64_t number, unsigned int bit_range_start, unsigned int bit_range_end) 
 {
     int result = 0;
-    for (int i = 0; i < bit_range_end + 1; i++)
+    for (int i = bit_range_start; i < bit_range_end + 1; i++)
     {
-        result += read_bit(number, bit_range_start + i) << i;
+        result += read_bit(number, i) << (i - bit_range_start);
     }
     return result;
 }
@@ -67,11 +67,11 @@ Word Utils::make_word(Byte byte_1, Byte byte_2, Byte byte_3, Byte byte_4)
 
 Word Utils::current_word_at_memory(Byte * memory, Endian endian_type)
 {
-    if (endian_type == BIG_ENDIAN)
+    if (endian_type == ENDIAN_BIG)
     {
         return make_word(memory[3], memory[2], memory[1], memory[0]);
     } else 
-    if (endian_type == LITTLE_ENDIAN)
+    if (endian_type == ENDIAN_LITTLE)
     {
         return make_word(memory[0], memory[1], memory[2], memory[3]);
     }

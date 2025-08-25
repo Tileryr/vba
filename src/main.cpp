@@ -1,3 +1,9 @@
+#define SDL_MAIN_USE_CALLBACKS
+
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+#include <SDL3/SDL_render.h>
+
 #include "./cpu/cpu.h"
 #include "./utils.h"
 #include "./cpu/alu.h"
@@ -5,24 +11,97 @@
 #include <stdlib.h>
 #include <cstdio>
 
-struct ARM7TDMI ArmCPU;
-CpuALU alu;
+static ARM7TDMI * cpu = new ARM7TDMI();
+static SDL_Window * window = nullptr;
+static SDL_Renderer * renderer = nullptr;
 
-int main(int argc, char **argv )
-{   
-    
-    ArmCPU.memory = (u_int8_t *)malloc(32);
-    int8_t test = 0b10000000;
-    // u_int8_t test_unsigned = test;
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
+    // SDL_SetAppMetadata();
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_Log("SDL initialization failed: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
 
-    // alu.add(2, 1, __UINT32_MAX__);
-    bool c = 0;
-
-    Word result = alu.subtract(2, 5, 5, -c + 1);
-    
-    for (int i = 0; i < 16; i++) {
-        printf("%d", Utils::read_bit(0b1010101010101010, i));
+    window = SDL_CreateWindow("VBA", 500, 500, SDL_WINDOW_RESIZABLE);
+    if (window == nullptr) {
+        SDL_Log("SDL window creation failed: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
     }
     
-    return 0;
+    renderer = SDL_CreateRenderer(window, NULL);
+    if (renderer == nullptr) {
+        SDL_Log("SDL renderer creation failed: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+    
+    cpu->memory = (Byte *)malloc(0xFFFFFFF);
+    cpu->skip_bios();
+
+    if (argc > 1) {
+        FILE * fileptr;
+        
+        std::string filename = "test-roms/";
+        filename = filename + argv[1];
+
+        SDL_Log("%s", filename.c_str());
+
+        long file_length;
+
+        fileptr = fopen(filename.c_str(), "rb");
+        fseek(fileptr, 0, SEEK_END);
+        file_length = ftell(fileptr);
+        rewind(fileptr);
+
+        fread(&cpu->memory[GAMEPAK_ROM_START], 1, file_length, fileptr);
+        fclose(fileptr);
+    }
+
+    return SDL_APP_CONTINUE;
+}
+
+SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
+    if (event->type == SDL_EVENT_QUIT) {
+        return SDL_APP_SUCCESS;
+    }
+    return SDL_APP_CONTINUE;
+}   
+
+static void render() {
+    Word vram_address_start = 0x06000000;
+
+    // SDL_SetRenderDrawColor(renderer, 128, 128, 128, SDL_ALPHA_OPAQUE);
+    // SDL_RenderPoint(renderer, 12, 12);
+    for (int y = 0; y < 160; y++) {
+        for (int x = 0; x < 240; x++) {
+            HalfWord color = cpu->read_halfword_from_memory(vram_address_start + (x*2) * y);
+
+            Byte r = Utils::read_bit_range(color, 0,  4);
+            Byte g = Utils::read_bit_range(color, 5,  9);
+            Byte b = Utils::read_bit_range(color, 10, 14);
+
+            SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
+            SDL_RenderPoint(renderer, x, y);
+        }
+    }
+}
+
+SDL_AppResult SDL_AppIterate(void *appstate) {
+    // SDL_Log("mode: %d \n", cpu->cpsr.mode);
+    // SDL_Log("DEAD");
+    // cpu->read_register(1);
+
+    if (cpu->read_register(REGISTER_PC) < 0xFFFFFFF) {
+        cpu->run_next_opcode();
+    } else {
+        return SDL_APP_SUCCESS;
+    }
+
+    render();
+    SDL_RenderPresent(renderer);
+
+    return SDL_APP_CONTINUE;
+}
+
+void SDL_AppQuit(void *appstate, SDL_AppResult result) {
+    delete cpu;
 }

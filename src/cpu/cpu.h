@@ -10,6 +10,8 @@
 
 #include "../utils.h"
 
+#define GAMEPAK_ROM_START 0x08000000
+
 enum Exception {
     EXCEPTION_RESET,
     EXCEPTION_UNDEFINED,
@@ -42,11 +44,11 @@ typedef struct ARM7TDMI {
 
         void trigger_exception(OperatingMode new_mode, unsigned int exception_vector, unsigned int saved_pc_offset, int priority);
 
+        char * dissassemble_opcode(Word opcode);
         OpcodeType decode_opcode_arm(Word opcode);
 
         void warn(const char * msg);
 
-        Word read_word_from_memory(Word address);
         void write_word_to_memory(Word address, Word value);
         
         void opcode_branch(Word opcode);
@@ -65,6 +67,10 @@ typedef struct ARM7TDMI {
         ARM7TDMI();
 
         Byte * memory;
+        int runs = 0;
+        
+        Word read_word_from_memory(Word address);
+        HalfWord read_halfword_from_memory(Word address);
 
         Word read_register(int register_number);
         void write_register(int register_number, Word register_value);
@@ -74,6 +80,8 @@ typedef struct ARM7TDMI {
         // Exception Functions
         void run_exception(Exception exception_type);
         void run_next_opcode();
-} cpu;
+
+        void skip_bios();
+} ARM7TDMI;
 
 #endif

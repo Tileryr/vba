@@ -2,7 +2,7 @@
 #include "cpu_types.h"
 #include "../utils.h"
 
-ProgramStatusRegister::ProgramStatusRegister() : mode(MODE_USER), t(STATE_ARM), f(false), i(false)
+ProgramStatusRegister::ProgramStatusRegister() : mode(MODE_USER), t(STATE_ARM), f(false), i(false), n(false), z(false), c(false), v(false)
 {
 };
 

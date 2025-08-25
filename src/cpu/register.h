@@ -6,7 +6,7 @@
 
 enum SpecialRegisters {
     REGISTER_SP = 13,
-    REGISTER_LS = 14,
+    REGISTER_LR = 14,
     REGISTER_PC = 15
 };
 

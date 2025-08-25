@@ -1,19 +1,19 @@
 CC=g++
-CFLAGS=-pedantic
+CFLAGS=-pedantic -g
 
 SRC=$(wildcard src/*.cpp) $(wildcard src/cpu/*.cpp) $(wildcard src/cpu/opcodes/*.cpp)
 OBJ=$(SRC:%.cpp=%.o)
 DEP=$(OBJ:%.o=%.d)
 
 EXE=vba
-LIBS=$(addprefix -l,)
+LIBS=$(addprefix -l,) `pkg-config --libs --cflags sdl3`
 
-$(EXE): $(OBJ)
-	$(CC) -o $@ $^ $(LIBS)
+$(EXE): $(OBJ) 
+	$(CC) -g -o $@ $^ $(LIBS)
 
 -include $(DEP)
 
-%.o: %.c
+%.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:

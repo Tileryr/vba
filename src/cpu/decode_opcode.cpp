@@ -1,3 +1,5 @@
+#include <SDL3/SDL.h>
+
 #include "cpu.h"
 #include "opcode_type.h"
 #include "cpu_types.h"
@@ -35,8 +37,8 @@ OpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     {
         return MULTIPLY_LONG;
     }
-    if (Utils::read_bit_range(opcode, 27, 26) == 0b00
-    &&  Utils::read_bit_range(opcode, 24, 23) == 0b10
+    if (Utils::read_bit_range(opcode, 26, 27) == 0b00
+    &&  Utils::read_bit_range(opcode, 23, 24) == 0b10
     &&  Utils::read_bit(opcode, 20) == 0b0
     ) {
         return PSR_TRANSFER;
@@ -54,4 +56,6 @@ OpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
         Utils::read_bit_range(opcode, 4,  11) == 0b00001001) {
         return SWAP;
     }
+
+    SDL_assert(false);
 }
