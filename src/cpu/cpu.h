@@ -58,20 +58,24 @@ typedef struct ARM7TDMI {
 
         void warn(const char * msg);
 
-        void write_word_to_memory(Word address, Word value);
         
-        void opcode_branch(Word opcode);
-        void opcode_branch_exchange(Word opcode);
-        void opcode_software_interrupt(Word opcode);
-        void opcode_undefined_intruction(Word opcode);
-        void opcode_data_processing(Word opcode);
-        void opcode_multiply(Word opcode);
-        void opcode_multiply_long(Word opcode);
-        void opcode_psr_transfer(Word opcode);
-        void opcode_single_data_transfer(Word opcode);
-        void opcode_half_word_signed_data_transfer(Word opcode);
-        void opcode_block_data_transfer(Word opcode);
-        void opcode_swap(Word opcode);
+        
+        void arm_opcode_branch(Word opcode);
+        void arm_opcode_branch_exchange(Word opcode);
+        void arm_opcode_software_interrupt(Word opcode);
+        void arm_opcode_undefined_intruction(Word opcode);
+        void arm_opcode_data_processing(Word opcode);
+        void arm_opcode_multiply(Word opcode);
+        void arm_opcode_multiply_long(Word opcode);
+        void arm_opcode_psr_transfer(Word opcode);
+        void arm_opcode_single_data_transfer(Word opcode);
+        void arm_opcode_half_word_signed_data_transfer(Word opcode);
+        void arm_opcode_block_data_transfer(Word opcode);
+        void arm_opcode_swap(Word opcode);
+
+        void thumb_opcode_move_compare_add_subtract(HalfWord opcode);
+        void thumb_opcode_hi_register_operations_branch_exchange(HalfWord opcode, bool * increment_pc);
+        void thumb_opcode_load_address(HalfWord opcode);
     public:
         ARM7TDMI();
 
@@ -81,6 +85,9 @@ typedef struct ARM7TDMI {
         Word read_word_from_memory(Word address);
         HalfWord read_halfword_from_memory(Word address);
 
+        void write_word_to_memory(Word address, Word value);
+        void write_halfword_to_memory(Word address, HalfWord value);
+        
         Word read_register(int register_number);
         void write_register(int register_number, Word register_value);
 
@@ -92,6 +99,8 @@ typedef struct ARM7TDMI {
 
         Byte * memory_region(Word address);
         void skip_bios();
+
+        
 } ARM7TDMI;
 
 #endif

@@ -7,6 +7,7 @@
 #include "./cpu/cpu.h"
 #include "./utils.h"
 #include "./cpu/alu.h"
+#include "src/cpu/opcodes/arm/data_processing.h"
 
 #include <stdlib.h>
 #include <cstdio>
@@ -33,10 +34,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         SDL_Log("SDL renderer creation failed: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-    
-    cpu->memory = (Byte *)malloc(0xFFFFFFF);
-    cpu->skip_bios();
 
+    cpu->memory = (Byte *)malloc(0xFFFFFFF);
+    cpu->write_halfword_to_memory(0x04000004, 1);
+
+    cpu->skip_bios();
     if (argc > 1) {
         FILE * fileptr;
         
@@ -73,6 +75,9 @@ static void render() {
     Byte * vram = cpu->memory_region(VRAM_START);
     Byte * background_palette = cpu->memory_region(BG_PALETTE_RAM_START);
 
+    SDL_SetRenderDrawColor(renderer, 50, 50, 50, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(renderer);
+
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
             Byte palette_color = background_palette[(y*SCREEN_WIDTH) + x];
@@ -86,7 +91,8 @@ static void render() {
         }
     }
     
-
+    SDL_SetRenderDrawColor(renderer, 25 << 3, 25 << 3, 25 << 3, SDL_ALPHA_OPAQUE);
+    SDL_RenderPoint(renderer, 10, 10);
     // MODE 3
     // for (int y = 0; y < 160; y++) {
     //     for (int x = 0; x < 240; x++) {
@@ -103,15 +109,14 @@ static void render() {
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
-    // SDL_Log("mode: %d \n", cpu->cpsr.mode);
-    // SDL_Log("DEAD");
-    // cpu->read_register(1);
-
+    // SDL_Log("%d", SDL_GetTicks());
     if (cpu->read_register(REGISTER_PC) < 0xFFFFFFF) {
         cpu->run_next_opcode();
     } else {
         return SDL_APP_SUCCESS;
     }
+    
+    
 
     render();
     SDL_RenderPresent(renderer);

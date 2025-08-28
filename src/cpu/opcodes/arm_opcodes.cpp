@@ -9,6 +9,7 @@
 #include "opcode_types.h"
 
 #include "./arm/data_processing.h"
+#include "./arm/branch_exchange.h"
 #include "./arm/multiply.h"
 #include "./arm/multiply_long.h"
 #include "./arm/psr_transfer.h"
@@ -17,7 +18,7 @@
 #include "./arm/block_data_transfer.h"
 #include "./arm/swap.h"
 
-void ARM7TDMI::opcode_branch(Word opcode)
+void ARM7TDMI::arm_opcode_branch(Word opcode)
 {
     Word pc_with_prefetch_offset = read_register(REGISTER_PC) + 8; // Other 4 is accounted for after when incrementing instruction
     int32_t offset = Utils::read_bit_range(opcode, 0, 23);
@@ -36,34 +37,22 @@ void ARM7TDMI::opcode_branch(Word opcode)
     write_register(REGISTER_PC, new_address);
 }
 
-void ARM7TDMI::opcode_branch_exchange(Word opcode)
+void ARM7TDMI::arm_opcode_branch_exchange(Word opcode)
 {
-    Word register_number = Utils::read_bit_range(opcode, 0, 3);
-    Word register_value = read_register(register_number);
-    bool bit_one = Utils::read_bit(register_value, 0);
-
-    if (bit_one)
-    {
-        cpsr.t = STATE_THUMB;
-        write_register(REGISTER_PC, register_value - 1);
-    } else 
-    {
-        cpsr.t = STATE_ARM;
-        write_register(REGISTER_PC, register_value);
-    }
+    OpcodeBranchExchange(opcode).run(this);
 }
 
-void ARM7TDMI::opcode_software_interrupt(Word opcode)
+void ARM7TDMI::arm_opcode_software_interrupt(Word opcode)
 {
     run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
 }
 
-void ARM7TDMI::opcode_undefined_intruction(Word opcode)
+void ARM7TDMI::arm_opcode_undefined_intruction(Word opcode)
 {
     run_exception(EXCEPTION_UNDEFINED);
 }
 
-void ARM7TDMI::opcode_data_processing(Word opcode) 
+void ARM7TDMI::arm_opcode_data_processing(Word opcode) 
 {   
     DataProcess opcode_class = DataProcess(opcode);
     Word rn = read_register(opcode_class.rn);
@@ -76,7 +65,7 @@ void ARM7TDMI::opcode_data_processing(Word opcode)
 
         Word shift_register_value = read_register(opcode_class.shift_register);
         Byte shift_amount = opcode_class.get_op_2_register_shift_amount(opcode_class.shift_by_register, shift_register_value);
-        op2 = opcode_class.shift_op2(opcode_class.alu, op2, shift_amount, opcode_class.bit_shift_type, cpsr.c);
+        op2 = opcode_class.shift_op2(&opcode_class.alu, op2, shift_amount, opcode_class.bit_shift_type, cpsr.c);
     } else {
         op2 = opcode_class.calculate_immediate_op2(opcode_class.operand_2_immediate, opcode_class.immediate_ror_shift * 2);
     } 
@@ -85,22 +74,35 @@ void ARM7TDMI::opcode_data_processing(Word opcode)
         rn += opcode_class.calculate_pc_prefetch_offset();
     }
 
-    opcode_class.calculate_instruction((OpcodeDataProcess::InstructionType)opcode_class.instruction_type, rn, op2, cpsr.c);
+    OpcodeDataProcess::InstructionType instruction_type = (OpcodeDataProcess::InstructionType)opcode_class.instruction_type;
+    u_int64_t result = opcode_class.calculate_instruction(&opcode_class.alu, instruction_type, rn, op2, cpsr.c);
 
     if (opcode_class.set_condition_codes) {
         if (opcode_class.rd == REGISTER_PC) {
             cpsr = current_register_set()->spsr;
             return;
         }
-         opcode_class.set_psr_flags(&cpsr, opcode_class.last_result, opcode_class.operation_class);
+
+        opcode_class.set_psr_flags(&opcode_class.alu, &cpsr, result, opcode_class.operation_class);
+        if (opcode_class.operation_class == OpcodeDataProcess::ARITHMETIC) {
+            bool sub = (
+                opcode_class.instruction_type == OpcodeDataProcess::SUB ||
+                opcode_class.instruction_type == OpcodeDataProcess::SBC ||
+                opcode_class.instruction_type == OpcodeDataProcess::RSB ||
+                opcode_class.instruction_type == OpcodeDataProcess::RSC ||
+                opcode_class.instruction_type == OpcodeDataProcess::CMP 
+            );
+
+            cpsr.v = opcode_class.get_overflow_flag(rn, op2, result, sub);
+        }
     }
-   
-    if (opcode_class.write_result) {
-        write_register(opcode_class.rd, opcode_class.last_result & UINT32_MAX);
+
+    if (opcode_class.do_write_result(instruction_type)) {
+        write_register(opcode_class.rd, result & UINT32_MAX);
     }
 }
 
-void ARM7TDMI::opcode_multiply(Word opcode)
+void ARM7TDMI::arm_opcode_multiply(Word opcode)
 {
     Multiply multiply = Multiply(opcode);
     Word destination_value;
@@ -138,7 +140,7 @@ void ARM7TDMI::opcode_multiply(Word opcode)
     write_register(multiply.register_destination, destination_value);
 };
 
-void ARM7TDMI::opcode_multiply_long(Word opcode)
+void ARM7TDMI::arm_opcode_multiply_long(Word opcode)
 {
     MultiplyLong multiply_long = MultiplyLong(opcode);
     u_int64_t result;
@@ -185,7 +187,7 @@ void ARM7TDMI::opcode_multiply_long(Word opcode)
     }
 }
  
-void ARM7TDMI::opcode_psr_transfer(Word opcode)
+void ARM7TDMI::arm_opcode_psr_transfer(Word opcode)
 {
     OpcodePsrTransfer psr_transfer = OpcodePsrTransfer(opcode);
     PSR * target_psr = psr_transfer.psr == 0 
@@ -217,7 +219,7 @@ void ARM7TDMI::opcode_psr_transfer(Word opcode)
     }
 };
 
-void ARM7TDMI::opcode_single_data_transfer(Word opcode)
+void ARM7TDMI::arm_opcode_single_data_transfer(Word opcode)
 {
     OpcodeSingleDataTransfer data_transfer = OpcodeSingleDataTransfer(opcode);
     
@@ -230,7 +232,8 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
     if (data_transfer.i == 1) { // Offset = Shifted Register
         Word offset_register_value = read_register(data_transfer.offset_register);
         OpcodeDataProcess::BitShiftType shift_type = static_cast<OpcodeDataProcess::BitShiftType>(data_transfer.register_shift_type);
-        offset = OpcodeDataProcess::shift_op2(CpuALU(), offset_register_value, data_transfer.register_shift_amount, shift_type, cpsr.c);
+        CpuALU alu;
+        offset = OpcodeDataProcess::shift_op2(&alu, offset_register_value, data_transfer.register_shift_amount, shift_type, cpsr.c);
     } else { // Offset = immediate value
         offset = data_transfer.offset_immediate;
     }
@@ -245,7 +248,7 @@ void ARM7TDMI::opcode_single_data_transfer(Word opcode)
     }
 }
 
-void ARM7TDMI::opcode_half_word_signed_data_transfer(Word opcode) {
+void ARM7TDMI::arm_opcode_half_word_signed_data_transfer(Word opcode) {
     OpcodeHalfWordSignedDataTransfer data_transfer = OpcodeHalfWordSignedDataTransfer(opcode);
 
     Word offset;
@@ -301,7 +304,7 @@ void ARM7TDMI::opcode_half_word_signed_data_transfer(Word opcode) {
     
 }
 
-void ARM7TDMI::opcode_block_data_transfer(Word opcode) {
+void ARM7TDMI::arm_opcode_block_data_transfer(Word opcode) {
     OpcodeBlockDataTransfer data_transfer = OpcodeBlockDataTransfer(opcode);
     Word base_address = read_register(data_transfer.base_register);
     
@@ -378,7 +381,7 @@ void ARM7TDMI::opcode_block_data_transfer(Word opcode) {
     }
 }
 
-void ARM7TDMI::opcode_swap(Word opcode) {
+void ARM7TDMI::arm_opcode_swap(Word opcode) {
     OpcodeSwap swap = OpcodeSwap(opcode);
     if (swap.base_register == REGISTER_PC ||
         swap.source_register == REGISTER_PC ||

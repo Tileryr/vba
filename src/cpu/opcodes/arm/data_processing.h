@@ -5,26 +5,6 @@
 #include "../../cpu_types.h"
 #include "../../psr.h"
 
-enum class DataProcessingInstructionType 
-{
-    AND = 0x0,
-    EOR = 0x1,
-    SUB = 0x2,
-    RSB = 0x3,
-    ADD = 0x4,
-    ADC = 0x5,
-    SBC = 0x6,
-    RSC = 0x7,
-    TST = 0x8,
-    TEQ = 0x9,
-    CMP = 0xA,
-    CMN = 0xB,
-    ORR = 0xC,
-    MOV = 0xD,
-    BIC = 0xE,
-    MVN = 0xF
-};
-
 typedef struct OpcodeDataProcess {
      enum BitShiftType {
         LSL = 0,
@@ -80,21 +60,20 @@ typedef struct OpcodeDataProcess {
 
     CpuALU alu;
 
-    u_int64_t last_result;
-
-    bool write_result;
     BitShiftType bit_shift_type;
     OperationClass operation_class;
 
     OpcodeDataProcess(Word opcode);
 
     Word calculate_immediate_op2( Byte immediate, unsigned int ror_shift);
-    u_int64_t calculate_instruction(InstructionType instruction, Word rn, Word op2, bool c_flag);
-    static Word shift_op2(CpuALU alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag);
-    void set_psr_flags(PSR * psr, u_int64_t result, OperationClass operation_class);
+    static u_int64_t calculate_instruction(CpuALU * alu, InstructionType instruction, Word rn, Word op2, bool c_flag);
+    static Word shift_op2(CpuALU * alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag);
+    static void set_psr_flags(CpuALU * alu, PSR * psr, u_int64_t result);
+    static bool do_write_result(InstructionType instruction);
 
     Byte get_op_2_register_shift_amount(bool shift_by_register, Word shift_register_value);
     unsigned int calculate_pc_prefetch_offset();
+    static bool get_overflow_flag(Word op1, Word op2, u_int64_t result, bool subtraction);
 } DataProcess;
 
 #endif

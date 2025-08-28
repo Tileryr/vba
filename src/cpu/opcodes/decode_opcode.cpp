@@ -80,7 +80,7 @@ ThumbOpcodeType ARM7TDMI::decode_opcode_thumb(HalfWord opcode) {
         return ALU_OPERATION;
     }
     if (get_bitregion(10, 15) == 0b010001) {
-        return HI_REGISTER_OPERATION_BRANCH_EXCHANGE;
+        return HI_REGISTER_OPERATIONS_BRANCH_EXCHANGE;
     }
     if (get_bitregion(11, 15) == 0b01001) {
         return PC_RELATIVE_LOAD;

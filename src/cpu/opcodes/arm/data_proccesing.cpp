@@ -15,24 +15,13 @@ OpcodeDataProcess::OpcodeDataProcess(Word opcode)
     shift_immediate_amount = Utils::read_bit_range(opcode, 7, 11);
     
     shift_type = Utils::read_bit_range(opcode, 5, 6);
-    shift_by_register == Utils::read_bit(opcode, 4);
+    shift_by_register = Utils::read_bit(opcode, 4);
     operand_2_register = Utils::read_bit_range(opcode, 0, 3);
 
     immediate_ror_shift = Utils::read_bit_range(opcode, 8, 11);
     operand_2_immediate = Utils::read_bit_range(opcode, 0, 7);
 
     bit_shift_type = (BitShiftType)shift_type;
-
-    if (
-        instruction_type == TST ||
-        instruction_type == TEQ ||
-        instruction_type == CMP ||
-        instruction_type == CMN
-    )   {
-        write_result = false;
-    } else {
-        write_result = true;
-    }
 
     if (
         instruction_type == AND ||
@@ -58,32 +47,32 @@ Word OpcodeDataProcess::calculate_immediate_op2( Byte immediate, unsigned int ro
         return rotated_immediate;
 }
 
-Word OpcodeDataProcess::shift_op2(CpuALU alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag)
+Word OpcodeDataProcess::shift_op2(CpuALU * alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag)
 {
     switch (bit_shift_type)
     {
         case LSL:
             if (shift_amount == 0) {
-                alu.carry_flag = c_flag;
+                alu->carry_flag = c_flag;
                 return op2;
             }
-            return alu.logical_left_shift(op2, shift_amount);
+            return alu->logical_left_shift(op2, shift_amount);
         case LSR:
             if (shift_amount == 0)
                 shift_amount = 32;
-            return alu.logical_right_shift(op2, shift_amount);
+            return alu->logical_right_shift(op2, shift_amount);
         case ASR:
             if (shift_amount == 0)
                 shift_amount = 32;
-            return alu.arithmetic_right_shift(op2, shift_amount);
+            return alu->arithmetic_right_shift(op2, shift_amount);
         case ROR:
             if (shift_amount == 0) 
-                return alu.rotate_right_extended(op2, c_flag);
-            return alu.rotate_right(op2, shift_amount);
+                return alu->rotate_right_extended(op2, c_flag);
+            return alu->rotate_right(op2, shift_amount);
     }
 }
 
-u_int64_t OpcodeDataProcess::calculate_instruction(InstructionType instruction, Word rn, Word op2, bool c_flag)
+u_int64_t OpcodeDataProcess::calculate_instruction(CpuALU * alu, InstructionType instruction, Word rn, Word op2, bool c_flag)
 {
     u_int64_t result;
 
@@ -96,22 +85,22 @@ u_int64_t OpcodeDataProcess::calculate_instruction(InstructionType instruction, 
             result = rn ^ op2;
             break;
         case 0x2: // SUB 
-            result = alu.subtract(1, rn, op2);
+            result = alu->subtract(1, rn, op2);
             break;
         case 0x3: // RSB
-            result = alu.subtract(1, op2, rn);
+            result = alu->subtract(1, op2, rn);
             break;
         case 0x4: // ADD
-            result = alu.add(2, rn, op2);
+            result = alu->add(2, rn, op2);
             break;
         case 0x5: // ADC
-            result = alu.add(3, rn, op2, c_flag);
+            result = alu->add(3, rn, op2, c_flag);
             break;
         case 0x6: // SBC
-            result = alu.subtract(2, rn, op2, -(c_flag - 1));
+            result = alu->subtract(2, rn, op2, -(c_flag - 1));
             break;
         case 0x7: // RSC
-            result = alu.subtract(2, op2, rn, -(c_flag - 1));
+            result = alu->subtract(2, op2, rn, -(c_flag - 1));
             break;
         case 0x8: // TST
             result = rn & op2;
@@ -120,10 +109,10 @@ u_int64_t OpcodeDataProcess::calculate_instruction(InstructionType instruction, 
             result = rn ^ op2;
             break;
         case 0xA: // CMP
-            result = alu.subtract(1, rn, op2);
+            result = alu->subtract(1, rn, op2);
             break;
         case 0xB: // CMN
-            result = alu.add(2, rn, op2);
+            result = alu->add(2, rn, op2);
             break;
         case 0xC: // ORR
             result = rn | op2;
@@ -138,8 +127,6 @@ u_int64_t OpcodeDataProcess::calculate_instruction(InstructionType instruction, 
             result = ~op2;
             break;
     }
-
-    last_result = result;
     
     return result;
 }
@@ -162,18 +149,24 @@ unsigned int OpcodeDataProcess::calculate_pc_prefetch_offset()
     }
 }
 
-void OpcodeDataProcess::set_psr_flags(PSR * psr, u_int64_t result, OperationClass operation_class) 
+bool OpcodeDataProcess::do_write_result(InstructionType instruction) {
+    return !(
+        instruction == TST ||
+        instruction == TEQ ||
+        instruction == CMP ||
+        instruction == CMN
+    );
+}
+
+void OpcodeDataProcess::set_psr_flags(CpuALU * alu, PSR * psr, u_int64_t result) 
 {
-    psr->c = alu.carry_flag;
+    psr->c = alu->carry_flag;
     psr->z = result == 0;
     psr->n = Utils::read_bit(result, 31);
+}
 
-    if (operation_class == ARITHMETIC)
-    {
-        int64_t result_signed = result;
-        if (result_signed > INT_MAX || result_signed < INT_MIN)
-            psr->v = 1;
-        else
-            psr->v = 0;
-    }
+bool OpcodeDataProcess::get_overflow_flag(Word op1, Word op2, u_int64_t result, bool subtraction) {
+    if (subtraction) {op2 = (UINT32_MAX - op2);}
+
+    return ((op1^result)&(op2^result)&(1 << 31)) != 0;
 }

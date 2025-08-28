@@ -72,8 +72,8 @@ Word ARM7TDMI::read_word_from_memory(Word address) {
 
 HalfWord ARM7TDMI::read_halfword_from_memory(Word address) {
     return (
-        memory[address]     << 0 ||
-        memory[address + 1] << 8 
+        (memory[address]     << 0) |
+        (memory[address + 1] << 8)
     );
 }
 
@@ -82,6 +82,11 @@ void ARM7TDMI::write_word_to_memory(Word address, Word value) {
     memory[address + 1] = (value >> 8) & 0xFF;
     memory[address + 2] = (value >> 16) & 0xFF;
     memory[address + 3] = (value >> 24) & 0xFF;
+}
+
+void ARM7TDMI::write_halfword_to_memory(Word address, HalfWord value) {
+    memory[address + 0] = (value >> 0) & 0xFF;
+    memory[address + 1] = (value >> 8) & 0xFF;
 }
 
 // Public
@@ -239,10 +244,6 @@ void ARM7TDMI::warn(const char * msg)
     return;
 }
 
-void stop() {
-
-}
-
 void ARM7TDMI::run_next_opcode()
 {   
     Word pc = read_register(REGISTER_PC);
@@ -250,10 +251,18 @@ void ARM7TDMI::run_next_opcode()
 
     Word end_run = 0x50;
 
-    if (pc == 0x8001d4c) {
+    static bool smth = false;
+    // if (pc == 0x8000458) {
+    //     SDL_Log("BREAK pc: %08x test: %d", pc, read_register(12));
+    //     SDL_TriggerBreakpoint();
+    //     return;
+    // }
+
+    if (pc == 0x8001d4c || smth) {
+        smth = true;
         SDL_Log("FAILED: TEST %d", read_register(12));
-        stop();
-        return;
+        // SDL_TriggerBreakpoint();
+        // return;
     }
     runs++;
 
@@ -266,23 +275,24 @@ void ARM7TDMI::run_next_opcode()
         Byte condition_code = Utils::read_bit_range(opcode, 28, 31);
         if (condition_field(condition_code) == false) {
             write_register(REGISTER_PC, pc + 4);
+            
             return;
         }
 
         switch (opcode_type)
         {
-            case BRANCH: opcode_branch(opcode); break;
-            case BX: opcode_branch_exchange(opcode); break;
-            case SWI: opcode_software_interrupt(opcode); break;
-            case UNDEFINED: opcode_undefined_intruction(opcode); break;
-            case ALU: opcode_data_processing(opcode); break;
-            case MULTIPLY: opcode_multiply(opcode); break;
-            case MULTIPLY_LONG: opcode_multiply_long(opcode); break;
-            case PSR_TRANSFER: opcode_psr_transfer(opcode); break;
-            case SINGLE_DATA_TRANSFER: opcode_single_data_transfer(opcode); break;
-            case HALF_WORD_SIGNED_DATA_TRANSFER: opcode_half_word_signed_data_transfer(opcode); break;
-            case BLOCK_DATA_TRANSFER: opcode_block_data_transfer(opcode); break;
-            case SWAP: opcode_swap(opcode); break;
+            case BRANCH: arm_opcode_branch(opcode); break;
+            case BX: arm_opcode_branch_exchange(opcode); break;
+            case SWI: arm_opcode_software_interrupt(opcode); break;
+            case UNDEFINED: arm_opcode_undefined_intruction(opcode); break;
+            case ALU: arm_opcode_data_processing(opcode); break;
+            case MULTIPLY: arm_opcode_multiply(opcode); break;
+            case MULTIPLY_LONG: arm_opcode_multiply_long(opcode); break;
+            case PSR_TRANSFER: arm_opcode_psr_transfer(opcode); break;
+            case SINGLE_DATA_TRANSFER: arm_opcode_single_data_transfer(opcode); break;
+            case HALF_WORD_SIGNED_DATA_TRANSFER: arm_opcode_half_word_signed_data_transfer(opcode); break;
+            case BLOCK_DATA_TRANSFER: arm_opcode_block_data_transfer(opcode); break;
+            case SWAP: arm_opcode_swap(opcode); break;
             default:
                 break;
         }
@@ -290,6 +300,24 @@ void ARM7TDMI::run_next_opcode()
         if (opcode_type != BRANCH && opcode_type != BX) {
             write_register(REGISTER_PC, read_register(REGISTER_PC) + 4);
         }
-    }   
+    } else {
+        HalfWord opcode = read_halfword_from_memory(pc);
+        ThumbOpcodeType opcode_type = decode_opcode_thumb(opcode);
+
+        SDL_Log("pc: %08x, opcode: %04x, THUMB", pc, opcode);
+
+        bool increment_pc = true;
+
+        switch (opcode_type)
+        {
+            case MOVE_COMPARE_ADD_SUBTRACT_IMMEDIATE: thumb_opcode_move_compare_add_subtract(opcode); break;
+            case HI_REGISTER_OPERATIONS_BRANCH_EXCHANGE: thumb_opcode_hi_register_operations_branch_exchange(opcode, &increment_pc); break;
+            case LOAD_ADDRESS: thumb_opcode_load_address(opcode); break;
+        }
+
+        if (increment_pc) {
+            write_register(REGISTER_PC, read_register(REGISTER_PC) + 2);
+        }
+    }
 }
 
