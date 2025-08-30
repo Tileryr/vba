@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <cstdio>
 
+#define SCALE 3
+
 static ARM7TDMI * cpu = new ARM7TDMI();
 static Scheduler * scheduler = new Scheduler();
 
@@ -28,7 +30,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         return SDL_APP_FAILURE;
     }
 
-    window = SDL_CreateWindow("VBA", 500, 500, SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("VBA", 240 * SCALE, 160 * SCALE, SDL_WINDOW_RESIZABLE);
     if (window == nullptr) {
         SDL_Log("SDL window creation failed: %s", SDL_GetError());
         return SDL_APP_FAILURE;
@@ -39,6 +41,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         SDL_Log("SDL renderer creation failed: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
+
+    SDL_SetRenderScale(renderer, SCALE, SCALE);
 
     display = new Display(renderer, &cpu->memory);
     display->start_draw_loop(scheduler);
