@@ -17,7 +17,7 @@ typedef struct OpcodeSingleDataTransfer : DataTransfer {
 
     void static load(ARM7TDMI * cpu, Word address, Byte destination_register, bool byte);
     void static load(ARM7TDMI * cpu, Word address, Word value, Byte destination_register, bool byte);
-    void static store(ARM7TDMI * cpu, Word address, Byte source_register, bool byte);
+    void static store(ARM7TDMI * cpu, Word address, Word source_register_value, bool byte);
 } OpcodeSingleDataTransfer;
 
 #endif

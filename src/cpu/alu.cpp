@@ -87,7 +87,7 @@ int32_t ArithmaticLogicUnit::arithmetic_right_shift(int32_t number, unsigned int
         bool bit_31 = Utils::read_bit(number, 31);
         carry_flag = bit_31;
         if (bit_31)
-            return INT32_MAX;
+            return UINT32_MAX;
         else
             return 0;
     }

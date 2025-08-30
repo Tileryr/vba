@@ -33,7 +33,7 @@ void ARM7TDMI::thumb_opcode_move_compare_add_subtract(HalfWord opcode) {
         cpsr.c
     );
 
-    OpcodeDataProcess::set_psr_flags(&alu, &cpsr, result, operation_class);
+    OpcodeDataProcess::set_psr_flags(&alu, &cpsr, result);
 
     if (OpcodeDataProcess::do_write_result(instruction_type)) {
         write_register(source_destination_register, result & UINT32_MAX);
@@ -86,7 +86,7 @@ void ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(HalfWord opco
     );
 
     if (instruction_type == OpcodeDataProcess::CMP) {
-        OpcodeDataProcess::set_psr_flags(&alu, &cpsr, result, OpcodeDataProcess::LOGICAL);
+        OpcodeDataProcess::set_psr_flags(&alu, &cpsr, result);
         return;
     }
 

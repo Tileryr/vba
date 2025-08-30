@@ -17,7 +17,8 @@ typedef struct OpcodePsrTransfer {
     unsigned int register_destination : 4; // 12 - 15
 
     // MSR
-    unsigned int only_write_flag : 1; // 19
+    unsigned int write_flag_bits : 1; // 19
+    unsigned int write_control_bits : 1; // 16
     unsigned int register_source : 4; // 0 - 3
 
     // If only only_write_flag

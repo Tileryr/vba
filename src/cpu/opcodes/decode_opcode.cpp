@@ -23,40 +23,40 @@ ArmOpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     {
         return UNDEFINED;
     }
+    if (Utils::read_bit_range(opcode, 23, 27) == 0b00010 &&
+        Utils::read_bit_range(opcode, 4,  11) == 0b00001001 &&
+        Utils::read_bit_range(opcode, 20, 21) == 0b00) {
+        return SWAP;
+    }
     if (Utils::read_bit_range(opcode, 26, 27) == 0b00
     &&  Utils::read_bit_range(opcode, 23, 24) == 0b10
     &&  Utils::read_bit(opcode, 20) == 0b0
     ) {
         return PSR_TRANSFER;
     }
-    if (Utils::read_bit_range(opcode, 26, 27) == 0b00)
-    {
-        return ALU;
-    }
     if (Utils::read_bit_range(opcode, 22, 27) == 0b000000
     &&  Utils::read_bit_range(opcode, 4,  7 ) == 0b1001)
     {
-        return MULTIPLY_LONG;
+        return MULTIPLY;
     }
     if (Utils::read_bit_range(opcode, 23, 27) == 0b00001
     &&  Utils::read_bit_range(opcode, 4,  7 ) == 0b1001)
     {
         return MULTIPLY_LONG;
     }
+    if (Utils::read_bit_range(opcode, 25, 27) == 0b000 && Utils::read_bit(opcode, 7) && Utils::read_bit(opcode, 4)) {
+        return HALF_WORD_SIGNED_DATA_TRANSFER;
+    }
+    if (Utils::read_bit_range(opcode, 26, 27) == 0b00)
+    {
+        return ALU;
+    }
     if (Utils::read_bit_range(opcode, 26, 27) == 0b01) {
         return SINGLE_DATA_TRANSFER;
-    }
-    if (Utils::read_bit_range(opcode, 25, 27) == 0b000) {
-        return HALF_WORD_SIGNED_DATA_TRANSFER;
     }
     if (Utils::read_bit_range(opcode, 25, 27) == 0b100) {
         return BLOCK_DATA_TRANSFER;
     }
-    if (Utils::read_bit_range(opcode, 23, 27) == 0b00010 &&
-        Utils::read_bit_range(opcode, 4,  11) == 0b00001001) {
-        return SWAP;
-    }
-
     SDL_assert(false);
 }
 

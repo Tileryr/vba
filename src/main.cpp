@@ -8,11 +8,16 @@
 #include "./utils.h"
 #include "./cpu/alu.h"
 #include "src/cpu/opcodes/arm/data_processing.h"
+#include "src/display.h"
+#include "src/scheduler.h"
 
 #include <stdlib.h>
 #include <cstdio>
 
 static ARM7TDMI * cpu = new ARM7TDMI();
+static Scheduler * scheduler = new Scheduler();
+
+static Display * display = nullptr;
 static SDL_Window * window = nullptr;
 static SDL_Renderer * renderer = nullptr;
 
@@ -35,10 +40,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         return SDL_APP_FAILURE;
     }
 
-    cpu->memory = (Byte *)malloc(0xFFFFFFF);
-    cpu->write_halfword_to_memory(0x04000004, 1);
+    display = new Display(renderer, &cpu->memory);
+    display->start_draw_loop(scheduler);
 
     cpu->skip_bios();
+
     if (argc > 1) {
         FILE * fileptr;
         
@@ -54,7 +60,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         file_length = ftell(fileptr);
         rewind(fileptr);
 
-        fread(&cpu->memory[GAMEPAK_ROM_START], 1, file_length, fileptr);
+        fread(&cpu->memory.memory[GAMEPAK_ROM_START], 1, file_length, fileptr);
         fclose(fileptr);
     }
 
@@ -68,62 +74,24 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     return SDL_APP_CONTINUE;
 }   
 
-static void render() {
-    Word vram_address_start = 0x06000000;
-
-    // MODE 4
-    Byte * vram = cpu->memory_region(VRAM_START);
-    Byte * background_palette = cpu->memory_region(BG_PALETTE_RAM_START);
-
-    SDL_SetRenderDrawColor(renderer, 50, 50, 50, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(renderer);
-
-    for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        for (int x = 0; x < SCREEN_WIDTH; x++) {
-            Byte palette_color = background_palette[(y*SCREEN_WIDTH) + x];
-
-            Byte r = Utils::read_bit_range(palette_color, 0,  4);
-            Byte g = Utils::read_bit_range(palette_color, 5,  9);
-            Byte b = Utils::read_bit_range(palette_color, 10, 14);
-
-            SDL_SetRenderDrawColor(renderer, r << 3, g << 3, b << 3, SDL_ALPHA_OPAQUE);
-            SDL_RenderPoint(renderer, x, y);
-        }
-    }
-    
-    SDL_SetRenderDrawColor(renderer, 25 << 3, 25 << 3, 25 << 3, SDL_ALPHA_OPAQUE);
-    SDL_RenderPoint(renderer, 10, 10);
-    // MODE 3
-    // for (int y = 0; y < 160; y++) {
-    //     for (int x = 0; x < 240; x++) {
-    //         HalfWord color = cpu->read_halfword_from_memory(vram_address_start + (x*2) * y);
-
-    //         Byte r = Utils::read_bit_range(color, 0,  4);
-    //         Byte g = Utils::read_bit_range(color, 5,  9);
-    //         Byte b = Utils::read_bit_range(color, 10, 14);
-
-    //         SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
-    //         SDL_RenderPoint(renderer, x, y);
-    //     }
-    // }
-}
-
 SDL_AppResult SDL_AppIterate(void *appstate) {
     // SDL_Log("%d", SDL_GetTicks());
-    if (cpu->read_register(REGISTER_PC) < 0xFFFFFFF) {
-        cpu->run_next_opcode();
-    } else {
+    if (cpu->read_register(REGISTER_PC) > 0xFFFFFFF) {
         return SDL_APP_SUCCESS;
+    } else {
+        cpu->run_next_opcode();
     }
     
+    scheduler->tick();
+    display->update_screen_bgmode_4();
+    display->render();
     
-
-    render();
-    SDL_RenderPresent(renderer);
 
     return SDL_APP_CONTINUE;
 }
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
+    delete scheduler;
+    delete display;
     delete cpu;
 }

@@ -20,7 +20,7 @@ void OpcodeSingleDataTransfer::load(ARM7TDMI * cpu, Word address, Byte destinati
     if (byte == 1) { // Byte
         cpu->write_register(
         destination_register,
-        cpu->memory[address]
+        cpu->memory.read_from_memory(address)
         );
     } else { // Word
         Word aligned_address = address & (~0b11);
@@ -49,15 +49,15 @@ void OpcodeSingleDataTransfer::load(ARM7TDMI * cpu, Word address, Word value, By
     }
 }
 
-void OpcodeSingleDataTransfer::store(ARM7TDMI * cpu, Word address, Byte source_register, bool byte) { // Register -> Memory
-    Word source_register_value = cpu->read_register(source_register);
-    if (source_register == REGISTER_PC) {
-        source_register_value += 12;
-    }
+void OpcodeSingleDataTransfer::store(ARM7TDMI * cpu, Word address, Word source_register_value, bool byte) { // Register -> Memory
+    // Word source_register_value = cpu->read_register(source_register);
+    // if (source_register == REGISTER_PC) {
+    //     source_register_value += 12;
+    // }
 
     if (byte == 1) { // Byte
         Byte stored_byte = source_register_value & 0xFF;
-        cpu->memory[address] = stored_byte;
+        cpu->memory.write_to_memory(address, stored_byte);
     } else { // Word
         Word aligned_address = address & (~0b11);
         cpu->write_word_to_memory(aligned_address, source_register_value);

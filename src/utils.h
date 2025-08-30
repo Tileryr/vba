@@ -10,7 +10,14 @@ enum Endian {
 };
 
 typedef struct Utils {
-    static void write_bit(Word * number, unsigned int bit_number, bool bit_value);
+    template <class T>
+    static void write_bit(T number, unsigned int bit_number, bool bit_value) {
+        if (bit_value == 0)
+            *number = *number & (~(1 << bit_number));
+        else
+            *number = *number | (1 << bit_number);
+    }
+
     static bool read_bit(u_int64_t number, unsigned int bit_number);
 
     static void write_bit_range(Word * number, unsigned int bit_range_start, unsigned int bit_range_end, unsigned int bit_value);
@@ -22,10 +29,6 @@ typedef struct Utils {
     static Word rotate_right(unsigned int number, unsigned int rotate_amount, unsigned int bit_size);
 
     static int sign_extend(int base_number, int bits_in_base);
-
-    static Word make_word(Byte byte_1, Byte byte_2, Byte byte_3, Byte byte_4);
-    static Word current_word_at_memory(Byte * memory, Endian endian_type);
-
 } Utils;
 
 #endif

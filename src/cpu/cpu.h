@@ -7,16 +7,9 @@
 #include "psr.h"
 #include "register.h"
 #include "./opcodes/opcode_types.h"
+#include "src/memory.h"
 
 #include "../utils.h"
-
-#define SCREEN_WIDTH 240
-#define SCREEN_HEIGHT 160
-
-#define VRAM_START 0x06000000
-
-#define BG_PALETTE_RAM_START 0x05000000
-#define OBJ_PALETTE_RAM_START 0x05000200
 
 #define GAMEPAK_ROM_START 0x08000000
 
@@ -57,8 +50,6 @@ typedef struct ARM7TDMI {
         ThumbOpcodeType decode_opcode_thumb(HalfWord opcode);
 
         void warn(const char * msg);
-
-        
         
         void arm_opcode_branch(Word opcode);
         void arm_opcode_branch_exchange(Word opcode);
@@ -79,7 +70,7 @@ typedef struct ARM7TDMI {
     public:
         ARM7TDMI();
 
-        Byte * memory;
+        Memory memory;
         int runs = 0;
         
         Word read_word_from_memory(Word address);
@@ -88,6 +79,8 @@ typedef struct ARM7TDMI {
         void write_word_to_memory(Word address, Word value);
         void write_halfword_to_memory(Word address, HalfWord value);
         
+        Byte * memory_region(Word address);
+
         Word read_register(int register_number);
         void write_register(int register_number, Word register_value);
 
@@ -97,7 +90,6 @@ typedef struct ARM7TDMI {
         void run_exception(Exception exception_type);
         void run_next_opcode();
 
-        Byte * memory_region(Word address);
         void skip_bios();
 
         

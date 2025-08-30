@@ -67,32 +67,28 @@ void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_
 };
 
 Word ARM7TDMI::read_word_from_memory(Word address) {
-    return Utils::current_word_at_memory(&memory[address], endian_type);
+    if (address < 0x10000000) {
+        return memory.read_word_from_memory(address);
+    } else {
+        return read_register(REGISTER_PC) + 8;
+    }
 }
 
 HalfWord ARM7TDMI::read_halfword_from_memory(Word address) {
-    return (
-        (memory[address]     << 0) |
-        (memory[address + 1] << 8)
-    );
+    return memory.read_halfword_from_memory(address);
 }
 
 void ARM7TDMI::write_word_to_memory(Word address, Word value) {
-    memory[address + 0] = (value >> 0) & 0xFF;
-    memory[address + 1] = (value >> 8) & 0xFF;
-    memory[address + 2] = (value >> 16) & 0xFF;
-    memory[address + 3] = (value >> 24) & 0xFF;
+    memory.write_word_to_memory(address, value);
 }
 
 void ARM7TDMI::write_halfword_to_memory(Word address, HalfWord value) {
-    memory[address + 0] = (value >> 0) & 0xFF;
-    memory[address + 1] = (value >> 8) & 0xFF;
+    memory.write_halfword_to_memory(address, value);
 }
 
 // Public
 
-ARM7TDMI::ARM7TDMI()
-{
+ARM7TDMI::ARM7TDMI() : memory(0xFFFFFFF) {
     registers_user = RegisterSet();
 
     RegisterSet * register_sets[5] = {&registers_fiq, &registers_irq, &registers_supervisor, &registers_abort, &registers_undefined};
@@ -182,12 +178,12 @@ bool ARM7TDMI::is_priviledged() {
 }
 
 Byte * ARM7TDMI::memory_region(Word address) {
-    return &memory[address];
+    return memory.memory_region(address);
 }
 
 void ARM7TDMI::skip_bios() {
     for (Word i = 0x3007E00; i < 0x3008000; i++) {
-        memory[i] = 0x0;
+        memory.memory[i] = 0x0;
     }
     
     for (Word i = 0; i < 13; i++) {
@@ -247,27 +243,22 @@ void ARM7TDMI::warn(const char * msg)
 void ARM7TDMI::run_next_opcode()
 {   
     Word pc = read_register(REGISTER_PC);
-    Byte * current_memory_place = &memory[pc];
 
-    Word end_run = 0x50;
-
-    static bool smth = false;
-    // if (pc == 0x8000458) {
-    //     SDL_Log("BREAK pc: %08x test: %d", pc, read_register(12));
-    //     SDL_TriggerBreakpoint();
-    //     return;
-    // }
-
-    if (pc == 0x8001d4c || smth) {
-        smth = true;
-        SDL_Log("FAILED: TEST %d", read_register(12));
-        // SDL_TriggerBreakpoint();
-        // return;
+    if (pc >= 0x800153c) {
+        // SDL_Log("BREAK");
     }
-    runs++;
+
+    if (pc == 0x8001d4c) {
+        if (read_register(12) == 0) {
+            SDL_Log("TESTS PASSED");
+        } else {
+            SDL_Log("FAILED: TEST %d", read_register(12));
+            SDL_TriggerBreakpoint();
+        }
+    }
 
     if (cpsr.t == STATE_ARM) {
-        Word opcode = Utils::current_word_at_memory(current_memory_place, endian_type);
+        Word opcode = read_word_from_memory(pc);
         ArmOpcodeType opcode_type = decode_opcode_arm(opcode);
 
         SDL_Log("pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode(opcode).c_str(), read_register(0));
@@ -297,7 +288,8 @@ void ARM7TDMI::run_next_opcode()
                 break;
         }
 
-        if (opcode_type != BRANCH && opcode_type != BX) {
+        bool pc_changed = pc != read_register(REGISTER_PC);
+        if (!pc_changed) {
             write_register(REGISTER_PC, read_register(REGISTER_PC) + 4);
         }
     } else {

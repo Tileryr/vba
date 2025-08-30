@@ -2,13 +2,14 @@
 #include <cstdio>
 #include <assert.h>
 
-void Utils::write_bit(Word * number, unsigned int bit_number, bool bit_value) 
-{
-    if (bit_value == 0)
-        *number = *number & (~(1 << bit_number));
-    else
-        *number = *number | (1 << bit_number);
-}
+// template <class T>
+// void Utils::write_bit(T number, unsigned int bit_number, bool bit_value) 
+// {
+//     if (bit_value == 0)
+//         *number = *number & (~(1 << bit_number));
+//     else
+//         *number = *number | (1 << bit_number);
+// }
 
 bool Utils::read_bit(u_int64_t number, unsigned int bit_number) 
 {
@@ -55,27 +56,3 @@ unsigned int Utils::rotate_right(unsigned int number, unsigned int rotate_amount
     result = result & ((1 << bit_size) - 1);
     return result;
 }
-
-Word Utils::make_word(Byte byte_1, Byte byte_2, Byte byte_3, Byte byte_4)
-{
-    return 
-      (byte_1 << 0) 
-    | (byte_2 << 8)
-    | (byte_3 << 16)
-    | (byte_4 << 24);
-}
-
-Word Utils::current_word_at_memory(Byte * memory, Endian endian_type)
-{
-    if (endian_type == ENDIAN_BIG)
-    {
-        return make_word(memory[3], memory[2], memory[1], memory[0]);
-    } else 
-    if (endian_type == ENDIAN_LITTLE)
-    {
-        return make_word(memory[0], memory[1], memory[2], memory[3]);
-    }
-
-    assert(false);
-}
-
