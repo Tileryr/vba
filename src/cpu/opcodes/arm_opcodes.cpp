@@ -70,58 +70,59 @@ void ARM7TDMI::arm_opcode_undefined_intruction(Word opcode)
 
 void ARM7TDMI::arm_opcode_data_processing(Word opcode) 
 {   
-    DataProcess opcode_class = DataProcess(opcode);
-    Word rn = read_register(opcode_class.rn);
-    Word op2;
+    OpcodeDataProcess opcode_class = OpcodeDataProcess(opcode);
+    opcode_class.run(this);
+    // Word rn = read_register(opcode_class.rn);
+    // Word op2;
 
-    if (!opcode_class.use_immediate_operand_2) {
-        op2 = read_register(opcode_class.operand_2_register);
-        if (opcode_class.operand_2_register == REGISTER_PC)
-            op2 += opcode_class.calculate_pc_prefetch_offset();
+    // if (!opcode_class.use_immediate_operand_2) {
+    //     op2 = read_register(opcode_class.operand_2_register);
+    //     if (opcode_class.operand_2_register == REGISTER_PC)
+    //         op2 += opcode_class.calculate_pc_prefetch_offset();
 
-        Word shift_register_value = read_register(opcode_class.shift_register);
-        Byte shift_amount = opcode_class.get_op_2_register_shift_amount(opcode_class.shift_by_register, shift_register_value);
+    //     Word shift_register_value = read_register(opcode_class.shift_register);
+    //     Byte shift_amount = opcode_class.get_op_2_register_shift_amount(opcode_class.shift_by_register, shift_register_value);
 
-        if (opcode_class.shift_by_register && shift_amount == 0) {
-            opcode_class.alu.carry_flag = cpsr.c;
-        } else {
-            op2 = opcode_class.shift_op2(&opcode_class.alu, op2, shift_amount, opcode_class.bit_shift_type, cpsr.c);
-        }
+    //     if (opcode_class.shift_by_register && shift_amount == 0) {
+    //         opcode_class.alu.carry_flag = cpsr.c;
+    //     } else {
+    //         op2 = opcode_class.shift_op2(&opcode_class.alu, op2, shift_amount, opcode_class.bit_shift_type, cpsr.c);
+    //     }
         
-    } else {
-        op2 = opcode_class.calculate_immediate_op2(opcode_class.operand_2_immediate, opcode_class.immediate_ror_shift * 2);
-    } 
+    // } else {
+    //     op2 = opcode_class.calculate_immediate_op2(opcode_class.operand_2_immediate, opcode_class.immediate_ror_shift * 2);
+    // } 
 
-    if (opcode_class.rn == REGISTER_PC) {
-        rn += opcode_class.calculate_pc_prefetch_offset();
-    }
+    // if (opcode_class.rn == REGISTER_PC) {
+    //     rn += opcode_class.calculate_pc_prefetch_offset();
+    // }
 
-    OpcodeDataProcess::InstructionType instruction_type = (OpcodeDataProcess::InstructionType)opcode_class.instruction_type;
-    u_int64_t result = opcode_class.calculate_instruction(&opcode_class.alu, instruction_type, rn, op2, cpsr.c);
+    // OpcodeDataProcess::InstructionType instruction_type = (OpcodeDataProcess::InstructionType)opcode_class.instruction_type;
+    // u_int64_t result = opcode_class.calculate_instruction(&opcode_class.alu, instruction_type, rn, op2, cpsr.c);
 
-    if (opcode_class.set_condition_codes) {
-        if (opcode_class.rd == REGISTER_PC) {
-            cpsr = current_register_set()->spsr;
-            return;
-        }
+    // if (opcode_class.set_condition_codes) {
+    //     if (opcode_class.rd == REGISTER_PC) {
+    //         cpsr = current_register_set()->spsr;
+    //         return;
+    //     }
 
-        opcode_class.set_psr_flags(&opcode_class.alu, &cpsr, result);
-        if (opcode_class.operation_class == OpcodeDataProcess::ARITHMETIC) {
-            bool sub = (
-                opcode_class.instruction_type == OpcodeDataProcess::SUB ||
-                opcode_class.instruction_type == OpcodeDataProcess::SBC ||
-                opcode_class.instruction_type == OpcodeDataProcess::RSB ||
-                opcode_class.instruction_type == OpcodeDataProcess::RSC ||
-                opcode_class.instruction_type == OpcodeDataProcess::CMP 
-            );
+    //     opcode_class.set_psr_flags(&opcode_class.alu, &cpsr, result);
+    //     if (opcode_class.operation_class == OpcodeDataProcess::ARITHMETIC) {
+    //         bool sub = (
+    //             opcode_class.instruction_type == OpcodeDataProcess::SUB ||
+    //             opcode_class.instruction_type == OpcodeDataProcess::SBC ||
+    //             opcode_class.instruction_type == OpcodeDataProcess::RSB ||
+    //             opcode_class.instruction_type == OpcodeDataProcess::RSC ||
+    //             opcode_class.instruction_type == OpcodeDataProcess::CMP 
+    //         );
 
-            cpsr.v = opcode_class.get_overflow_flag(rn, op2, result, sub);
-        }
-    }
+    //         cpsr.v = opcode_class.get_overflow_flag(rn, op2, result, sub);
+    //     }
+    // }
 
-    if (opcode_class.do_write_result(instruction_type)) {
-        write_register(opcode_class.rd, result & UINT32_MAX);
-    }
+    // if (opcode_class.do_write_result(instruction_type)) {
+    //     write_register(opcode_class.rd, result & UINT32_MAX);
+    // }
 }
 
 void ARM7TDMI::arm_opcode_multiply(Word opcode)
@@ -340,8 +341,6 @@ void ARM7TDMI::arm_opcode_half_word_signed_data_transfer(Word opcode) {
 void ARM7TDMI::arm_opcode_block_data_transfer(Word opcode) {
     OpcodeBlockDataTransfer data_transfer = OpcodeBlockDataTransfer(opcode);
     Word base_address = read_register(data_transfer.base_register);
-    
-    
 
     if (is_priviledged() && data_transfer.s == 1) {
         warn("Block Data Transfer - not priviledged && s == 1");

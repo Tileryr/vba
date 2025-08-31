@@ -4,6 +4,28 @@
 #include "src/cpu/opcodes/arm/branch_exchange.h"
 #include "opcode_types.h"
 
+void ARM7TDMI::thumb_opcode_move_shifted_register(HalfWord opcode) {
+    Byte sub_opcode = Utils::read_bit_range(opcode, 11, 12);
+    Byte offset = Utils::read_bit_range(opcode, 6, 10);
+    Byte source_register = Utils::read_bit_range(opcode, 3, 5);
+    Byte destination_register = Utils::read_bit_range(opcode, 0, 2);
+
+    OpcodeDataProcess::BitShiftType shift_type;
+
+    switch (sub_opcode)
+    {
+        case 0:
+            shift_type = OpcodeDataProcess::LSL;
+            break;
+        case 1:
+            shift_type = OpcodeDataProcess::LSR;
+            break;
+        case 2:
+            shift_type = OpcodeDataProcess::ASR;
+            break;
+    }
+}
+
 void ARM7TDMI::thumb_opcode_move_compare_add_subtract(HalfWord opcode) {
     CpuALU alu;
 

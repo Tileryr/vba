@@ -1,6 +1,7 @@
 #ifndef OPCODE_DATA_PROCESSING_INCLUDED
 #define OPCODE_DATA_PROCESSING_INCLUDED
 
+#include "src/cpu/cpu.h"
 #include "../../alu.h"
 #include "../../cpu_types.h"
 #include "../../psr.h"
@@ -60,9 +61,7 @@ typedef struct OpcodeDataProcess {
 
     CpuALU alu;
 
-    BitShiftType bit_shift_type;
-    OperationClass operation_class;
-
+    OpcodeDataProcess();
     OpcodeDataProcess(Word opcode);
 
     Word calculate_immediate_op2( Byte immediate, unsigned int ror_shift);
@@ -70,10 +69,29 @@ typedef struct OpcodeDataProcess {
     static Word shift_op2(CpuALU * alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag);
     static void set_psr_flags(CpuALU * alu, PSR * psr, u_int64_t result);
     static bool do_write_result(InstructionType instruction);
+    static OperationClass operation_class(InstructionType instruction);
 
     Byte get_op_2_register_shift_amount(bool shift_by_register, Word shift_register_value);
     unsigned int calculate_pc_prefetch_offset();
     static bool get_overflow_flag(Word op1, Word op2, u_int64_t result, bool subtraction);
-} DataProcess;
+
+    void run(ARM7TDMI * cpu);
+} OpcodeDataProcess;
+
+typedef struct OpcodeDataProcessingBuilder {
+    OpcodeDataProcessingBuilder(Word instruction_type, bool set_condition_codes);
+    OpcodeDataProcess product;
+
+    OpcodeDataProcessingBuilder& set_destination_register(Word destination_register);
+    OpcodeDataProcessingBuilder& set_source_register(Word source_register);
+
+    OpcodeDataProcessingBuilder& set_immediate_op2(Byte immediate, Word ror_shift);
+    OpcodeDataProcessingBuilder& set_register_op2(Byte op2_register, Byte shift_type);
+
+    OpcodeDataProcessingBuilder& set_register_op2_shift_register(Byte shift_register);
+    OpcodeDataProcessingBuilder& set_register_op2_shift_immediate(Byte shift_immediate_amount);
+
+    OpcodeDataProcess get_product();
+} OpcodeDataProcessingBuilder;
 
 #endif
