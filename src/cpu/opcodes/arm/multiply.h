@@ -1,9 +1,11 @@
 #ifndef OPCODE_MULTIPLY_INCLUDED
 #define OPCODE_MULTIPLY_INCLUDED
 
+#include "src/cpu/cpu.h"
 #include "src/cpu/cpu_types.h"
 
 typedef struct OpcodeMultiply {
+    OpcodeMultiply();
     OpcodeMultiply(Word opcode);
     unsigned int accumulate : 1; // 21
     unsigned int set_condition_codes : 1; // 20
@@ -11,7 +13,18 @@ typedef struct OpcodeMultiply {
     unsigned int rn : 4; // 15 - 12
     unsigned int rs : 4; // 11 - 8
     unsigned int rm : 4; // 3 - 0
-} Multiply;
+
+    void run(ARM7TDMI * cpu);
+} OpcodeMultiply;
+
+typedef struct OpcodeMultiplyBuilder {
+    OpcodeMultiplyBuilder(Byte destination_register, Byte rs, Byte rm, bool set_condition_codes);
+    OpcodeMultiply product;
+
+    OpcodeMultiplyBuilder& set_accumulate(Byte accumulate_register);
+
+    OpcodeMultiply get_product();
+} OpcodeMultiplyBuilder;
 
 
 #endif

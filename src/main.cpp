@@ -83,7 +83,9 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     if (cpu->read_register(REGISTER_PC) > 0xFFFFFFF) {
         return SDL_APP_SUCCESS;
     } else {
-        cpu->run_next_opcode();
+        for (int i = 0; i < 4; i++) {
+            cpu->run_next_opcode();
+        }
     }
     
     scheduler->tick();

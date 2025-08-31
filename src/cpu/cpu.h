@@ -65,7 +65,10 @@ typedef struct ARM7TDMI {
         void arm_opcode_swap(Word opcode);
 
         void thumb_opcode_move_shifted_register(HalfWord opcode);
+        void thumb_opcode_add_subtract(HalfWord opcode);
         void thumb_opcode_move_compare_add_subtract(HalfWord opcode);
+        void thumb_opcode_alu_operations(HalfWord opcode);
+
         void thumb_opcode_hi_register_operations_branch_exchange(HalfWord opcode, bool * increment_pc);
         void thumb_opcode_load_address(HalfWord opcode);
     public:

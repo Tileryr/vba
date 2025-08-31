@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include <SDL3/SDL.h>
+#include "src/cpu/opcodes/arm/data_processing.h"
 // Private
 
 RegisterSet * ARM7TDMI::mode_to_register_set(OperatingMode mode) 
@@ -297,7 +298,6 @@ void ARM7TDMI::run_next_opcode()
         ThumbOpcodeType opcode_type = decode_opcode_thumb(opcode);
 
         SDL_Log("pc: %08x, opcode: %04x, THUMB", pc, opcode);
-
         bool increment_pc = true;
 
         switch (opcode_type)
