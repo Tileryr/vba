@@ -1,7 +1,9 @@
 #include "data_processing.h"
 #include "src/utils.h"
 
+#include <SDL3/SDL.h>
 #include <limits.h>
+
 OpcodeDataProcess::OpcodeDataProcess() {}
 OpcodeDataProcess::OpcodeDataProcess(Word opcode) 
 {
@@ -52,6 +54,9 @@ Word OpcodeDataProcess::shift_op2(CpuALU * alu, Word op2, Byte shift_amount, Bit
             if (shift_amount == 0) 
                 return alu->rotate_right_extended(op2, c_flag);
             return alu->rotate_right(op2, shift_amount);
+        default:
+            SDL_assert(false);
+            return op2;
     }
 }
 
@@ -123,12 +128,16 @@ Byte OpcodeDataProcess::get_op_2_register_shift_amount(bool shift_by_register, W
     }
 }
 
-unsigned int OpcodeDataProcess::calculate_pc_prefetch_offset() 
+unsigned int OpcodeDataProcess::calculate_pc_with_prefetch_offset(Word address, CPUState state) 
 {
-    if (!use_immediate_operand_2 && shift_by_register) {
-        return 12;
+    if (state == STATE_ARM) {
+        if (!use_immediate_operand_2 && shift_by_register) {
+            return address + 12;
+        } else {
+            return address + 8;
+        }
     } else {
-        return 8;
+        return (address + 4) & (~1);
     }
 }
 
@@ -177,8 +186,10 @@ void OpcodeDataProcess::run(ARM7TDMI * cpu) {
 
     if (!use_immediate_operand_2) {
         op2 = cpu->read_register(operand_2_register);
-        if (operand_2_register == REGISTER_PC)
-            op2 += calculate_pc_prefetch_offset();
+        if (operand_2_register == REGISTER_PC) {
+            op2 = calculate_pc_with_prefetch_offset(op2, cpu->cpsr.t);
+        }
+            
 
         Word shift_register_value = cpu->read_register(shift_register);
         Byte shift_amount = get_op_2_register_shift_amount(shift_by_register, shift_register_value);
@@ -194,7 +205,8 @@ void OpcodeDataProcess::run(ARM7TDMI * cpu) {
     } 
 
     if (this->rn == REGISTER_PC) {
-        rn_value += calculate_pc_prefetch_offset();
+        rn_value = calculate_pc_with_prefetch_offset(rn_value, cpu->cpsr.t);
+
     }
 
     InstructionType instruction_type = (InstructionType)this->instruction_type;

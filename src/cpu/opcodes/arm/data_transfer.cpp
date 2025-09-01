@@ -1,6 +1,7 @@
 #include "data_transfer.h"
 #include "src/cpu/cpu.h"
 
+DataTransfer::DataTransfer() {}
 DataTransfer::DataTransfer(Word opcode) {
     p = Utils::read_bit(opcode, 24);
     u = Utils::read_bit(opcode, 23);
@@ -24,7 +25,11 @@ Word DataTransfer::calculate_address(ARM7TDMI * cpu, Word offset) {
         if (w) {
             cpu->warn("Single Data Transfer - Base register == PC && writeback");
         }
-        base_register_value += 8;
+        if (cpu->cpsr.t == STATE_ARM) {
+            base_register_value += 8;
+        } else {
+            base_register_value = (base_register_value + 4) & (~0b11);
+        }
     }
 
     if (u == 0) { // Down - Subtract

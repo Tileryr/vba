@@ -57,7 +57,9 @@ ArmOpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     if (Utils::read_bit_range(opcode, 25, 27) == 0b100) {
         return BLOCK_DATA_TRANSFER;
     }
+    
     SDL_assert(false);
+    return ALU;
 }
 
 ThumbOpcodeType ARM7TDMI::decode_opcode_thumb(HalfWord opcode) {
@@ -98,7 +100,7 @@ ThumbOpcodeType ARM7TDMI::decode_opcode_thumb(HalfWord opcode) {
         return LOAD_STORE_HALFWORD;
     }
     if (get_bitregion(12, 15) == 0b1001) {
-        return LOAD_STORE_SP_RELATIVE;
+        return SP_RELATIVE_LOAD_STORE;
     }
     if (get_bitregion(12, 15) == 0b1010) {
         return LOAD_ADDRESS;
@@ -125,4 +127,6 @@ ThumbOpcodeType ARM7TDMI::decode_opcode_thumb(HalfWord opcode) {
         return LONG_BRANCH_WITH_LINK;
     }
 
+    SDL_assert(false);
+    return ALU_OPERATION;
 }

@@ -58,6 +58,7 @@ OpcodeMultiplyBuilder::OpcodeMultiplyBuilder(Byte destination_register, Byte rs,
 OpcodeMultiplyBuilder& OpcodeMultiplyBuilder::set_accumulate(Byte accumulate_register) {
     product.accumulate = true;
     product.rn = accumulate_register;
+    return *this;
 }
 
 OpcodeMultiply OpcodeMultiplyBuilder::get_product() {

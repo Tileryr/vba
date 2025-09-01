@@ -25,7 +25,6 @@ std::string ARM7TDMI::dissassemble_opcode(Word opcode) {
         case MULTIPLY_LONG:
             return "multiply_long";
             break;
-
         case PSR_TRANSFER:
             return "psr_transfer";
             break;
@@ -44,4 +43,5 @@ std::string ARM7TDMI::dissassemble_opcode(Word opcode) {
     }
     
     SDL_assert(false);
+    return "ERROR";
 }

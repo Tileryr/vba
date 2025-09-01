@@ -245,10 +245,6 @@ void ARM7TDMI::run_next_opcode()
 {   
     Word pc = read_register(REGISTER_PC);
 
-    if (pc >= 0x800153c) {
-        // SDL_Log("BREAK");
-    }
-
     if (pc == 0x8001d4c) {
         if (read_register(12) == 0) {
             SDL_Log("TESTS PASSED");
@@ -298,16 +294,16 @@ void ARM7TDMI::run_next_opcode()
         ThumbOpcodeType opcode_type = decode_opcode_thumb(opcode);
 
         SDL_Log("pc: %08x, opcode: %04x, THUMB", pc, opcode);
-        bool increment_pc = true;
 
         switch (opcode_type)
         {
             case MOVE_COMPARE_ADD_SUBTRACT_IMMEDIATE: thumb_opcode_move_compare_add_subtract(opcode); break;
-            case HI_REGISTER_OPERATIONS_BRANCH_EXCHANGE: thumb_opcode_hi_register_operations_branch_exchange(opcode, &increment_pc); break;
+            case HI_REGISTER_OPERATIONS_BRANCH_EXCHANGE: thumb_opcode_hi_register_operations_branch_exchange(opcode); break;
             case LOAD_ADDRESS: thumb_opcode_load_address(opcode); break;
         }
 
-        if (increment_pc) {
+        bool pc_changed = pc != read_register(REGISTER_PC);
+        if (!pc_changed) {
             write_register(REGISTER_PC, read_register(REGISTER_PC) + 2);
         }
     }

@@ -72,7 +72,7 @@ typedef struct OpcodeDataProcess {
     static OperationClass operation_class(InstructionType instruction);
 
     Byte get_op_2_register_shift_amount(bool shift_by_register, Word shift_register_value);
-    unsigned int calculate_pc_prefetch_offset();
+    unsigned int calculate_pc_with_prefetch_offset(Word address, CPUState state);
     static bool get_overflow_flag(Word op1, Word op2, u_int64_t result, bool subtraction);
 
     void run(ARM7TDMI * cpu);

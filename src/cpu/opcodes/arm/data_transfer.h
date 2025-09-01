@@ -6,6 +6,7 @@
 
 typedef struct DataTransfer
 {
+    DataTransfer();
     DataTransfer(Word opcode);
     
     unsigned int p : 1; // Pre/Post : 24
@@ -20,7 +21,6 @@ typedef struct DataTransfer
     unsigned int offset_register : 4; // 3 - 0
 
     Word calculate_address(ARM7TDMI * cpu, Word offset);
-
 } DataTransfer;
 
 

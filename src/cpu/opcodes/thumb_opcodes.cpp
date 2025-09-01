@@ -1,6 +1,9 @@
 #include "src/cpu/cpu.h"
 #include "src/cpu/opcodes/arm/data_processing.h"
 #include "src/cpu/opcodes/arm/multiply.h"
+#include "src/cpu/opcodes/arm/single_data_transfer.h"
+#include "src/cpu/opcodes/arm/half_word_signed_data_transfer.h"
+#include "src/cpu/opcodes/arm/block_data_transfer.h"
 #include "src/cpu/opcodes/arm/branch_exchange.h"
 
 #include "opcode_types.h"
@@ -154,7 +157,7 @@ void ARM7TDMI::thumb_opcode_alu_operations(HalfWord opcode) {
     }
 }
 
-void ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(HalfWord opcode, bool * increment_pc) {
+void ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(HalfWord opcode) {
     Byte opcode_instruction_type = Utils::read_bit_range(opcode, 8, 9);
     bool hi_operand_flag_1 = Utils::read_bit(opcode, 7);
     bool hi_operand_flag_2 = Utils::read_bit(opcode, 6);
@@ -170,7 +173,6 @@ void ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(HalfWord opco
     if (opcode_instruction_type == 3) { // BX
         OpcodeBranchExchange branch_exchange;
         OpcodeBranchExchange::build(&branch_exchange, target_source_register);
-        *increment_pc = false;
         branch_exchange.run(this);
         return;
     }
@@ -197,25 +199,174 @@ void ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(HalfWord opco
     .get_product().run(this);
 }
 
+void ARM7TDMI::thumb_opcode_pc_relative_load(HalfWord opcode) {
+    Byte destination_register = Utils::read_bit_range(opcode, 8, 10);
+    Byte word_8 = Utils::read_bit_range(opcode, 0, 7);
 
+    Word immediate = word_8 << 2;
+
+    OpcodeSingleDataTransferBuilder(true, REGISTER_PC, destination_register)
+    .set_flags(true, true, false, false)
+    .set_offset_immediate(immediate)
+    .get_product().run(this);
+}
+
+void ARM7TDMI::thumb_opcode_load_store_register_offset(HalfWord opcode) {
+    bool load = Utils::read_bit(opcode, 11);
+    bool byte = Utils::read_bit(opcode, 10);
+
+    Byte offset_register = Utils::read_bit_range(opcode, 6, 8);
+    Byte base_register = Utils::read_bit_range(opcode, 3, 5);
+    Byte source_destination_register = Utils::read_bit_range(opcode, 0, 2);
+
+    OpcodeSingleDataTransferBuilder(load, base_register, source_destination_register)
+    .set_flags(true, true, byte, false)
+    .set_offset_register(offset_register, 0, 0)
+    .get_product().run(this);
+}
+
+void ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(HalfWord opcode) {
+    bool h = Utils::read_bit(opcode, 11);
+    bool sign_extend = Utils::read_bit(opcode, 10);
+
+    Byte offset_register = Utils::read_bit_range(opcode, 6, 8);
+    Byte base_register = Utils::read_bit_range(opcode, 3, 5);
+    Byte source_destination_register = Utils::read_bit_range(opcode, 0, 2);
+
+    bool load;
+    if (h == 0 && sign_extend == 0) {
+        load = false;
+    } else {
+        load = true;
+    }
+
+    OpcodeHalfWordSignedDataTransfer::DataType data_type;
+    if (h == 0 && sign_extend == 0) {
+        data_type = OpcodeHalfWordSignedDataTransfer::UNSIGNED_HALFWORD;
+    } else {
+        Byte sh = (sign_extend << 1) | h;
+        data_type = (OpcodeHalfWordSignedDataTransfer::DataType) sh;
+    }
+
+    OpcodeHalfWordSignedDataTransferBuilder(load, base_register, source_destination_register)
+    .set_datatype(data_type)
+    .set_flags(true, true, false)
+    .set_offset_register(offset_register)
+    .get_product().run(this);
+}
+
+void ARM7TDMI::thumb_opcode_load_store_immediate_offset(HalfWord opcode) {
+    bool byte = Utils::read_bit(opcode, 12);
+    bool load = Utils::read_bit(opcode, 11);
+
+    Byte offset_value = Utils::read_bit_range(opcode, 6, 10);
+    Byte base_register = Utils::read_bit_range(opcode, 3, 5);
+    Byte source_destination_register = Utils::read_bit_range(opcode, 0, 2);
+
+    Byte immediate = byte ? offset_value : offset_value << 2;
+
+    OpcodeSingleDataTransferBuilder(load, base_register, source_destination_register)
+    .set_flags(true, true, byte, false)
+    .set_offset_immediate(immediate)
+    .get_product().run(this);
+}
+
+void ARM7TDMI::thumb_opcode_load_store_halfword(HalfWord opcode) {
+    bool load = Utils::read_bit(opcode, 11);
+
+    Byte offset_value = Utils::read_bit_range(opcode, 6, 10);
+    Byte base_register = Utils::read_bit_range(opcode, 3, 5);
+    Byte source_destination_register = Utils::read_bit_range(opcode, 0, 2);
+
+    Byte immediate = offset_value << 1;
+
+    OpcodeHalfWordSignedDataTransferBuilder(load, base_register, source_destination_register)
+    .set_datatype(OpcodeHalfWordSignedDataTransfer::UNSIGNED_HALFWORD)
+    .set_flags(true, true, false)
+    .set_offset_immediate(immediate)
+    .get_product().run(this);
+}
+
+void ARM7TDMI::thumb_opcode_sp_relative_load_store(HalfWord opcode) {
+    bool load = Utils::read_bit(opcode, 11);
+    Byte destination_register = Utils::read_bit_range(opcode, 8, 10);
+    Byte word_8 = Utils::read_bit_range(opcode, 0, 7);
+
+    Word immediate = word_8 << 2;
+
+    OpcodeSingleDataTransferBuilder(load, REGISTER_SP, destination_register)
+    .set_flags(true, true, false, false)
+    .set_offset_immediate(immediate)
+    .get_product().run(this);
+}
 
 void ARM7TDMI::thumb_opcode_load_address(HalfWord opcode) {
     bool sp = Utils::read_bit(opcode, 11);
     Byte destination_register = Utils::read_bit_range(opcode, 8, 10);
-    Word immediate = Utils::read_bit_range(opcode, 0, 7) << 2;
+    Byte word_8 = Utils::read_bit_range(opcode, 0, 7);
 
-    Word pc_value = (read_register(REGISTER_PC) + 4) & (~1);
-    Word sp_value = read_register(REGISTER_SP);
-    Word source_value = sp ? sp_value : pc_value;
+    Byte source_register = sp ? REGISTER_SP : REGISTER_PC;
+    Word immediate = word_8 << 2;
 
-    CpuALU alu;
-    Word result = OpcodeDataProcess::calculate_instruction(
-        &alu, 
-        OpcodeDataProcess::ADD, 
-        source_value,
-        immediate, 
-        cpsr.c
-    );
-
-    write_register(destination_register, result);
+    OpcodeDataProcessingBuilder(OpcodeDataProcess::ADD, false)
+    .set_destination_register(destination_register)
+    .set_source_register(source_register)
+    .set_immediate_op2(immediate, 0)
+    .get_product().run(this);
 }
+
+void ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(HalfWord opcode) {
+    bool sign = Utils::read_bit(opcode, 7);
+    Byte s_word_7 = Utils::read_bit_range(opcode, 0, 6);
+
+    Word immediate = s_word_7 << 2;
+
+    OpcodeDataProcess::InstructionType instruction_type;
+    if (sign == 0) {
+        instruction_type = OpcodeDataProcess::ADD;
+    } else {
+        instruction_type = OpcodeDataProcess::SUB;
+    }
+
+    OpcodeDataProcessingBuilder(instruction_type, false)
+    .set_destination_register(REGISTER_SP)
+    .set_source_register(REGISTER_SP)
+    .set_immediate_op2(immediate, 0)
+    .get_product().run(this);
+}
+
+void ARM7TDMI::thumb_opcode_push_pop_registers(HalfWord opcode) {
+    bool load = Utils::read_bit(opcode, 11);
+    bool pc_lr_bit = Utils::read_bit(opcode, 8);
+    Byte r_list = Utils::read_bit_range(opcode, 0, 7);
+
+    bool up  = load ? true : false;
+    bool pre = load ? false : true;
+
+    HalfWord register_list = r_list;
+
+    if (pc_lr_bit) {
+        if (load) {
+            register_list = register_list | (1 << REGISTER_PC);
+        } else {
+            register_list = register_list | (1 << REGISTER_LR);
+        }
+    }
+
+    OpcodeBlockDataTransferBuilder(load, REGISTER_SP)
+    .set_flags(pre, up, false, true)
+    .set_register_list(register_list)
+    .get_product().run(this);
+}
+
+void ARM7TDMI::thumb_opcode_multiple_load_store(HalfWord opcode) {
+    bool load = Utils::read_bit(opcode, 11);
+    Byte base_register = Utils::read_bit_range(opcode, 8, 10);
+    Byte register_list = Utils::read_bit_range(opcode, 0, 7);
+
+    OpcodeBlockDataTransferBuilder(load, base_register)
+    .set_flags(false, true, false, true)
+    .set_register_list(register_list)
+    .get_product().run(this);
+}   
+

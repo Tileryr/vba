@@ -168,176 +168,17 @@ void ARM7TDMI::arm_opcode_psr_transfer(Word opcode)
 void ARM7TDMI::arm_opcode_single_data_transfer(Word opcode)
 {
     OpcodeSingleDataTransfer data_transfer = OpcodeSingleDataTransfer(opcode);
-    
-    if (data_transfer.offset_register == REGISTER_PC) {
-        warn("Single Data Transfer - Offset register == PC");
-    }
-
-    Word offset;
-
-    if (data_transfer.i == 1) { // Offset = Shifted Register
-        Word offset_register_value = read_register(data_transfer.offset_register);
-        OpcodeDataProcess::BitShiftType shift_type = static_cast<OpcodeDataProcess::BitShiftType>(data_transfer.register_shift_type);
-        CpuALU alu;
-        offset = OpcodeDataProcess::shift_op2(&alu, offset_register_value, data_transfer.register_shift_amount, shift_type, cpsr.c);
-    } else { // Offset = immediate value
-        offset = data_transfer.offset_immediate;
-    }
-
-    Word source_destination_register_value = read_register(data_transfer.source_destination_register);
-    Word address = data_transfer.calculate_address(this, offset);
-
-    // For little endian only
-    if (data_transfer.l == 0) { // Store
-        if (data_transfer.source_destination_register == REGISTER_PC) {
-            source_destination_register_value += 12;
-        }
-        data_transfer.store(this, address, source_destination_register_value, data_transfer.b);
-    } else { // Load
-        data_transfer.load(this, address, data_transfer.source_destination_register, data_transfer.b);
-    }
+    data_transfer.run(this);
 }
 
 void ARM7TDMI::arm_opcode_half_word_signed_data_transfer(Word opcode) {
     OpcodeHalfWordSignedDataTransfer data_transfer = OpcodeHalfWordSignedDataTransfer(opcode);
-
-    Word offset;
-
-    if (data_transfer.offset_register == REGISTER_PC) {
-        warn("Single Data Transfer - Offset register == PC");
-    }
-
-    if (data_transfer.i == 0) { // Register Offset
-        offset = read_register(data_transfer.offset_register);
-    } else { // Immediate Offset
-        offset = (data_transfer.immediate_high_nibble << 4) | data_transfer.immediate_low_nibble;
-    }
-
-    Word source_register_value = read_register(data_transfer.source_destination_register);
-    if (data_transfer.source_destination_register == REGISTER_PC) {
-        source_register_value += 12;
-    }
-
-    Word address = data_transfer.calculate_address(this, offset);
-    Word aligned_address = address & (~0b1);
-
-    // For little endian
-    if (data_transfer.l == 0) { // Store
-        if (data_transfer.s == 0) { // Unsigned
-            if (data_transfer.h == 0) { // Byte || Reserved for SWP
-
-            } else { // Halfword || STRH
-                HalfWord selected_halfword = source_register_value & 0xFFFF;
-                memory.write_halfword_to_memory(aligned_address, selected_halfword);
-            }
-        } else { // Signed
-            warn("Half-Word signed data transfer - Storing signed value");
-        }
-    } else { // Load
-        Word selected_halfword = memory.read_halfword_from_memory(aligned_address);
-        Byte rotate_amount = (address & 1) * 8;
-        selected_halfword = CpuALU().rotate_right(selected_halfword, rotate_amount);
-
-        if (data_transfer.s == 0) { // Unsigned
-            if (data_transfer.h == 0) { // Byte || Reserved for SWP
-
-            } else { // Halfword || LDRH
-                write_register(data_transfer.source_destination_register, selected_halfword);
-            }
-        } else { // Signed
-            if (data_transfer.h == 0) { // Byte || LDRSB
-                Byte selected_byte = memory.read_from_memory(address);
-                write_register(data_transfer.source_destination_register, Utils::sign_extend(selected_byte, 8));
-            } else { // Halfword || LDRSH
-                write_register(data_transfer.source_destination_register, Utils::sign_extend(selected_halfword, 16 - rotate_amount));
-            }
-        }
-    }
+    data_transfer.run(this);
 }
 
 void ARM7TDMI::arm_opcode_block_data_transfer(Word opcode) {
     OpcodeBlockDataTransfer data_transfer = OpcodeBlockDataTransfer(opcode);
-    Word base_address = read_register(data_transfer.base_register);
-
-    if (is_priviledged() && data_transfer.s == 1) {
-        warn("Block Data Transfer - not priviledged && s == 1");
-    }
-    if (data_transfer.base_register == REGISTER_PC) {
-        warn("Block Data Transfer - base_register == PC");
-    }
-
-    Word offset = 0;
-    Word write_back_address = base_address;
-    bool pc_in_transfer_list = false;
-
-    bool empty_register_list = data_transfer.register_list == 0b0;
-    if (empty_register_list) {
-        data_transfer.register_list = 0x8000;
-        offset = 0x3C;
-    }
-
-    for (int i = 0; i < 16; i++) {
-        bool transfer_register = Utils::read_bit(data_transfer.register_list, i);
-        if (transfer_register) {
-            offset += 4;
-            if (i == 15) {
-                pc_in_transfer_list = true;
-            }
-        }
-    }
-    write_back_address += data_transfer.u ? offset : -offset;
-
-    Word current_address = base_address;
-    if (data_transfer.u == 0) { // Down
-        current_address = write_back_address;
-    }
-
-    bool pre_increment = data_transfer.u ? data_transfer.p : !data_transfer.p;
-
-    RegisterSet * target_register_set = current_register_set();
-    if ((data_transfer.s == 1) && (!pc_in_transfer_list) || (data_transfer.l == 0)) {
-        target_register_set = &registers_user;
-        if (data_transfer.w == 1) {
-            warn("Block Data Transfer - writeback and using user register bank");
-        }
-    }
-
-    if (data_transfer.w == 1) {
-        write_register(data_transfer.base_register, write_back_address);
-    }
-
-    for (int i = 0; i < 16; i++) {
-        bool transfer_register = Utils::read_bit(data_transfer.register_list, i);
-        if (!transfer_register) {continue;}
-
-        if (pre_increment == 1) {
-            current_address += 4;
-        }
-
-        if (data_transfer.l == 0) { // Store | Register -> Memory
-            bool stored_register_is_base_register = i == data_transfer.base_register;
-            bool first_stored_register = Utils::read_bit_range(data_transfer.register_list, 0, i - 1) == 0;
-            if (stored_register_is_base_register && first_stored_register) {
-                write_word_to_memory(current_address, base_address);
-            } else {
-                Word register_value = *target_register_set->registers[i];
-                if (i == REGISTER_PC) {
-                    register_value += 12;
-                }
-                write_word_to_memory(current_address, register_value);
-            }
-
-        } else { // Load | Memory -> Register
-            *target_register_set->registers[i] = read_word_from_memory(current_address);
-            if (data_transfer.s == 1 && i == REGISTER_PC) {
-                cpsr = current_register_set()->spsr;
-            }
-        }
-
-        if (pre_increment == 0) {
-            current_address += 4;
-        }
-    }
+    data_transfer.run(this);
 }
 
 void ARM7TDMI::arm_opcode_swap(Word opcode) {
