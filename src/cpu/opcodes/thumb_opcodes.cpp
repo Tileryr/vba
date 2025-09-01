@@ -1,4 +1,6 @@
 #include "src/cpu/cpu.h"
+
+#include "src/cpu/opcodes/arm/branch.h"
 #include "src/cpu/opcodes/arm/data_processing.h"
 #include "src/cpu/opcodes/arm/multiply.h"
 #include "src/cpu/opcodes/arm/single_data_transfer.h"
@@ -370,3 +372,44 @@ void ARM7TDMI::thumb_opcode_multiple_load_store(HalfWord opcode) {
     .get_product().run(this);
 }   
 
+void ARM7TDMI::thumb_opcode_conditional_branch(HalfWord opcode) {
+    Byte condition = Utils::read_bit_range(opcode, 8, 11);
+    Byte s_offset_8 = Utils::read_bit_range(opcode, 0, 7);
+
+    if (condition_field(condition) == false) {
+        return;
+    }
+
+    Word pc = read_register(REGISTER_PC) + 4;
+    Word immediate = s_offset_8 << 1;
+
+    OpcodeBranch::branch(this, pc, immediate, 9);
+}
+
+void ARM7TDMI::thumb_opcode_software_interrupt(HalfWord opcode) {
+    run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
+}
+
+void ARM7TDMI::thumb_opcode_unconditional_branch(HalfWord opcode) {
+    HalfWord offset_11 = Utils::read_bit_range(opcode, 0, 10);
+    Word pc = read_register(REGISTER_PC) + 4;
+    Word immediate = offset_11 << 1;
+
+    OpcodeBranch::branch(this, pc, immediate, 12);
+}  
+
+void ARM7TDMI::thumb_opcode_long_branch_with_link(HalfWord opcode) {
+    bool low_offset = Utils::read_bit(opcode, 11);
+    HalfWord offset = Utils::read_bit_range(opcode, 0, 11);
+
+    if (low_offset == 0) {
+        Word pc = read_register(REGISTER_PC) + 4;
+        write_register(REGISTER_LR, (offset << 12) + pc);
+    } else {
+        Word branch_offset = (offset << 1) + read_register(REGISTER_LR);
+        Word following_address = read_register(REGISTER_PC) + 2;
+
+        write_register(REGISTER_LR, following_address | 1);
+        write_register(REGISTER_PC, branch_offset);
+    }
+}

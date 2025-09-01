@@ -115,13 +115,13 @@ ThumbOpcodeType ARM7TDMI::decode_opcode_thumb(HalfWord opcode) {
         return MULTIPLE_LOAD_STORE;
     }
     if (get_bitregion(12, 15) == 0b1101) {
-        return BRANCH_CONDITIONAL;
+        return CONDITIONAL_BRANCH;
     }
     if (get_bitregion(8,  15) == 0b11011111) {
         return SOFTWARE_INTERRUPT;
     }
     if (get_bitregion(11, 15) == 0b11100) {
-        return BRANCH_UNCONDITIONAL;
+        return UNCONDITIONAL_BRANCH;
     }
     if (get_bitregion(12, 15) == 0b1111) {
         return LONG_BRANCH_WITH_LINK;

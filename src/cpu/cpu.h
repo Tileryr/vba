@@ -81,7 +81,10 @@ typedef struct ARM7TDMI {
         void thumb_opcode_multiple_load_store(HalfWord opcode);
 
         void thumb_opcode_conditional_branch(HalfWord opcode);
-        void thumb_opcode_uncondition_branch(HalfWord opcode);
+        void thumb_opcode_software_interrupt(HalfWord opcode);
+        void thumb_opcode_unconditional_branch(HalfWord opcode);
+        void thumb_opcode_long_branch_with_link(HalfWord opcode);
+        
     public:
         ARM7TDMI();
 

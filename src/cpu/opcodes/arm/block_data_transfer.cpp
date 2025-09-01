@@ -97,7 +97,7 @@ void OpcodeBlockDataTransfer::run(ARM7TDMI * cpu) {
     }
 }
 
-OpcodeBlockDataTransferBuilder::OpcodeBlockDataTransferBuilder(bool load, bool base_register) {
+OpcodeBlockDataTransferBuilder::OpcodeBlockDataTransferBuilder(bool load, Byte base_register) {
     product.l = load;
     product.base_register = base_register;
 }

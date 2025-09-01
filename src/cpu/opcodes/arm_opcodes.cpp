@@ -8,6 +8,7 @@
 
 #include "opcode_types.h"
 
+#include "src/cpu/opcodes/arm/branch.h"
 #include "./arm/data_processing.h"
 #include "./arm/branch_exchange.h"
 #include "./arm/multiply.h"
@@ -20,21 +21,19 @@
 
 void ARM7TDMI::arm_opcode_branch(Word opcode)
 {
-    Word pc_with_prefetch_offset = read_register(REGISTER_PC) + 8; // Other 4 is accounted for after when incrementing instruction
-    int32_t offset = Utils::read_bit_range(opcode, 0, 23);
-    bool link_bit = Utils::read_bit(opcode, 24);
+    OpcodeBranch branch = OpcodeBranch(opcode);
+    Word pc_with_prefetch_offset = read_register(REGISTER_PC) + 8;
 
+    Word offset = branch.offset;
     offset = offset << 2;
-    offset = Utils::sign_extend(offset, 26);
 
-    if (link_bit)
+    if (branch.link_bit)
     {
         Word return_address = pc_with_prefetch_offset - 4;
         write_register(REGISTER_LR, return_address);
     }
 
-    Word new_address = pc_with_prefetch_offset + offset;
-    write_register(REGISTER_PC, new_address);
+    OpcodeBranch::branch(this, pc_with_prefetch_offset, offset, 26);
 }
 
 void ARM7TDMI::arm_opcode_branch_exchange(Word opcode)
