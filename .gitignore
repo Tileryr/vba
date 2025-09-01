@@ -1,0 +1,7 @@
+*.o
+
+test-roms
+test-roms/**
+
+.vscode
+.vscode/**
