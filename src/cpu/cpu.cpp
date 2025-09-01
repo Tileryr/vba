@@ -297,9 +297,25 @@ void ARM7TDMI::run_next_opcode()
 
         switch (opcode_type)
         {
+            case MOVE_SHIFTED_REGISTER: thumb_opcode_move_shifted_register(opcode); break;
+            case ADD_SUBTRACT: thumb_opcode_add_subtract(opcode); break;
             case MOVE_COMPARE_ADD_SUBTRACT_IMMEDIATE: thumb_opcode_move_compare_add_subtract(opcode); break;
+            case ALU_OPERATION: thumb_opcode_alu_operations(opcode); break;
             case HI_REGISTER_OPERATIONS_BRANCH_EXCHANGE: thumb_opcode_hi_register_operations_branch_exchange(opcode); break;
+            case PC_RELATIVE_LOAD: thumb_opcode_pc_relative_load(opcode); break;
+            case LOAD_STORE_REGISTER_OFFSET: thumb_opcode_load_store_register_offset(opcode); break;
+            case LOAD_STORE_SIGN_EXTENDED_BYTE_HALFWORD: thumb_opcode_load_store_sign_extended_byte_halfword(opcode); break;
+            case LOAD_STORE_IMMEDIATE_OFFSET: thumb_opcode_load_store_immediate_offset(opcode); break;
+            case LOAD_STORE_HALFWORD: thumb_opcode_load_store_halfword(opcode); break;
+            case SP_RELATIVE_LOAD_STORE: thumb_opcode_sp_relative_load_store(opcode); break;
             case LOAD_ADDRESS: thumb_opcode_load_address(opcode); break;
+            case ADD_OFFSET_TO_STACK_POINTER: thumb_opcode_add_offset_to_stack_pointer(opcode); break;
+            case PUSH_POP_REGISTERS: thumb_opcode_push_pop_registers(opcode); break;
+            case MULTIPLE_LOAD_STORE: thumb_opcode_multiple_load_store(opcode); break;
+            case CONDITIONAL_BRANCH: thumb_opcode_conditional_branch(opcode); break;
+            case SOFTWARE_INTERRUPT: thumb_opcode_software_interrupt(opcode); break;
+            case UNCONDITIONAL_BRANCH: thumb_opcode_unconditional_branch(opcode); break;
+            case LONG_BRANCH_WITH_LINK: thumb_opcode_long_branch_with_link(opcode); break;
         }
 
         bool pc_changed = pc != read_register(REGISTER_PC);
