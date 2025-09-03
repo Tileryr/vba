@@ -102,7 +102,7 @@ void ARM7TDMI::arm_opcode_multiply_long(Word opcode)
         int64_t result_signed;
         int32_t rs_value_u = read_register(multiply_long.rs);
         int32_t rm_value_u = read_register(multiply_long.rm);
-        result_signed = rm_value_u * rs_value_u;
+        result_signed = (int64_t)rm_value_u * (int64_t)rs_value_u;
 
         if (multiply_long.accumulate) {
             int64_t rdhi = read_register(multiply_long.register_destination_high);

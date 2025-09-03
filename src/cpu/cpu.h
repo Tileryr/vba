@@ -11,6 +11,7 @@
 
 #include "../utils.h"
 
+#define KEY_INPUT_ADDRESS 0x04000130
 #define GAMEPAK_ROM_START 0x08000000
 
 enum Exception {
@@ -45,7 +46,6 @@ typedef struct ARM7TDMI {
 
         void trigger_exception(OperatingMode new_mode, unsigned int exception_vector, unsigned int saved_pc_offset, int priority);
 
-        std::string dissassemble_opcode(Word opcode);
         ArmOpcodeType decode_opcode_arm(Word opcode);
         ThumbOpcodeType decode_opcode_thumb(HalfWord opcode);
 

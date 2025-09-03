@@ -8,6 +8,7 @@
 #include "src/cpu/opcodes/arm/block_data_transfer.h"
 #include "src/cpu/opcodes/arm/branch_exchange.h"
 
+#include <SDL3/SDL.h>
 #include "opcode_types.h"
 
 void ARM7TDMI::thumb_opcode_move_shifted_register(HalfWord opcode) {
@@ -203,7 +204,7 @@ void ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(HalfWord opco
 
 void ARM7TDMI::thumb_opcode_pc_relative_load(HalfWord opcode) {
     Byte destination_register = Utils::read_bit_range(opcode, 8, 10);
-    Byte word_8 = Utils::read_bit_range(opcode, 0, 7);
+    Word word_8 = Utils::read_bit_range(opcode, 0, 7);
 
     Word immediate = word_8 << 2;
 
@@ -292,7 +293,7 @@ void ARM7TDMI::thumb_opcode_load_store_halfword(HalfWord opcode) {
 void ARM7TDMI::thumb_opcode_sp_relative_load_store(HalfWord opcode) {
     bool load = Utils::read_bit(opcode, 11);
     Byte destination_register = Utils::read_bit_range(opcode, 8, 10);
-    Byte word_8 = Utils::read_bit_range(opcode, 0, 7);
+    Word word_8 = Utils::read_bit_range(opcode, 0, 7);
 
     Word immediate = word_8 << 2;
 
@@ -305,21 +306,26 @@ void ARM7TDMI::thumb_opcode_sp_relative_load_store(HalfWord opcode) {
 void ARM7TDMI::thumb_opcode_load_address(HalfWord opcode) {
     bool sp = Utils::read_bit(opcode, 11);
     Byte destination_register = Utils::read_bit_range(opcode, 8, 10);
-    Byte word_8 = Utils::read_bit_range(opcode, 0, 7);
+    Word word_8 = Utils::read_bit_range(opcode, 0, 7);
 
     Byte source_register = sp ? REGISTER_SP : REGISTER_PC;
     Word immediate = word_8 << 2;
-
+    
     OpcodeDataProcessingBuilder(OpcodeDataProcess::ADD, false)
     .set_destination_register(destination_register)
     .set_source_register(source_register)
     .set_immediate_op2(immediate, 0)
     .get_product().run(this);
+
+    if (source_register == REGISTER_PC) {
+        Word wrote_value = read_register(destination_register);
+        write_register(destination_register, wrote_value & (~0b10));
+    }
 }
 
 void ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(HalfWord opcode) {
     bool sign = Utils::read_bit(opcode, 7);
-    Byte s_word_7 = Utils::read_bit_range(opcode, 0, 6);
+    Word s_word_7 = Utils::read_bit_range(opcode, 0, 6);
 
     Word immediate = s_word_7 << 2;
 
@@ -374,7 +380,7 @@ void ARM7TDMI::thumb_opcode_multiple_load_store(HalfWord opcode) {
 
 void ARM7TDMI::thumb_opcode_conditional_branch(HalfWord opcode) {
     Byte condition = Utils::read_bit_range(opcode, 8, 11);
-    Byte s_offset_8 = Utils::read_bit_range(opcode, 0, 7);
+    Word s_offset_8 = Utils::read_bit_range(opcode, 0, 7);
 
     if (condition_field(condition) == false) {
         return;
@@ -400,11 +406,13 @@ void ARM7TDMI::thumb_opcode_unconditional_branch(HalfWord opcode) {
 
 void ARM7TDMI::thumb_opcode_long_branch_with_link(HalfWord opcode) {
     bool low_offset = Utils::read_bit(opcode, 11);
-    HalfWord offset = Utils::read_bit_range(opcode, 0, 11);
+    Word offset = Utils::read_bit_range(opcode, 0, 10);
 
     if (low_offset == 0) {
         Word pc = read_register(REGISTER_PC) + 4;
-        write_register(REGISTER_LR, (offset << 12) + pc);
+        
+        Word signed_high_offset = Utils::sign_extend((offset << 12), 23);
+        write_register(REGISTER_LR, signed_high_offset + pc);
     } else {
         Word branch_offset = (offset << 1) + read_register(REGISTER_LR);
         Word following_address = read_register(REGISTER_PC) + 2;

@@ -1,11 +1,12 @@
-#include "cpu.h"
-#include "../utils.h"
-
 #include <cassert>
 #include <cstdlib>
 
 #include <SDL3/SDL.h>
-#include "src/cpu/opcodes/arm/data_processing.h"
+
+#include "src/cpu/opcodes/dissassembler.h"
+#include "cpu.h"
+#include "../utils.h"
+
 // Private
 
 RegisterSet * ARM7TDMI::mode_to_register_set(OperatingMode mode) 
@@ -127,8 +128,8 @@ Word ARM7TDMI::read_register(int register_number)
 
 void ARM7TDMI::write_register(int register_number, Word register_value)
 {
-    assert(register_number < 16);
-    *(current_register_set()->registers[register_number]) = register_value;
+    SDL_assert(register_number < 16);
+    current_register_set()->write_register(register_number, register_value);
 };
 
 bool ARM7TDMI::condition_field(int condition_code) 
@@ -202,7 +203,10 @@ void ARM7TDMI::skip_bios() {
 
     cpsr.mode = MODE_SYSTEM;
     cpsr.t = STATE_ARM;
+
     write_register(REGISTER_PC, GAMEPAK_ROM_START);
+
+    write_halfword_to_memory(KEY_INPUT_ADDRESS, 0xFFFF);
 }
 
 void ARM7TDMI::run_exception(Exception exception_type) {
@@ -245,20 +249,11 @@ void ARM7TDMI::run_next_opcode()
 {   
     Word pc = read_register(REGISTER_PC);
 
-    if (pc == 0x8001d4c) {
-        if (read_register(12) == 0) {
-            SDL_Log("TESTS PASSED");
-        } else {
-            SDL_Log("FAILED: TEST %d", read_register(12));
-            SDL_TriggerBreakpoint();
-        }
-    }
-
     if (cpsr.t == STATE_ARM) {
         Word opcode = read_word_from_memory(pc);
         ArmOpcodeType opcode_type = decode_opcode_arm(opcode);
 
-        SDL_Log("pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode(opcode).c_str(), read_register(0));
+        // SDL_Log("ARM pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_arm(opcode_type).c_str(), read_register(0));
         
         Byte condition_code = Utils::read_bit_range(opcode, 28, 31);
         if (condition_field(condition_code) == false) {
@@ -290,10 +285,13 @@ void ARM7TDMI::run_next_opcode()
             write_register(REGISTER_PC, read_register(REGISTER_PC) + 4);
         }
     } else {
+        if (read_halfword_from_memory(0x0800054e) == 0) {
+            SDL_TriggerBreakpoint();
+        }
         HalfWord opcode = read_halfword_from_memory(pc);
         ThumbOpcodeType opcode_type = decode_opcode_thumb(opcode);
 
-        SDL_Log("pc: %08x, opcode: %04x, THUMB", pc, opcode);
+        SDL_Log("THUMB pc: %08x, opcode: %04x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_thumb(opcode_type).c_str(), read_register(0));
 
         switch (opcode_type)
         {

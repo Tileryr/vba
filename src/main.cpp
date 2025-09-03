@@ -1,5 +1,7 @@
 #define SDL_MAIN_USE_CALLBACKS
 
+#include <map>
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL_render.h>
@@ -13,6 +15,8 @@
 
 #include <stdlib.h>
 #include <cstdio>
+
+#include "src/cpu/opcodes/arm/multiply.h"
 
 #define SCALE 3
 
@@ -72,18 +76,44 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 }
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
+    static std::map<SDL_Scancode, u_int16_t> input_bit_map = {
+        {SDL_SCANCODE_Z, 0}, // A
+        {SDL_SCANCODE_X, 1}, // B
+        {SDL_SCANCODE_C, 2}, // SELECT
+        {SDL_SCANCODE_V, 3}, // START
+        {SDL_SCANCODE_RIGHT, 4}, // RIGHT
+        {SDL_SCANCODE_LEFT, 5}, // LEFT
+        {SDL_SCANCODE_UP, 6}, // UP
+        {SDL_SCANCODE_DOWN, 7}, // DOWN
+        {SDL_SCANCODE_A, 8}, // R
+        {SDL_SCANCODE_D, 9}, // L
+    };
+
     if (event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;
     }
+
+    if (event->type != SDL_EVENT_KEY_DOWN && event->type != SDL_EVENT_KEY_UP) {
+        return SDL_APP_CONTINUE;
+    }
+
+    auto iterator = input_bit_map.find(event->key.scancode);
+    if (iterator != input_bit_map.end()) {
+        HalfWord target_bit = iterator->second;
+        
+        HalfWord current_input = cpu->read_halfword_from_memory(KEY_INPUT_ADDRESS);
+        bool released = event->type == SDL_EVENT_KEY_UP;
+        Utils::write_bit(&current_input, target_bit, released);
+        cpu->write_halfword_to_memory(KEY_INPUT_ADDRESS, current_input);
+    }
+    
     return SDL_APP_CONTINUE;
 }   
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
-    // SDL_Log("%d", SDL_GetTicks());
-    if (cpu->read_register(REGISTER_PC) > 0xFFFFFFF) {
-        return SDL_APP_SUCCESS;
-    } else {
-        for (int i = 0; i < 4; i++) {
+
+    if (cpu->read_register(REGISTER_PC) >= 0x08000000) {
+        for (int i = 0; i < 1000; i++) {
             cpu->run_next_opcode();
         }
     }

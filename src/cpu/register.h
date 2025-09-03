@@ -12,7 +12,7 @@ enum SpecialRegisters {
 
 typedef struct RegisterSet {
     RegisterSet();
-
+    void write_register(int register_number, Word register_value);
     Word * registers[16];
    
     ProgramStatusRegister spsr;

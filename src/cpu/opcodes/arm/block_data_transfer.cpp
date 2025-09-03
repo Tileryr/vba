@@ -79,13 +79,13 @@ void OpcodeBlockDataTransfer::run(ARM7TDMI * cpu) {
             } else {
                 Word register_value = *target_register_set->registers[i];
                 if (i == REGISTER_PC) {
-                    register_value += 12;
+                    register_value += cpu->cpsr.t == STATE_ARM ? 12 : 6;
                 }
                 cpu->write_word_to_memory(current_address, register_value);
             }
 
         } else { // Load | Memory -> Register
-            *target_register_set->registers[i] = cpu->read_word_from_memory(current_address);
+            target_register_set->write_register(i, cpu->read_word_from_memory(current_address));
             if (this->s == 1 && i == REGISTER_PC) {
                 cpu->cpsr = cpu->current_register_set()->spsr;
             }

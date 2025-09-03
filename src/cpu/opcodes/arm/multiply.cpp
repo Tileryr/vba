@@ -37,7 +37,7 @@ void OpcodeMultiply::run(ARM7TDMI * cpu) {
     }
 
     if (set_condition_codes) {
-        cpu->cpsr.n = Utils::read_bit(31, destination_value);
+        cpu->cpsr.n = Utils::read_bit(destination_value, 31);
         cpu->cpsr.z = destination_value == 0;
         cpu->cpsr.c = rand() & 1;
         cpu->cpsr.v; // Unaffected
