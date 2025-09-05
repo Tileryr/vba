@@ -1,15 +1,22 @@
 #include "src/scheduler.h"
+#include "src/memory.h"
 #include "src/display.h"
 
 Display::Display(SDL_Renderer * renderer, Memory * memory) : 
 renderer(renderer), 
 memory(memory), 
-lcd_status(memory->memory_region(LCD_STATUS_ADDRESS)) {}
+
+display_control(memory->memory_region(DISPLAY_CONTROL_ADDRESS)),
+display_status(memory->memory_region(DISPLAY_STATUS_ADDRESS)),
+vcount(memory->memory_region(VCOUNT_ADDRESS), 0, 7),
+
+scanline(0)
+{}
 
 void Display::update_screen_bgmode_4() {
     Byte * vram = memory->memory_region(VRAM_START);
     Byte * background_palette = memory->memory_region(BG_PALETTE_RAM_START);
-
+    
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
             HalfWord pixel_palette = vram[(y*SCREEN_WIDTH) + x] << 1;
@@ -41,15 +48,54 @@ void Display::render() {
 }
 
 void Display::start_draw_loop(Scheduler * scheduler) {
-    scheduler->schedule_event(VDRAW_CYCLE_LENGTH, [scheduler, this](){
-        set_vblank(false);
-        scheduler->schedule_event(VBLANK_CYCLE_LENGTH, [scheduler, this](){
-            set_vblank(true);
+    scanline++;
+
+    if (scanline > 226) {
+        display_status.vblank.set(false);
+        scanline = 0;
+    } else if (scanline >= 160) {
+        display_status.vblank.set(true);
+        if (display_status.vblank_irq.get() == true) {
+            // DO IRQ   
+        }
+    }
+
+    if (display_status.vcount_irq.get() == true && scanline == display_status.vcount_setting.get()) {
+        // DO IRQ   
+    }
+    
+    vcount.set(scanline);
+
+    scheduler->schedule_event(HDRAW_CYCLE_LENGTH, [scheduler, this](){
+        display_status.hblank.set(true);
+        if (display_status.hblank_irq.get() == true) {
+            // DO IRQ   
+        }
+        scheduler->schedule_event(HBLANK_CYCLE_LENGTH, [scheduler, this](){
+            display_status.hblank.set(false);
             start_draw_loop(scheduler);
         });
     });
 };
 
-void Display::set_vblank(bool value) {
-    Utils::write_bit(lcd_status, 0, value); 
-}
+Display::DisplayControl::DisplayControl(Byte * memory_location) :
+mode(memory_location, 0, 2),
+display_frame_select(memory_location, 4),
+hblank_interval_free(memory_location, 5),
+vram_mapping(memory_location, 6),
+forced_blank(memory_location, 7),
+display_backgrounds(memory_location, 8, 11),
+display_objects(memory_location, 12),
+display_windows(memory_location, 13, 14),
+display_objects_windows(memory_location, 15)
+{}
+
+Display::DisplayStatus::DisplayStatus(Byte * memory_location) :
+vblank(memory_location, 0),
+hblank(memory_location, 1),
+vcount(memory_location, 2),
+vblank_irq(memory_location, 3),
+hblank_irq(memory_location, 4),
+vcount_irq(memory_location, 5),
+vcount_setting(memory_location, 8, 15)
+{}

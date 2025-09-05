@@ -3,24 +3,27 @@
 
 #include <SDL3/SDL.h>
 #include <functional>
+#include <list>
 #include <map>
+
+#include "src/cpu/cpu_types.h"
 
 #define CYCLES_PER_SECOND 16777216
 #define CYCLES_PER_MILISECOND 1677
 
 typedef struct Scheduler {
-    u_int64_t total_passed_cycles;
-    int total_passed_milliseconds;
+    typedef struct ScheduledEvent {
+        Word cycles_till_done;
+        std::function<void()> event;
+    } ScheduledEvent;
+
+    Word total_passed_milliseconds;
     
-    std::map<u_int64_t, std::function<void()>> events;
+    std::list<ScheduledEvent> events;
 
-    Scheduler();
+    void schedule_event(Word cycles, std::function<void()> event);
 
-    void initialize();
-
-    void update_time();
-
-    void schedule_event(int cycles, std::function<void()> event);
+    void move_events_forward(Word cycles);
 
     void tick();  
 } Scheduler;

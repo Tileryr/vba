@@ -1,41 +1,33 @@
 #include "src/scheduler.h"
 #include "src/display.h"
 
-Scheduler::Scheduler() {
-    update_time();
-    initialize();
+void Scheduler::schedule_event(Word cycles, std::function<void()> event) {
+    ScheduledEvent scheduled_event = {cycles, event};
+    events.push_back(scheduled_event);
+    events.sort([](const ScheduledEvent& first, const ScheduledEvent& second){
+        return first.cycles_till_done < second.cycles_till_done;
+    });
 }
-
-void Scheduler::initialize() {}
-
-void Scheduler::update_time() {
-    total_passed_milliseconds = SDL_GetTicks();
-    total_passed_cycles = total_passed_milliseconds * CYCLES_PER_MILISECOND;
-}
-
-void Scheduler::schedule_event(int cycles, std::function<void()> event) {
-    u_int64_t event_time = cycles + total_passed_cycles;
-    bool event_already_exists = events.count(cycles);
-    if (event_already_exists) {
-        std::function<void()> current_event = events.find(cycles)->second;
-        events.insert_or_assign(event_time, [event, current_event](){
-            current_event();
-            event();
-        });
-    } else {
-
-        events.insert_or_assign(event_time, event);
+ 
+void Scheduler::move_events_forward(Word cycles) {
+    for (auto & scheduled_event : events) {
+        scheduled_event.cycles_till_done -= cycles;
     }
 }
 
 void Scheduler::tick() {
-    update_time();
+    Word passed_cycles = (SDL_GetTicks() - total_passed_milliseconds) * CYCLES_PER_MILISECOND;
 
-    for (auto iterator = events.begin(); iterator != events.upper_bound(total_passed_cycles); iterator++) {
-        iterator->second();
+    while (passed_cycles > 0) {
+        ScheduledEvent next_event = events.front();
+
+        move_events_forward(next_event.cycles_till_done);
+        passed_cycles -= next_event.cycles_till_done;
+
+        next_event.event();
+
+        events.pop_front();
     }
-
-    auto iterator_start = events.begin();
-    auto iterator_end = events.upper_bound(total_passed_cycles);
-    events.erase(iterator_start, iterator_end);
+    
+    total_passed_milliseconds = SDL_GetTicks();
 }    

@@ -209,6 +209,14 @@ void ARM7TDMI::skip_bios() {
     write_halfword_to_memory(KEY_INPUT_ADDRESS, 0xFFFF);
 }
 
+void ARM7TDMI::start_run_loop(Scheduler * scheduler) {
+    // PLACEHOLDER 3 BEFORE CYCLES ARE IMPLEMENTED
+    scheduler->schedule_event(3U, [this, scheduler](){
+        run_next_opcode();
+        start_run_loop(scheduler);
+    });
+}
+
 void ARM7TDMI::run_exception(Exception exception_type) {
     switch (exception_type)
     {
@@ -247,14 +255,17 @@ void ARM7TDMI::warn(const char * msg)
 
 void ARM7TDMI::run_next_opcode()
 {   
+    static bool print = false;
     Word pc = read_register(REGISTER_PC);
 
     if (cpsr.t == STATE_ARM) {
         Word opcode = read_word_from_memory(pc);
         ArmOpcodeType opcode_type = decode_opcode_arm(opcode);
 
-        // SDL_Log("ARM pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_arm(opcode_type).c_str(), read_register(0));
-        
+        if (print) {
+            SDL_Log("ARM pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_arm(opcode_type).c_str(), read_register(0));
+        }
+
         Byte condition_code = Utils::read_bit_range(opcode, 28, 31);
         if (condition_field(condition_code) == false) {
             write_register(REGISTER_PC, pc + 4);
@@ -291,7 +302,9 @@ void ARM7TDMI::run_next_opcode()
         HalfWord opcode = read_halfword_from_memory(pc);
         ThumbOpcodeType opcode_type = decode_opcode_thumb(opcode);
 
-        SDL_Log("THUMB pc: %08x, opcode: %04x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_thumb(opcode_type).c_str(), read_register(0));
+        if (print) {
+            SDL_Log("THUMB pc: %08x, opcode: %04x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_thumb(opcode_type).c_str(), read_register(0));
+        }
 
         switch (opcode_type)
         {

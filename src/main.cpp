@@ -22,8 +22,8 @@
 
 static ARM7TDMI * cpu = new ARM7TDMI();
 static Scheduler * scheduler = new Scheduler();
-
 static Display * display = nullptr;
+
 static SDL_Window * window = nullptr;
 static SDL_Renderer * renderer = nullptr;
 
@@ -49,8 +49,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     SDL_SetRenderScale(renderer, SCALE, SCALE);
 
     display = new Display(renderer, &cpu->memory);
-    display->start_draw_loop(scheduler);
-
     cpu->skip_bios();
 
     if (argc > 1) {
@@ -72,6 +70,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         fclose(fileptr);
     }
 
+    display->start_draw_loop(scheduler);
+    cpu->start_run_loop(scheduler);
+    
     return SDL_APP_CONTINUE;
 }
 
@@ -106,23 +107,16 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         Utils::write_bit(&current_input, target_bit, released);
         cpu->write_halfword_to_memory(KEY_INPUT_ADDRESS, current_input);
     }
-    
+
     return SDL_APP_CONTINUE;
 }   
 
-SDL_AppResult SDL_AppIterate(void *appstate) {
-
-    if (cpu->read_register(REGISTER_PC) >= 0x08000000) {
-        for (int i = 0; i < 1000; i++) {
-            cpu->run_next_opcode();
-        }
-    }
-    
+SDL_AppResult SDL_AppIterate(void *appstate) {    
     scheduler->tick();
+
     display->update_screen_bgmode_4();
     display->render();
     
-
     return SDL_APP_CONTINUE;
 }
 

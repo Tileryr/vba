@@ -23,6 +23,10 @@ typedef struct Memory {
     static Word read_word_from_memory(Byte * memory, Word address);
     static HalfWord read_halfword_from_memory(Byte * memory, Word address);
     static Byte read_from_memory(Byte * memory, Word address);
+
+    static void write_word_to_memory(Byte * memory, Word address, Word value);
+    static void write_halfword_to_memory(Byte * memory, Word address, HalfWord value);
+    static void write_to_memory(Byte * memory, Word address, Byte value);
 } Memory;
 
 #endif
