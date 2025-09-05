@@ -13,15 +13,69 @@ vcount(memory->memory_region(VCOUNT_ADDRESS), 0, 7),
 scanline(0)
 {}
 
-void Display::update_screen_bgmode_4() {
+void Display::update_screen() {
+    switch (display_control.mode.get())
+    {
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            update_screen_bgmode_3();
+            break;
+        case 4:
+            update_screen_bgmode_4();
+            break;
+        case 5:
+            update_screen_bgmode_5();
+            break;
+    }
+}
+
+void Display::update_screen_bgmode_3() {
     Byte * vram = memory->memory_region(VRAM_START);
-    Byte * background_palette = memory->memory_region(BG_PALETTE_RAM_START);
     
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
-            HalfWord pixel_palette = vram[(y*SCREEN_WIDTH) + x] << 1;
+            HalfWord color = Memory::read_halfword_from_memory(vram, (y*SCREEN_WIDTH*2) + (x*2));
+            screen[x][y] = color;
+        }
+    }
+}
+
+void Display::update_screen_bgmode_4() {
+    Byte * vram = memory->memory_region(VRAM_START);
+    Byte * background_palette = memory->memory_region(BG_PALETTE_RAM_START);
+
+    for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            Word palette_address =(y*SCREEN_WIDTH) + x;
+            if (display_control.display_frame_select.get() == 1) {
+                palette_address += 0xA000;
+            }
+            HalfWord pixel_palette = vram[palette_address] << 1;
+            
+
             HalfWord palette_color = Memory::read_halfword_from_memory(background_palette, pixel_palette);
             screen[x][y] = palette_color;
+        }
+    }
+}
+
+void Display::update_screen_bgmode_5() {
+    Byte * vram = memory->memory_region(VRAM_START);
+    memset(screen, 0, sizeof(screen));
+
+    for (int y = 0; y < MODE_5_SCREEN_HEIGHT; y++) {
+        for (int x = 0; x < MODE_5_SCREEN_WIDTH; x++) {
+            Word palette_address = (y*MODE_5_SCREEN_WIDTH*2) + x*2;
+            if (display_control.display_frame_select.get() == 1) {
+                palette_address += 0xA000;
+            }
+            HalfWord color = Memory::read_halfword_from_memory(vram, palette_address);
+            screen[x][y] = color;
         }
     }
 }

@@ -113,8 +113,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 
 SDL_AppResult SDL_AppIterate(void *appstate) {    
     scheduler->tick();
-
-    display->update_screen_bgmode_4();
+    display->update_screen();
     display->render();
     
     return SDL_APP_CONTINUE;

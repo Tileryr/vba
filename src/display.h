@@ -13,6 +13,9 @@
 #define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 160
 
+#define MODE_5_SCREEN_WIDTH 160
+#define MODE_5_SCREEN_HEIGHT 128
+
 #define VRAM_START 0x06000000
 
 #define BG_PALETTE_RAM_START 0x05000000
@@ -62,7 +65,10 @@ typedef struct Display {
 
     HalfWord screen[SCREEN_WIDTH][SCREEN_HEIGHT];
 
+    void update_screen();
+    void update_screen_bgmode_3();
     void update_screen_bgmode_4();
+    void update_screen_bgmode_5();
 
     void render();
 
