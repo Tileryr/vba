@@ -16,6 +16,7 @@
 #define MODE_5_SCREEN_WIDTH 160
 #define MODE_5_SCREEN_HEIGHT 128
 
+#define OAM_START 0x07000000
 #define VRAM_START 0x06000000
 
 #define BG_PALETTE_RAM_START 0x05000000
@@ -55,6 +56,35 @@ typedef struct Display {
         BitRegion vcount_setting;
     } display_status;
 
+    typedef struct AttributeZero {
+        AttributeZero(HalfWord value);
+        unsigned int y : 8;
+        unsigned int object_mode : 2;
+        unsigned int gfx_mode : 2;
+        unsigned int mosiac : 1;
+        unsigned int color_mode : 1;
+        unsigned int sprite_shape : 2;
+    } AttributeZero;
+
+    typedef struct AttributeOne {
+        AttributeOne(HalfWord value);
+        unsigned int x : 9;
+        
+        unsigned int affine_index : 5;
+
+        unsigned int horizontal_flip : 1;
+        unsigned int vertical_flip : 1;
+
+        unsigned int sprite_size : 2;
+    } AttributeOne;
+
+    typedef struct AttributeTwo {
+        AttributeTwo(HalfWord value);
+        unsigned int tile_index : 10;
+        unsigned int priority : 2;
+        unsigned int palette_bank : 4;
+    } AttributeTwo;
+
     SDL_Renderer * renderer;
     Memory * memory;
 
@@ -62,13 +92,18 @@ typedef struct Display {
 
     Byte scanline;
 
-
     HalfWord screen[SCREEN_WIDTH][SCREEN_HEIGHT];
 
     void update_screen();
     void update_screen_bgmode_3();
     void update_screen_bgmode_4();
     void update_screen_bgmode_5();
+
+    void update_sprites();
+    void render_sprite(Byte sprite_number);
+
+    void render_tile_4bpp(Byte charblock, HalfWord tile, Byte palbank, Byte * palette_memory, HalfWord x, HalfWord y);
+    void render_tile_8bpp(Byte charblock, HalfWord tile, Byte * palette_memory, HalfWord x, HalfWord y);
 
     void render();
 

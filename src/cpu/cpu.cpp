@@ -296,9 +296,6 @@ void ARM7TDMI::run_next_opcode()
             write_register(REGISTER_PC, read_register(REGISTER_PC) + 4);
         }
     } else {
-        if (read_halfword_from_memory(0x0800054e) == 0) {
-            SDL_TriggerBreakpoint();
-        }
         HalfWord opcode = read_halfword_from_memory(pc);
         ThumbOpcodeType opcode_type = decode_opcode_thumb(opcode);
 

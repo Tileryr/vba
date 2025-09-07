@@ -17,6 +17,7 @@ void Scheduler::move_events_forward(Word cycles) {
 
 void Scheduler::tick() {
     int passed_cycles = (SDL_GetTicks() - total_passed_milliseconds) * CYCLES_PER_MILISECOND;
+    int event_total = 0;
 
     while (passed_cycles > 0) {
         ScheduledEvent next_event = events.front();
@@ -27,7 +28,8 @@ void Scheduler::tick() {
         next_event.event();
 
         events.pop_front();
+        event_total++;
     }
-    
+
     total_passed_milliseconds = SDL_GetTicks();
 }    
