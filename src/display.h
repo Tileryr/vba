@@ -9,6 +9,7 @@
 
 #include "src/cpu/cpu_types.h"
 #include "src/cpu/bit_region.h"
+#include "src/matrix.h"
 
 #define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 160
@@ -28,6 +29,8 @@
 
 #define HDRAW_CYCLE_LENGTH 960U
 #define HBLANK_CYCLE_LENGTH 272U
+
+#define COLOR_TRANSPARENT 0xFFFF
 
 typedef struct Display {
     Display(SDL_Renderer * renderer, Memory * memory);
@@ -102,10 +105,11 @@ typedef struct Display {
     void update_sprites();
     void render_sprite(Byte sprite_number);
 
-    void render_tile_4bpp(Byte charblock, HalfWord tile, Byte palbank, Byte * palette_memory, HalfWord x, HalfWord y);
+    void render_tile_4bpp(Matrix<HalfWord> * buffer, Byte charblock, HalfWord tile, Byte palbank, bool background_palette, HalfWord x, HalfWord y);
     void render_tile_8bpp(Byte charblock, HalfWord tile, Byte * palette_memory, HalfWord x, HalfWord y);
 
     void render();
+    HalfWord get_palette_color(Byte index, bool background_palette);
 
     void start_draw_loop(Scheduler * scheduler);
 } Display;

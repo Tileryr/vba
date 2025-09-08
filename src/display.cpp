@@ -14,6 +14,8 @@ scanline(0)
 {}
 
 void Display::update_screen() {
+    memset(screen, 0, sizeof(screen));
+
     switch (display_control.mode.get())
     {
         case 0:
@@ -32,6 +34,8 @@ void Display::update_screen() {
             update_screen_bgmode_5();
             break;
     }
+
+    update_sprites();
 }
 
 void Display::update_screen_bgmode_3() {
@@ -55,22 +59,19 @@ void Display::update_screen_bgmode_4() {
             if (display_control.display_frame_select.get() == 1) {
                 palette_address += 0xA000;
             }
-            HalfWord pixel_palette = vram[palette_address] << 1;
-            
+            HalfWord palette_index = vram[palette_address];
 
-            HalfWord palette_color = Memory::read_halfword_from_memory(background_palette, pixel_palette);
-            screen[x][y] = palette_color;
+            screen[x][y] = get_palette_color(palette_index, true);
         }
     }
 }
 
 void Display::update_screen_bgmode_5() {
     Byte * vram = memory->memory_region(VRAM_START);
-    memset(screen, 0, sizeof(screen));
-
+    
     for (int y = 0; y < MODE_5_SCREEN_HEIGHT; y++) {
         for (int x = 0; x < MODE_5_SCREEN_WIDTH; x++) {
-            Word palette_address = (y*MODE_5_SCREEN_WIDTH*2) + x*2;
+            Word palette_address = ((y*MODE_5_SCREEN_WIDTH) + x)*2;
             if (display_control.display_frame_select.get() == 1) {
                 palette_address += 0xA000;
             }
@@ -102,8 +103,6 @@ void Display::render_sprite(Byte sprite_number) {
     if (attribute_0.object_mode == 0b10) {
         return;
     }
-
-    SDL_Log("sprite: %d, value: %04x", sprite_number, attribute_0_value);
 
     HalfWord pixel_size_x;
     HalfWord pixel_size_y;
@@ -146,6 +145,8 @@ void Display::render_sprite(Byte sprite_number) {
         pixel_size_y = base_pixel_size;
     }
 
+    Matrix<HalfWord> sprite_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
+
     HalfWord tile_size_x = pixel_size_x / 8;
     HalfWord tile_size_y = pixel_size_y / 8;
 
@@ -153,15 +154,15 @@ void Display::render_sprite(Byte sprite_number) {
         for (int x = 0; x < tile_size_x; x++) {
             bool one_dimensional = display_control.vram_mapping.get() == 1;
             if (one_dimensional) {
-                Word tile_x = attribute_1.x + x*8;
-                Word tile_y = attribute_0.y + y*8;
+                Word tile_x = x*8;
+                Word tile_y = y*8;
 
-                SDL_Log("%d", (y*tile_size_x + x));
                 render_tile_4bpp(
+                    &sprite_buffer,
                     4, 
                     attribute_2.tile_index + (y*tile_size_x + x), 
                     attribute_2.palette_bank,
-                    memory->memory_region(OBJ_PALETTE_RAM_START),
+                    false,
                     tile_x,
                     tile_y
                 );
@@ -170,15 +171,37 @@ void Display::render_sprite(Byte sprite_number) {
             }
         }
     }
+
+    if (attribute_1.horizontal_flip == 1) {
+        Matrix<HalfWord> hflip_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
+        sprite_buffer.for_each([&hflip_buffer, &sprite_buffer](Word x, Word y) mutable {
+            hflip_buffer.set(x, y, sprite_buffer.get((-(x-32))+31, y));
+        });
+
+        sprite_buffer.copy(&hflip_buffer);
+    }
+    
+    if (attribute_1.vertical_flip == 1) {
+        Matrix<HalfWord> vflip_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
+        sprite_buffer.for_each([&vflip_buffer, &sprite_buffer](Word x, Word y) mutable {
+            vflip_buffer.set(x, y, sprite_buffer.get(x, (-(y-32))+31));
+        });
+
+        sprite_buffer.copy(&vflip_buffer);
+    } 
+
+    sprite_buffer.for_each([&](Word x, Word y){
+        screen[attribute_1.x+x][attribute_0.y+y] = sprite_buffer.get(x, y);
+    });
 }
 
-void Display::render_tile_4bpp(Byte charblock, HalfWord tile, Byte palbank, Byte * palette_memory, HalfWord x, HalfWord y) {
+void Display::render_tile_4bpp(Matrix<HalfWord> * buffer, Byte charblock, HalfWord tile, Byte palbank, bool background_palette, HalfWord x, HalfWord y) {
     Byte * vram = memory->memory_region(VRAM_START);
+
+    Word tile_start_address = (charblock * 0x4000) + tile * 0x20;
 
     for (int offset_y = 0; offset_y < 8; offset_y++) {
         for (int offset_x = 0; offset_x < 4; offset_x += 1) {
-            Word tile_start_address = (charblock * 0x4000) + tile * 0x20;
-
             Byte palette_index_low;
             Byte palette_index_high;
 
@@ -188,16 +211,12 @@ void Display::render_tile_4bpp(Byte charblock, HalfWord tile, Byte palbank, Byte
             palette_index_low |= (palbank << 4);
             palette_index_high |= (palbank << 4);
 
-            Byte screen_x = offset_x*2 + x;
-            Byte screen_y = offset_y + y;
+            Byte buffer_x = offset_x*2 + x;
+            Byte buffer_y = offset_y + y;
 
-            screen[screen_x][screen_y] = Memory::read_halfword_from_memory(palette_memory, palette_index_low*2);
-            screen[screen_x + 1][screen_y] = Memory::read_halfword_from_memory(palette_memory, palette_index_high*2);
+            buffer->set(buffer_x, buffer_y, get_palette_color(palette_index_low, background_palette));
+            buffer->set(buffer_x+1, buffer_y, get_palette_color(palette_index_high, background_palette));
         }
-    }
-
-    for (int i = 0; i < 16; i++) {
-        screen[(SCREEN_WIDTH - i) - 1][SCREEN_HEIGHT - 1] = Memory::read_halfword_from_memory(palette_memory, (palbank << 4) | i); 
     }
 }
 
@@ -220,6 +239,17 @@ void Display::render() {
     }
     
     SDL_RenderPresent(renderer);
+}
+
+HalfWord Display::get_palette_color(Byte index, bool background_palette) {
+    Byte * palette;
+    if (background_palette) {
+        palette = memory->memory_region(BG_PALETTE_RAM_START);
+    } else {
+        palette = memory->memory_region(OBJ_PALETTE_RAM_START);
+    }
+
+    return Memory::read_halfword_from_memory(palette, index*2);
 }
 
 void Display::start_draw_loop(Scheduler * scheduler) {
