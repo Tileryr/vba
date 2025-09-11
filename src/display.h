@@ -88,6 +88,33 @@ typedef struct Display {
         unsigned int palette_bank : 4;
     } AttributeTwo;
 
+    typedef struct TiledBackground {
+        TiledBackground(Memory * memory, Byte number);
+        struct TiledBackgroundControl {
+            TiledBackgroundControl(Byte * address);
+            BitRegion priority;
+            BitRegion base_charblock;
+            BitRegion mosiac;
+            BitRegion color_mode;
+            BitRegion base_screenblock;
+            BitRegion affine_wrapping;
+            BitRegion background_size;
+        } control;
+
+        typedef struct ScreenEntry {
+            ScreenEntry(Byte * address);
+            BitRegion tile_index;
+            BitRegion horizontal_flip;
+            BitRegion vertical_flip;
+            BitRegion palette_bank;
+        } ScreenEntry;
+        
+        BitRegion h_scroll;
+        BitRegion v_scroll;
+    } TiledBackground;
+    
+    TiledBackground tiled_backgrounds[4];
+
     SDL_Renderer * renderer;
     Memory * memory;
 
@@ -98,18 +125,26 @@ typedef struct Display {
     HalfWord screen[SCREEN_WIDTH][SCREEN_HEIGHT];
 
     void update_screen();
+    void update_screen_bgmode_0();
+    void update_screen_bgmode_1();
+    void update_screen_bgmode_2();
     void update_screen_bgmode_3();
     void update_screen_bgmode_4();
     void update_screen_bgmode_5();
 
     void update_sprites();
+
+    void render_tiled_background_affine(TiledBackground background_number);
+    void render_tiled_background(TiledBackground background);
     void render_sprite(Byte sprite_number);
 
-    void render_tile_4bpp(Matrix<HalfWord> * buffer, Byte charblock, HalfWord tile, Byte palbank, bool background_palette, HalfWord x, HalfWord y);
-    void render_tile_8bpp(Byte charblock, HalfWord tile, Byte * palette_memory, HalfWord x, HalfWord y);
+    void render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y);
+    void render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y);
+
+    inline Word calculate_tile_start_address(Word charblock, Word tile);
 
     void render();
-    HalfWord get_palette_color(Byte index, bool background_palette);
+    HalfWord get_palette_color(Byte index, Word palette_start_address);
 
     void start_draw_loop(Scheduler * scheduler);
 } Display;

@@ -11,7 +11,7 @@ Matrix<T>::Matrix(Word width, Word height) : width(width), height(height) {
 
 template<typename T>
 Matrix<T>::~Matrix() {
-    delete array;
+    delete[] array;
 }
 
 template<typename T>
@@ -36,4 +36,13 @@ void Matrix<T>::for_each(std::function<void(Word, Word)> function) {
 template<typename T>
 void Matrix<T>::copy(Matrix<T> * matrix) {
     memcpy(array, matrix->array, sizeof(T)*width*height);
+}
+
+template<typename T>
+void Matrix<T>::iterate_xy(Word max_x, Word max_y, std::function<void(Word, Word)> function) {
+    for (int y = 0; y < max_y; y++) {
+        for (int x = 0; x < max_x; x++) {
+            function(x, y);
+        }
+    }
 }

@@ -26,12 +26,13 @@ void Utils::write_bit_range(Word * number, unsigned int bit_range_start, unsigne
 
 int Utils::read_bit_range(u_int64_t number, unsigned int bit_range_start, unsigned int bit_range_end) 
 {
-    int result = 0;
-    for (int i = bit_range_start; i < bit_range_end + 1; i++)
-    {
-        result += read_bit(number, i) << (i - bit_range_start);
-    }
-    return result;
+    // int result = 0;
+    // for (int i = bit_range_start; i < bit_range_end + 1; i++)
+    // {
+    //     result += read_bit(number, i) << (i - bit_range_start);
+    // }
+    unsigned int mask = ((1<<(bit_range_end-bit_range_start+1))-1);
+    return (((mask<<bit_range_start)&number)>>bit_range_start);
 }
 
 int Utils::sign_extend(int base_number, int bits_in_base) {

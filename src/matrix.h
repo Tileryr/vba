@@ -18,6 +18,8 @@ struct Matrix {
 
     void for_each(std::function<void(Word, Word)> function);
     void copy(Matrix<T> * matrix);
+
+    static void iterate_xy(Word max_x, Word max_y, std::function<void(Word, Word)> function);
 };
 
 #endif

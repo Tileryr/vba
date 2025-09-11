@@ -20,6 +20,8 @@
 
 #define SCALE 3
 
+
+
 static ARM7TDMI * cpu = new ARM7TDMI();
 static Scheduler * scheduler = new Scheduler();
 static Display * display = nullptr;
@@ -72,7 +74,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 
     display->start_draw_loop(scheduler);
     cpu->start_run_loop(scheduler);
-    
+    scheduler->total_passed_milliseconds = SDL_GetTicks();
+
     return SDL_APP_CONTINUE;
 }
 
@@ -111,9 +114,9 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     return SDL_APP_CONTINUE;
 }   
 
-SDL_AppResult SDL_AppIterate(void *appstate) {    
+SDL_AppResult SDL_AppIterate(void *appstate) {   
     scheduler->tick();
-    display->update_screen();
+    display->update_screen_bgmode_0();
     display->render();
     
     return SDL_APP_CONTINUE;

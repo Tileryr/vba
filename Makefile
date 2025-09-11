@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-pedantic -g -I.
+CFLAGS=-pedantic -g  -I.
 
 SRC=$(wildcard src/*.cpp) $(wildcard src/cpu/*.cpp) $(wildcard src/cpu/opcodes/*.cpp) $(wildcard src/cpu/opcodes/arm/*.cpp)
 OBJ=$(SRC:%.cpp=%.o)
