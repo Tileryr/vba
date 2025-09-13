@@ -209,14 +209,6 @@ void ARM7TDMI::skip_bios() {
     write_halfword_to_memory(KEY_INPUT_ADDRESS, 0xFFFF);
 }
 
-void ARM7TDMI::start_run_loop(Scheduler * scheduler) {
-    // PLACEHOLDER 3 BEFORE CYCLES ARE IMPLEMENTED
-    scheduler->schedule_event(3U, [this, scheduler](){
-        run_next_opcode();
-        start_run_loop(scheduler);
-    });
-}
-
 void ARM7TDMI::run_exception(Exception exception_type) {
     switch (exception_type)
     {

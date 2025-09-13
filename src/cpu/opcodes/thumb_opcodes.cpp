@@ -174,6 +174,12 @@ void ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(HalfWord opco
     Byte target_source_register = hi_operand_flag_2 ? source_hi_register : source_register;
 
     if (opcode_instruction_type == 3) { // BX
+        if (target_source_register == REGISTER_PC) {
+            write_register(REGISTER_PC, (read_register(REGISTER_PC)+4)&(~2));
+            cpsr.t = STATE_ARM;
+            return;
+        } 
+
         OpcodeBranchExchange branch_exchange;
         OpcodeBranchExchange::build(&branch_exchange, target_source_register);
         branch_exchange.run(this);
@@ -200,6 +206,8 @@ void ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(HalfWord opco
     .set_register_op2(target_source_register, 0)
     .set_register_op2_shift_immediate(0)
     .get_product().run(this);
+
+    
 }
 
 void ARM7TDMI::thumb_opcode_pc_relative_load(HalfWord opcode) {

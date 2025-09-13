@@ -20,14 +20,14 @@
 
 #define SCALE 3
 
-
-
 static ARM7TDMI * cpu = new ARM7TDMI();
-static Scheduler * scheduler = new Scheduler();
+static Scheduler * scheduler = new Scheduler(cpu);
 static Display * display = nullptr;
 
 static SDL_Window * window = nullptr;
 static SDL_Renderer * renderer = nullptr;
+
+Word ticks_since_last_render = 0;
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     // SDL_SetAppMetadata();
@@ -73,8 +73,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     }
 
     display->start_draw_loop(scheduler);
-    cpu->start_run_loop(scheduler);
     scheduler->total_passed_milliseconds = SDL_GetTicks();
+    scheduler->total_passed_nanoseconds = SDL_GetTicksNS();
 
     return SDL_APP_CONTINUE;
 }
@@ -110,14 +110,20 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         Utils::write_bit(&current_input, target_bit, released);
         cpu->write_halfword_to_memory(KEY_INPUT_ADDRESS, current_input);
     }
-
+    
     return SDL_APP_CONTINUE;
 }   
 
 SDL_AppResult SDL_AppIterate(void *appstate) {   
     scheduler->tick();
-    display->update_screen_bgmode_0();
-    display->render();
+
+    ticks_since_last_render += scheduler->passed_milliseconds;
+    if (ticks_since_last_render > 1000/60) {
+        SDL_Log("Render");
+        display->update_screen();
+        display->render();
+        ticks_since_last_render = 0;
+    }
     
     return SDL_APP_CONTINUE;
 }

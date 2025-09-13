@@ -141,9 +141,12 @@ typedef struct Display {
     void render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y);
     void render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y);
 
+    void apply_affine_transformation_sprite(Matrix<HalfWord> * sprite, Matrix<int16_t> * transformation, Word sprite_x, Word sprite_y, bool double_render_area);
     inline Word calculate_tile_start_address(Word charblock, Word tile);
 
     void render();
+    
+    void set_screen_pixel(Word x, Word y, HalfWord color);
     HalfWord get_palette_color(Byte index, Word palette_start_address);
 
     void start_draw_loop(Scheduler * scheduler);

@@ -9,7 +9,6 @@
 #include "./opcodes/opcode_types.h"
 
 #include "src/memory.h"
-#include "src/scheduler.h"
 
 #include "../utils.h"
 
@@ -110,10 +109,7 @@ typedef struct ARM7TDMI {
         void run_exception(Exception exception_type);
         void run_next_opcode();
 
-        void start_run_loop(Scheduler * scheduler);
         void skip_bios();
-
-        
 } ARM7TDMI;
 
 #endif

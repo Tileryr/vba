@@ -3,6 +3,7 @@
 #include "src/matrix.h"
 
 template class Matrix<HalfWord>;
+template class Matrix<int16_t>;
 
 template<typename T>
 Matrix<T>::Matrix(Word width, Word height) : width(width), height(height) {

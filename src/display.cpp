@@ -71,8 +71,8 @@ void Display::update_screen_bgmode_3() {
     
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
-            HalfWord color = Memory::read_halfword_from_memory(vram, (y*SCREEN_WIDTH*2) + (x*2));
-            screen[x][y] = color;
+            HalfWord color = Memory::read_halfword_from_memory(vram, (y*SCREEN_WIDTH*2) + (x*2))&(~0x8000);
+            set_screen_pixel(x, y, color);
         }
     }
 }
@@ -89,7 +89,7 @@ void Display::update_screen_bgmode_4() {
             }
             HalfWord palette_index = vram[palette_address];
 
-            screen[x][y] = get_palette_color(palette_index, true);
+            set_screen_pixel(x, y, get_palette_color(palette_index, BG_PALETTE_RAM_START));
         }
     }
 }
@@ -103,14 +103,15 @@ void Display::update_screen_bgmode_5() {
             if (display_control.display_frame_select.get() == 1) {
                 palette_address += 0xA000;
             }
+
             HalfWord color = Memory::read_halfword_from_memory(vram, palette_address);
-            screen[x][y] = color;
+            set_screen_pixel(x, y, color);
         }
     }
 }
 
 void Display::update_sprites() {
-    for (int i = 0; i < 128; i++) {
+    for (int i = 127; i >= 0; i--) {
         render_sprite(i);
     }
 }
@@ -188,7 +189,7 @@ void Display::render_tiled_background(TiledBackground background) {
             Word target_pixel_y = y+background.v_scroll.get();
             target_pixel_x %= pixel_width;
             target_pixel_y %= pixel_height;
-            screen[x][y] = background_buffer.get(target_pixel_x, target_pixel_y);
+            set_screen_pixel(x, y, background_buffer.get(target_pixel_x, target_pixel_y));
         }
     }
 }
@@ -290,27 +291,67 @@ void Display::render_sprite(Byte sprite_number) {
         }
     }
 
-    if (attribute_1.horizontal_flip == 1) {
-        Matrix<HalfWord> hflip_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
-        sprite_buffer.for_each([&hflip_buffer, &sprite_buffer](Word x, Word y) mutable {
-            hflip_buffer.set(x, y, sprite_buffer.get((-(x-32))+31, y));
+    if (attribute_0.object_mode == 0b01 || attribute_0.object_mode == 0b11) {
+        Matrix<int16_t> transform_matrix = Matrix<int16_t>(2, 2);
+        transform_matrix.for_each([&](Word x, Word y){
+            Word index = (y*2+x+1);
+            transform_matrix.set(x, y, memory->read_halfword_from_memory(OAM_START + ((4*index)-1)*2 + attribute_1.affine_index*32)); 
         });
 
-        sprite_buffer.copy(&hflip_buffer);
+        bool double_sized = attribute_0.object_mode == 0b11;
+        apply_affine_transformation_sprite(&sprite_buffer, &transform_matrix, attribute_1.x, attribute_0.y, double_sized);
+    } else {
+        if (attribute_1.horizontal_flip == 1) {
+            Matrix<HalfWord> hflip_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
+            sprite_buffer.for_each([&hflip_buffer, &sprite_buffer](Word x, Word y) mutable {
+                hflip_buffer.set(x, y, sprite_buffer.get((-(x-32))+31, y));
+            });
+
+            sprite_buffer.copy(&hflip_buffer);
+        }
+
+        if (attribute_1.vertical_flip == 1) {
+            Matrix<HalfWord> vflip_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
+            sprite_buffer.for_each([&vflip_buffer, &sprite_buffer](Word x, Word y) mutable {
+                vflip_buffer.set(x, y, sprite_buffer.get(x, (-(y-32))+31));
+            });
+
+            sprite_buffer.copy(&vflip_buffer);
+        } 
+
+        sprite_buffer.for_each([&](Word x, Word y){
+            set_screen_pixel(attribute_1.x+x, attribute_0.y+y, sprite_buffer.get(x, y));
+        });
     }
-    
-    if (attribute_1.vertical_flip == 1) {
-        Matrix<HalfWord> vflip_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
-        sprite_buffer.for_each([&vflip_buffer, &sprite_buffer](Word x, Word y) mutable {
-            vflip_buffer.set(x, y, sprite_buffer.get(x, (-(y-32))+31));
-        });
+}
 
-        sprite_buffer.copy(&vflip_buffer);
-    } 
+void Display::apply_affine_transformation_sprite(Matrix<HalfWord> * sprite, Matrix<int16_t> * transformation, Word sprite_x, Word sprite_y, bool double_render_area) {
+    int32_t half_sprite_width = sprite->width/2;
+    int32_t half_sprite_height = sprite->height/2;
 
-    sprite_buffer.for_each([&](Word x, Word y){
-        screen[attribute_1.x+x][attribute_0.y+y] = sprite_buffer.get(x, y);
-    });
+    int32_t render_area_width = half_sprite_width;
+    int32_t render_area_height = half_sprite_height;
+
+    if (double_render_area) {
+        render_area_width *= 2;
+        render_area_height *= 2;
+    }
+    // BASE = CENTER OF SPRITE SCREEN COORDS
+    Word base_x = sprite_x+render_area_width;
+    Word base_y = sprite_y+render_area_height;
+
+    for (int y = -render_area_height; y < render_area_height; y++) {
+        for (int x = -render_area_width; x < render_area_width; x++) {
+            int16_t mapped_pixel_x = (transformation->get(0, 0)*x + transformation->get(1, 0)*y)>>8;
+            int16_t mapped_pixel_y = (transformation->get(0, 1)*x + transformation->get(1, 1)*y)>>8;
+
+            Word target_pixel_x = mapped_pixel_x+half_sprite_width;
+            Word target_pixel_y = mapped_pixel_y+half_sprite_height;
+            if (target_pixel_x < 0 || target_pixel_x >= sprite->width || target_pixel_y < 0 || target_pixel_y >= sprite->height) {continue;}
+            HalfWord mapped_pixel_color = sprite->get(target_pixel_x, target_pixel_y);
+            set_screen_pixel(base_x+x, base_y+y, mapped_pixel_color);
+        }
+    }
 }
 
 void Display::render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y) {
@@ -376,9 +417,17 @@ void Display::render() {
     SDL_RenderPresent(renderer);
 }
 
+void Display::set_screen_pixel(Word x, Word y, HalfWord color) {
+    if (color == COLOR_TRANSPARENT) {return;}
+    screen[x][y] = color;
+}
+
 HalfWord Display::get_palette_color(Byte index, Word palatte_start_address) {
     Byte * palette = memory->memory_region(palatte_start_address);
-    return Memory::read_halfword_from_memory(palette, index*2);
+    if (index % 16 == 0) {
+        return COLOR_TRANSPARENT;
+    } 
+    return Memory::read_halfword_from_memory(palette, index*2) & (~0x8000);
 }
 
 Word Display::calculate_tile_start_address(Word charblock, Word tile) {
