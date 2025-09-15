@@ -101,6 +101,12 @@ typedef struct Display {
             BitRegion background_size;
         } control;
 
+        struct AffineData {
+            AffineData(Byte * address);
+            BitRegion pa, pb, pc, pd;
+            BitRegion displacement_x, displacement_y;
+        } affine_data;
+
         typedef struct ScreenEntry {
             ScreenEntry(Byte * address);
             BitRegion tile_index;

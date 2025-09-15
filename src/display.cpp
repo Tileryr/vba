@@ -116,7 +116,71 @@ void Display::update_sprites() {
     }
 }
 
-void Display::render_tiled_background_affine(TiledBackground background_number) {}
+void Display::render_tiled_background_affine(TiledBackground background) {
+    Word tile_size;
+    switch (background.control.background_size.get()) {
+        case 0:
+            tile_size = 16;
+            break;
+        case 1:
+            tile_size = 32;
+            break;
+        case 2:
+            tile_size = 64;
+            break;
+        case 3:
+            tile_size = 128;
+            break;
+    }
+    Word pixel_size = tile_size*8;
+    Matrix<HalfWord> background_buffer = Matrix<HalfWord>(pixel_size, pixel_size);
+    Word screenblock_base_address = VRAM_START + (0x800*background.control.base_screenblock.get());
+    Matrix<HalfWord>::iterate_xy(tile_size, tile_size, [&](Word tile_x, Word tile_y){
+        Word screen_entry_index = ((tile_y*tile_size)+tile_x);
+        
+       
+        Word screen_entry_address = screenblock_base_address+screen_entry_index;
+
+        Word tile_index = memory->read_from_memory(screen_entry_address);
+        Word tile_start_address = calculate_tile_start_address(background.control.base_charblock.get(), tile_index)*2;
+
+        Word pixel_x = tile_x*8;
+        Word pixel_y = tile_y*8;
+
+        render_tile_8bpp(&background_buffer, tile_start_address, BG_PALETTE_RAM_START, pixel_x, pixel_y);
+    });
+
+    Matrix<int16_t> transformation = Matrix<int16_t>(2, 2);
+    transformation.set(0, 0, background.affine_data.pa.get());
+    transformation.set(1, 0, background.affine_data.pb.get());
+    transformation.set(0, 1, background.affine_data.pc.get());
+    transformation.set(1, 1, background.affine_data.pd.get());
+    
+    Matrix<HalfWord>::iterate_xy(SCREEN_WIDTH, SCREEN_HEIGHT, [&](Word x, Word y){
+        Word displaced_x = (x);
+        Word displaced_y = (y);
+        Word mapped_pixel_x = (transformation.get(0, 0)*displaced_x + transformation.get(1, 0)*displaced_y);
+        Word mapped_pixel_y = (transformation.get(0, 1)*displaced_x + transformation.get(1, 1)*displaced_y);
+        mapped_pixel_x += background.affine_data.displacement_x.get();
+        mapped_pixel_y += background.affine_data.displacement_y.get();
+        mapped_pixel_x = mapped_pixel_x >> 8;
+        mapped_pixel_y = mapped_pixel_y >> 8;
+        
+        if (x == 0 && y == 0) {
+            SDL_Log("%04x %04x", mapped_pixel_x, mapped_pixel_y);
+        }
+        if (background.control.affine_wrapping.get() == 1) {
+            mapped_pixel_x %= pixel_size;
+            mapped_pixel_y %= pixel_size;
+        } 
+
+        if (mapped_pixel_x > 0 && mapped_pixel_x < pixel_size && mapped_pixel_y > 0 && mapped_pixel_y < pixel_size) {
+            HalfWord mapped_pixel_color = background_buffer.get(mapped_pixel_x, mapped_pixel_y);
+            set_screen_pixel(x, y, mapped_pixel_color);
+        }
+    });
+}
+
 void Display::render_tiled_background(TiledBackground background) {
     int tile_width;
     int tile_height;
@@ -320,7 +384,11 @@ void Display::render_sprite(Byte sprite_number) {
         } 
 
         sprite_buffer.for_each([&](Word x, Word y){
-            set_screen_pixel(attribute_1.x+x, attribute_0.y+y, sprite_buffer.get(x, y));
+            Word screen_x = attribute_1.x+x;
+            Word screen_y = attribute_0.y+y;
+            screen_x %= 512;
+            screen_y %= 256;
+            set_screen_pixel(screen_x, screen_y, sprite_buffer.get(x, y));
         });
     }
 }
@@ -345,11 +413,15 @@ void Display::apply_affine_transformation_sprite(Matrix<HalfWord> * sprite, Matr
             int16_t mapped_pixel_x = (transformation->get(0, 0)*x + transformation->get(1, 0)*y)>>8;
             int16_t mapped_pixel_y = (transformation->get(0, 1)*x + transformation->get(1, 1)*y)>>8;
 
-            Word target_pixel_x = mapped_pixel_x+half_sprite_width;
-            Word target_pixel_y = mapped_pixel_y+half_sprite_height;
-            if (target_pixel_x < 0 || target_pixel_x >= sprite->width || target_pixel_y < 0 || target_pixel_y >= sprite->height) {continue;}
-            HalfWord mapped_pixel_color = sprite->get(target_pixel_x, target_pixel_y);
-            set_screen_pixel(base_x+x, base_y+y, mapped_pixel_color);
+            Word target_sprite_pixel_x = mapped_pixel_x+half_sprite_width;
+            Word target_sprite_pixel_y = mapped_pixel_y+half_sprite_height;
+            if (target_sprite_pixel_x < 0 || target_sprite_pixel_x >= sprite->width || target_sprite_pixel_y < 0 || target_sprite_pixel_y >= sprite->height) {continue;}
+            HalfWord mapped_pixel_color = sprite->get(target_sprite_pixel_x, target_sprite_pixel_y);
+            Word screen_x = base_x+x;
+            Word screen_y = base_y+y;
+            screen_x %= 512;
+            screen_y %= 256;
+            set_screen_pixel(screen_x, screen_y, mapped_pixel_color);
         }
     }
 }
@@ -388,9 +460,12 @@ void Display::render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_addres
 
             palette_index = vram[tile_start_address + offset_x + (offset_y * 8)];
 
-            Byte buffer_x = offset_x + x;
-            Byte buffer_y = offset_y + y;
+            Word buffer_x = offset_x + x;
+            Word buffer_y = offset_y + y;
 
+            // if (offset_x == 0 && offset_y == 0) {
+            //     SDL_Log("pallete: %d, %b", tile_start_address, get_palette_color(palette_index, palette_start_address));
+            // }
             buffer->set(buffer_x, buffer_y, get_palette_color(palette_index, palette_start_address));
         }
     }
@@ -419,6 +494,9 @@ void Display::render() {
 
 void Display::set_screen_pixel(Word x, Word y, HalfWord color) {
     if (color == COLOR_TRANSPARENT) {return;}
+    if (x >= SCREEN_WIDTH) {return;}
+    if (y >= SCREEN_HEIGHT) {return;}
+
     screen[x][y] = color;
 }
 
@@ -490,7 +568,8 @@ vcount_setting(memory_location, 8, 15)
 Display::TiledBackground::TiledBackground(Memory * memory, Byte number) :
 control(memory->memory_region(0x04000008+(2*number))),
 h_scroll(memory->memory_region(0x04000010+(4*number)), 0, 15),
-v_scroll(memory->memory_region(0x04000012+(4*number)), 0, 15) 
+v_scroll(memory->memory_region(0x04000012+(4*number)), 0, 15),
+affine_data(memory->memory_region(0x04000020+(0x10*(number-2))))
 {}
 
 Display::TiledBackground::TiledBackgroundControl::TiledBackgroundControl(Byte * address) : 
@@ -501,6 +580,15 @@ color_mode(address,7),
 base_screenblock(address,8,12),
 affine_wrapping(address,13),
 background_size(address,14,15)
+{}
+
+Display::TiledBackground::AffineData::AffineData(Byte * address) : 
+pa(address, 0, 15),
+pb(address+0x2, 0, 15),
+pc(address+0x4, 0, 15),
+pd(address+0x6, 0, 15),
+displacement_x(address+0x8, 0, 31),
+displacement_y(address+0xc, 0, 31)
 {}
 
 Display::TiledBackground::ScreenEntry::ScreenEntry(Byte * address) : 

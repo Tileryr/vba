@@ -73,6 +73,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     }
 
     display->start_draw_loop(scheduler);
+
     scheduler->total_passed_milliseconds = SDL_GetTicks();
     scheduler->total_passed_nanoseconds = SDL_GetTicksNS();
 
