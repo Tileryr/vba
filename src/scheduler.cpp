@@ -3,7 +3,15 @@
 
 // #define PROFILE
 
-Scheduler::Scheduler(ARM7TDMI * cpu) : cpu(cpu) {}
+Scheduler::Scheduler(ARM7TDMI * cpu) : 
+cpu(cpu), 
+timers{
+    Timer(&cpu->memory, &timers[1] ,0),
+    Timer(&cpu->memory, &timers[2] ,1),
+    Timer(&cpu->memory, &timers[3] ,2),
+    Timer(&cpu->memory, nullptr ,3),
+} 
+{}
 
 void Scheduler::schedule_event(Word cycles, std::function<void()> event) {
     ScheduledEvent scheduled_event = {cycles, event};
@@ -35,11 +43,19 @@ void Scheduler::tick() {
         ScheduledEvent next_event = events.front();
         int cycles_till_next_event = next_event.cycles_till_done;
 
-        while (cycles_till_next_event > 0) {
-            cpu->run_next_opcode();
-            cycles_till_next_event -= 3;
-        }
         
+        while (cycles_till_next_event > 0) {
+            int cpu_passed_cycles = 3;
+            cpu->run_next_opcode();
+            cycles_till_next_event -= cpu_passed_cycles;
+            
+            for (int i = 0; i < 4; i++) {
+                Timer timer = timers[i];
+                if (timer.control.enabled.get() == 0 || timer.control.cascade.get() == 1) {continue;}
+                timer.pass_cycles(cpu_passed_cycles);
+            }
+        }
+
         move_events_forward(next_event.cycles_till_done);
         passed_cycles -= next_event.cycles_till_done;
 
@@ -62,3 +78,60 @@ void Scheduler::tick() {
     total_passed_milliseconds = SDL_GetTicks();
     passed_nanoseconds = SDL_GetTicksNS();
 }    
+
+Scheduler::Timer::Timer(Memory * memory, Timer * next_timer, Word number) : 
+data(memory->memory_region(0x04000100 + (0x04*number)), 0, 15),
+control(memory->memory_region(0x04000102 + (0x04*number))),
+next_timer(next_timer),
+cycles_until_increment(get_frequency()),
+reset_value(0)
+{}
+
+Scheduler::Timer::Control::Control(Byte * address) :
+frequency(address, 0, 1),
+cascade(address, 2),
+overflow_interrupt(address, 6),
+enabled(address, 7)
+{}
+
+void Scheduler::Timer::pass_cycles(Word cycles) {
+    int frequency = get_frequency();
+    cycles += cycles_until_increment;
+
+    while (cycles >= 0)
+    {
+        if (cycles >= frequency) {
+            cycles -= frequency;
+            increment_data();
+        } else {
+            cycles_until_increment = frequency - cycles;
+            cycles = -1;
+        }
+    }
+}
+
+void Scheduler::Timer::increment_data() {
+    data.set(data.get()+1);
+    if (data.get() == 0) {
+        data.set(reset_value);
+        if (next_timer == nullptr) return;
+        if (next_timer->control.enabled.get() == 1 && next_timer->control.cascade.get() == 1) {
+            next_timer->increment_data();
+        }
+    }
+}
+
+int Scheduler::Timer::get_frequency() {
+    switch (control.frequency.get()) {
+        case 0:
+            return 1;
+        case 1:
+            return 64;
+        case 2:
+            return 256;
+        case 3:
+            return 1024;
+    }
+
+    return 0;
+}

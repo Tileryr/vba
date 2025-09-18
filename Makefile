@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-pedantic -g  -I. -O2 -fsanitize=address
+CFLAGS=-pedantic -g  -I. -O2
 
 SRC=$(wildcard src/*.cpp) $(wildcard src/cpu/*.cpp) $(wildcard src/cpu/opcodes/*.cpp) $(wildcard src/cpu/opcodes/arm/*.cpp)
 OBJ=$(SRC:%.cpp=%.o)
@@ -9,7 +9,7 @@ EXE=vba
 LIBS=$(addprefix -l,) `pkg-config --libs --cflags sdl3`
 
 $(EXE): $(OBJ) 
-	$(CC) -fsanitize=address -static-libasan -g -o $@ $^ $(LIBS)
+	$(CC) -g -o $@ $^ $(LIBS)
 
 -include $(DEP)
 

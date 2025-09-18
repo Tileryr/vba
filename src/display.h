@@ -44,8 +44,9 @@ typedef struct Display {
         BitRegion forced_blank;
         BitRegion display_backgrounds;
         BitRegion display_objects;
-        BitRegion display_windows;
-        BitRegion display_objects_windows;
+        BitRegion display_window_0;
+        BitRegion display_window_1;
+        BitRegion display_objects_window;
     } display_control;
 
     struct DisplayStatus {
@@ -117,7 +118,48 @@ typedef struct Display {
         
         BitRegion h_scroll;
         BitRegion v_scroll;
+        int number;
     } TiledBackground;
+    
+    typedef struct RenderSettings {
+        bool bg0;
+        bool bg1;
+        bool bg2;
+        bool bg3;
+        bool obj;
+        bool sfx;
+    } RenderSettings;
+
+    typedef struct Window {
+        Window(Byte * content_address, bool start);
+        BitRegion bg0;
+        BitRegion bg1;
+        BitRegion bg2;
+        BitRegion bg3;
+        BitRegion obj;
+        BitRegion sfx;
+
+        RenderSettings get_render_settings();
+        bool inside;
+    } Window;
+
+    typedef struct SizableWindow : Window {
+        SizableWindow(Byte * content_address, bool start, Byte * h_address, Byte * v_address);
+        BitRegion left;
+        BitRegion right;
+        BitRegion top;
+        BitRegion bottom;
+
+        bool inside_h;
+        bool inside_v;
+        void update_inside(Word x, Word y);
+    } SizableWindow;
+
+
+    SizableWindow window_0;
+    SizableWindow window_1;
+    Window window_obj;
+    Window window_outside;
     
     TiledBackground tiled_backgrounds[4];
 
@@ -128,7 +170,15 @@ typedef struct Display {
 
     Byte scanline;
 
-    HalfWord screen[SCREEN_WIDTH][SCREEN_HEIGHT];
+    enum BufferType {
+        BUFFER_SPIRTE=0,
+        BUFFER_BG0=1,
+        BUFFER_BG1=2,
+        BUFFER_BG2=3,
+        BUFFER_BG3=4,
+    };
+
+    HalfWord screen_buffers[5][SCREEN_WIDTH][SCREEN_HEIGHT];
 
     void update_screen();
     void update_screen_bgmode_0();
@@ -147,13 +197,23 @@ typedef struct Display {
     void render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y);
     void render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y);
 
+    void update_scanline(int y);
+
+    void render_tiled_background_affine_scanline(TiledBackground background_number, int y);
+    void render_tiled_background_scanline(TiledBackground background, int y);
+    void render_sprite_scanline(Byte sprite_number, int y);
+
+    void render_tile_scanline_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y, int offset_y);
+    void render_tile_scanline_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y, int offset_y);
+    
     void apply_affine_transformation_sprite(Matrix<HalfWord> * sprite, Matrix<int16_t> * transformation, Word sprite_x, Word sprite_y, bool double_render_area);
     inline Word calculate_tile_start_address(Word charblock, Word tile);
 
     void render();
     
-    void set_screen_pixel(Word x, Word y, HalfWord color);
+    void set_screen_pixel(Word x, Word y, HalfWord color, BufferType buffer);
     HalfWord get_palette_color(Byte index, Word palette_start_address);
+    BufferType number_to_bg_buffer_type(int number);
 
     void start_draw_loop(Scheduler * scheduler);
 } Display;

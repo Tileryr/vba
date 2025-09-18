@@ -7,6 +7,9 @@
 #include "cpu.h"
 #include "../utils.h"
 
+#include "src/cpu/opcodes/arm/data_processing.h"
+#include "src/cpu/opcodes/arm/block_data_transfer.h"
+
 // Private
 
 RegisterSet * ARM7TDMI::mode_to_register_set(OperatingMode mode) 
@@ -61,7 +64,7 @@ void ARM7TDMI::trigger_exception(OperatingMode new_mode, unsigned int exception_
     *new_register_set->registers[REGISTER_LR] = ls_value;
 
     new_register_set->spsr = cpsr;
-    cpsr.t = STATE_THUMB;
+    cpsr.t = STATE_ARM;
     cpsr.mode = new_mode;
     cpsr.i = true;
 
@@ -239,6 +242,44 @@ void ARM7TDMI::run_exception(Exception exception_type) {
             break;
     }
 };
+
+void ARM7TDMI::start_interrupt() {
+    run_exception(EXCEPTION_INTERRUPT);
+
+    HalfWord saved_registers = 
+    ((1 << 4) - 1) |
+    (1 << 12) |
+    (1 << REGISTER_LR);
+
+    OpcodeBlockDataTransferBuilder(false, REGISTER_SP)
+    .set_flags(true, false, false, true)
+    .set_register_list(saved_registers)
+    .get_product()
+    .run(this);
+
+    write_register(0, 0x04000000);
+    write_register(REGISTER_PC, read_word_from_memory(0x03FFFFFC));
+}
+
+void ARM7TDMI::return_from_interrupt() {
+    HalfWord loaded_registers = 
+    ((1 << 4) - 1) |
+    (1 << 12) |
+    (1 << REGISTER_LR);
+
+    OpcodeBlockDataTransferBuilder(true, REGISTER_SP)
+    .set_flags(false, true, false, true)
+    .set_register_list(loaded_registers)
+    .get_product()
+    .run(this);
+
+    OpcodeDataProcessingBuilder(OpcodeDataProcess::SUB, true)
+    .set_destination_register(REGISTER_PC)
+    .set_source_register(REGISTER_LR)
+    .set_immediate_op2(0x4, 0)
+    .get_product()
+    .run(this);
+}
 
 void ARM7TDMI::warn(const char * msg)
 {

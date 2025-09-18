@@ -107,6 +107,9 @@ typedef struct ARM7TDMI {
         bool is_priviledged();
         // Exception Functions
         void run_exception(Exception exception_type);
+        void start_interrupt();
+        void return_from_interrupt();
+        
         void run_next_opcode();
 
         void skip_bios();
