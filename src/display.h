@@ -197,11 +197,15 @@ typedef struct Display {
     void render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y);
     void render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y);
 
+    HalfWord get_sprite_pixel_4bpp(Word x, Word y, Word tile_index, Word charblock, Word palette_start, Word palette_bank, Word sprite_width);
+
     void update_scanline(int y);
 
     void render_tiled_background_affine_scanline(TiledBackground background_number, int y);
     void render_tiled_background_scanline(TiledBackground background, int y);
     void render_sprite_scanline(Byte sprite_number, int y);
+
+    Word flip(Word number, Word flip_value);
 
     void render_tile_scanline_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y, int offset_y);
     void render_tile_scanline_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y, int offset_y);

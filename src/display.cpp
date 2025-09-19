@@ -1,6 +1,7 @@
 #include "src/scheduler.h"
 #include "src/memory.h"
 #include "src/display.h"
+#include <functional>
 
 Display::Display(SDL_Renderer * renderer, Memory * memory) : 
 renderer(renderer), 
@@ -224,9 +225,6 @@ void Display::render_tiled_background(TiledBackground background) {
                 TiledBackground::ScreenEntry screen_entry = TiledBackground::ScreenEntry(memory->memory_region(screen_entry_address));
 
                 Word tile_start_address = calculate_tile_start_address(background.control.base_charblock.get(), screen_entry.tile_index.get());
-                if (screen_entry.tile_index.get() != 0) {
-                    SDL_Log("address %d %0x", screen_entry.tile_index.get(), tile_start_address);
-                }
                 
                 Word pixel_x = x*8 + screenblock_x*256;
                 Word pixel_y = y*8 + screenblock_y*256;
@@ -463,87 +461,114 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
         pixel_size_y = base_pixel_size;
     }
 
-    if (y < attribute_0.y || y >= attribute_0.y + pixel_size_y) {
-        return;
+    bool affine = attribute_0.object_mode == 0b01 || attribute_0.object_mode == 0b11;
+    bool double_sized = attribute_0.object_mode == 0b11;
+
+    Word y_max_limit;
+    if (affine && double_sized) {
+        y_max_limit = attribute_0.y+(pixel_size_y*2);
+    } else {
+        y_max_limit = attribute_0.y+pixel_size_y;
     }
 
-    if (attribute_1.vertical_flip == 1) {
-        y -= attribute_0.y;
-        y = (-(y-32))+31;
-        y += attribute_0.y;
+    if (attribute_0.y + pixel_size_y > 255) {
+        if (y < attribute_0.y && y >= y_max_limit%256) {  
+            return;
+        }
+    } else {
+        if (y < attribute_0.y || y >= y_max_limit) {
+            return;
+        }
     }
 
     Word y_offset_from_base = y - attribute_0.y;
+    if (y < attribute_0.y) {
+        y_offset_from_base = (y + 256) - attribute_0.y; 
+    }
+
+    if (attribute_1.vertical_flip == 1) {
+        y_offset_from_base = flip(y_offset_from_base, pixel_size_y/2);
+    }
 
     Matrix<HalfWord> sprite_scanline_buffer = Matrix<HalfWord>(pixel_size_x, 1);
 
     HalfWord tile_size_x = pixel_size_x / 8;
     HalfWord tile_size_y = pixel_size_y / 8;
     
-    for (int x = 0; x < tile_size_x; x++) {
-        bool one_dimensional = display_control.vram_mapping.get() == 1;
-        
-        Word tile_index;
-        Word tile_y = y_offset_from_base / 8;
+    auto get_pixel_4bpp = [&](Word x, Word y){
+        return get_sprite_pixel_4bpp(
+            x, 
+            y, 
+            attribute_2.tile_index, 
+            4, 
+            OBJ_PALETTE_RAM_START,
+            attribute_2.palette_bank, 
+            pixel_size_y
+        );
+    };
 
-        if (one_dimensional) {
-            tile_index = attribute_2.tile_index + (tile_y*tile_size_x + x);
-        } else {
-            tile_index = attribute_2.tile_index + (tile_y*0x20 + x);
-        }
-
-        Word tile_screen_x = x*8;
-
-        if (attribute_0.color_mode == 0) {
-            render_tile_scanline_4bpp(
-                &sprite_scanline_buffer,
-                calculate_tile_start_address(4, tile_index),
-                OBJ_PALETTE_RAM_START,
-                attribute_2.palette_bank,
-                tile_screen_x,
-                0,
-                y_offset_from_base % 8
-            );
-        } else {
-            render_tile_scanline_8bpp(
-                &sprite_scanline_buffer,
-                calculate_tile_start_address(4, tile_index),
-                OBJ_PALETTE_RAM_START,
-                tile_screen_x,
-                0,
-                y_offset_from_base % 8
-            );
-        }   
-
-    }
-
-    if (attribute_0.object_mode == 0b01 || attribute_0.object_mode == 0b11) {
+    if (affine) {
         Matrix<int16_t> transform_matrix = Matrix<int16_t>(2, 2);
         transform_matrix.for_each([&](Word x, Word y){
             Word index = (y*2+x+1);
             transform_matrix.set(x, y, memory->read_halfword_from_memory(OAM_START + ((4*index)-1)*2 + attribute_1.affine_index*32)); 
         });
 
-        bool double_sized = attribute_0.object_mode == 0b11;
-    } else {
-        if (attribute_1.horizontal_flip == 1) {
-            Matrix<HalfWord> hflip_buffer = Matrix<HalfWord>(pixel_size_x, 1);
-            sprite_scanline_buffer.for_each([&hflip_buffer, &sprite_scanline_buffer](Word x, Word y) mutable {
-                hflip_buffer.set(x, y, sprite_scanline_buffer.get((-(x-32))+31, y));
-            });
+        
 
-            sprite_scanline_buffer.copy(&hflip_buffer);
+        int32_t half_sprite_width = pixel_size_x/2;
+        int32_t half_sprite_height = pixel_size_y/2;
+
+        int32_t render_area_width = half_sprite_width;
+        int32_t render_area_height = half_sprite_height;
+
+        if (double_sized) {
+            render_area_width *= 2;
+            render_area_height *= 2;
         }
 
-        sprite_scanline_buffer.set(0, 0, 0xFFF);
+        Word base_x = attribute_1.x+render_area_width;
+        Word base_y = attribute_0.y+render_area_height;
 
-        for (int x = 0; x < pixel_size_x; x++) {
-            Word screen_x = attribute_1.x+x;
+        int relative_y = y - base_y;
 
+        for (int x = -render_area_width; x < render_area_width; x++) {
+            int16_t mapped_pixel_x = (transform_matrix.get(0, 0)*x + transform_matrix.get(1, 0)*relative_y)>>8;
+            int16_t mapped_pixel_y = (transform_matrix.get(0, 1)*x + transform_matrix.get(1, 1)*relative_y)>>8;
+
+            Word target_sprite_pixel_x = mapped_pixel_x+half_sprite_width;
+            Word target_sprite_pixel_y = mapped_pixel_y+half_sprite_height;
+            if (target_sprite_pixel_x < 0 || target_sprite_pixel_x >= pixel_size_x || target_sprite_pixel_y < 0 || target_sprite_pixel_y >= pixel_size_y) {continue;}
+
+            HalfWord mapped_pixel_color = 
+            get_sprite_pixel_4bpp(
+                target_sprite_pixel_x, 
+                target_sprite_pixel_y, 
+                attribute_2.tile_index, 
+                4, 
+                OBJ_PALETTE_RAM_START,
+                attribute_2.palette_bank, 
+                pixel_size_x
+            );
+
+            Word screen_x = base_x+x;
+            Word screen_y = base_y+relative_y;
             screen_x %= 512;
+            screen_y %= 256;
+            set_screen_pixel(screen_x, screen_y, mapped_pixel_color, BUFFER_SPIRTE);
+        }
+    } else {
+        for (int x = 0; x < pixel_size_x; x++) {
+            Word mapped_x = x;
+            if (attribute_1.horizontal_flip == 1) {
+                mapped_x = flip(mapped_x, pixel_size_x/2);
+            }
 
-                set_screen_pixel(screen_x, y, sprite_scanline_buffer.get(x, 0), BUFFER_SPIRTE);
-            
+            HalfWord pixel_color = get_pixel_4bpp(mapped_x, y_offset_from_base);
+
+            Word screen_x = attribute_1.x+x;
+            screen_x %= 512;
+            set_screen_pixel(screen_x, y, pixel_color, BUFFER_SPIRTE);
         }
     }
 }
@@ -629,6 +654,41 @@ void Display::render_tile_scanline_4bpp(Matrix<HalfWord> * buffer, Word tile_sta
         buffer->set(buffer_x, buffer_y, low_palette_color);
         buffer->set(buffer_x+1, buffer_y, high_palette_color);
     }
+}
+
+HalfWord Display::get_sprite_pixel_4bpp(Word x, Word y, Word tile_base, Word charblock, Word palette_start, Word palette_bank, Word sprite_width) {
+    Word tile_x, tile_y;
+    tile_x = (x - (x % 8))/8;
+    tile_y = (y - (y % 8))/8;
+
+    bool one_dimensional = display_control.vram_mapping.get() == 1;
+    Word tile_index;
+    if (one_dimensional) {
+        Word tile_width = (sprite_width/8);
+        tile_index = tile_base + (tile_x + tile_y*tile_width);
+    } else {
+        tile_index = tile_base + (tile_x + tile_y*0x20);
+    }
+
+    Word tile_start_address = (charblock * 0x4000) + tile_index * 0x20;
+
+    Byte * vram = memory->memory_region(VRAM_START);
+    Word x_offset = x % 8;
+    Word y_offset = y % 8;
+
+    Byte palette_index;
+    palette_index = vram[tile_start_address + (x_offset/2) + (y_offset * 4)];
+
+    if (x % 2 == 1) {
+        palette_index = (palette_index >> 4) & 0xF;
+    } else {
+        palette_index = palette_index & 0xF;
+    }
+
+    palette_index |= (palette_bank << 4);
+    HalfWord palette_color = get_palette_color(palette_index, palette_start);
+
+    return palette_color;
 }
 
 void Display::render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y) {
@@ -764,6 +824,10 @@ HalfWord Display::get_palette_color(Byte index, Word palatte_start_address) {
 
 Word Display::calculate_tile_start_address(Word charblock, Word tile) {
     return (charblock * 0x4000) + tile * 0x20;
+}
+
+Word Display::flip(Word number, Word flip_value) {
+    return (-(number-flip_value))+(flip_value-1);
 }
 
 Display::BufferType Display::number_to_bg_buffer_type(int number) {
