@@ -57,7 +57,9 @@ void Display::update_screen() {
 
 void Display::update_screen_bgmode_0() {
     for (int i=0;i<4;i++) {
-        render_tiled_background(tiled_backgrounds[i]);
+        for (int y = 0; y < SCREEN_HEIGHT; y++) {
+            render_tiled_background_scanline(tiled_backgrounds[i], y);
+        }
     }
 }
 
@@ -212,7 +214,6 @@ void Display::render_tiled_background(TiledBackground background) {
 
     Word screenblock_width = tile_width/32;
     Word screenblock_height = tile_height/32;
-
     
     Matrix<HalfWord>::iterate_xy(screenblock_width, screenblock_height, [&](Word screenblock_x, Word screenblock_y){
         Word screenblock_index = background.control.base_screenblock.get() + (screenblock_y*screenblock_width + screenblock_x);
@@ -258,148 +259,79 @@ void Display::render_tiled_background(TiledBackground background) {
             Word target_pixel_y = y+background.v_scroll.get();
             target_pixel_x %= pixel_width;
             target_pixel_y %= pixel_height;
-            if (background.number == 0) {
-                if (background_buffer.get(target_pixel_x, target_pixel_y) != COLOR_TRANSPARENT) {
-                    SDL_Log("%d", 1);
-                }
-            } 
             set_screen_pixel(x, y, background_buffer.get(target_pixel_x, target_pixel_y), number_to_bg_buffer_type(background.number));
         }
     }
 }
 
-void Display::render_sprite(Byte sprite_number) {
-    Byte * oam = memory->memory_region(OAM_START);
-    Byte * object_attributes_start = &oam[sprite_number * 8];
-
-    HalfWord attribute_0_value = Memory::read_halfword_from_memory(object_attributes_start, 0);
-    AttributeZero attribute_0 = AttributeZero(attribute_0_value);
-
-    HalfWord attribute_1_value = Memory::read_halfword_from_memory(object_attributes_start, 2);
-    AttributeOne attribute_1 = AttributeOne(attribute_1_value);
-
-    HalfWord attribute_2_value = Memory::read_halfword_from_memory(object_attributes_start, 4);
-    AttributeTwo attribute_2 = AttributeTwo(attribute_2_value);
-
-    if (attribute_0.object_mode == 0b10) {
-        return;
-    }
-
-    HalfWord pixel_size_x;
-    HalfWord pixel_size_y;
-    HalfWord base_pixel_size;
-    switch (attribute_1.sprite_size)
-    {
-        case 0b00:
-            base_pixel_size = 8;
+void Display::render_tiled_background_scanline(TiledBackground background, int scanline) {
+    int tile_width;
+    int tile_height;
+    switch (background.control.background_size.get()) {
+        case 0:
+            tile_width = 32;
+            tile_height = 32;
             break;
-        case 0b01:
-            base_pixel_size = 16;
+        case 1:
+            tile_width = 64;
+            tile_height = 32;
             break;
-        case 0b10:
-            base_pixel_size = 32;
+        case 2:
+            tile_width = 32;
+            tile_height = 64;
             break;
-        case 0b11:
-            base_pixel_size = 64;
+        case 3:
+            tile_width = 64;
+            tile_height = 64;
             break;
     }
 
-    if (attribute_0.sprite_shape != 0b00) {
-        if (attribute_1.sprite_size == 0b01) {
-            pixel_size_x = 32;
-            pixel_size_y = 8;
-        } else {
-            pixel_size_x = base_pixel_size;
-            pixel_size_y = base_pixel_size/2;
+    Word h_offset = background.h_scroll.get();
+    Word v_offset = background.v_scroll.get();
 
-            if (attribute_1.sprite_size == 0b00) {
-                pixel_size_x *= 2;
-                pixel_size_y *= 2;
+    Word pixel_width = tile_width*8;
+    Word pixel_height = tile_height*8;
+
+    int relative_scanline = scanline + v_offset;
+    relative_scanline %= pixel_height;
+
+    Word screenblock_width = tile_width/32;
+
+    Word tile_y = (relative_scanline-(relative_scanline%8))/8;
+    Word screenblock_y = (tile_y-(tile_y%32))/32;
+
+    Word tile_offset_y = relative_scanline%8;
+
+    for (int screenblock_x = 0; screenblock_x < screenblock_width; screenblock_x++) {
+        Word screenblock_index = background.control.base_screenblock.get() + (screenblock_y*screenblock_width + screenblock_x);
+        Word screenblock_base_address = VRAM_START + (0x800*screenblock_index);
+
+        for (int tile_x = 0; tile_x < 32; tile_x++) {
+            Word screen_entry_index = (tile_y*32+tile_x);
+
+            Word screen_entry_address = screenblock_base_address+(screen_entry_index*2);
+            TiledBackground::ScreenEntry screen_entry = TiledBackground::ScreenEntry(memory->memory_region(screen_entry_address));
+
+            Word base_charblock = background.control.base_charblock.get();
+            Word tile_index = screen_entry.tile_index.get();
+
+            for (int tile_pixel_x = 0; tile_pixel_x < 8; tile_pixel_x++) {
+                Word screen_x = tile_pixel_x + tile_x*8 + screenblock_x*256 + -background.h_scroll.get();
+                screen_x %= pixel_width;
+
+                HalfWord background_color = get_tile_pixel_4bpp(
+                    tile_pixel_x,
+                    tile_offset_y,
+                    tile_index,
+                    base_charblock,
+                    BG_PALETTE_RAM_START,
+                    screen_entry.palette_bank.get(),
+                    8
+                );
+
+                set_screen_pixel(screen_x, scanline, background_color, number_to_bg_buffer_type(background.number));
             }
         }
-        
-        if (attribute_0.sprite_shape == 0b10) {
-            std::swap(pixel_size_x, pixel_size_y);
-        }
-    } else {
-        pixel_size_x = base_pixel_size;
-        pixel_size_y = base_pixel_size;
-    }
-
-    Matrix<HalfWord> sprite_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
-
-    HalfWord tile_size_x = pixel_size_x / 8;
-    HalfWord tile_size_y = pixel_size_y / 8;
-
-    for (int y = 0; y < tile_size_y; y++) {
-        for (int x = 0; x < tile_size_x; x++) {
-            bool one_dimensional = display_control.vram_mapping.get() == 1;
-            Word tile_x = x*8;
-            Word tile_y = y*8;
-            Word tile_index;
-
-            if (one_dimensional) {
-                tile_index = attribute_2.tile_index + (y*tile_size_x + x);
-            } else {
-                tile_index = attribute_2.tile_index + (y*0x20 + x);
-            }
-
-            if (attribute_0.color_mode == 0) {
-                render_tile_4bpp(
-                    &sprite_buffer,
-                    calculate_tile_start_address(4, tile_index),
-                    OBJ_PALETTE_RAM_START,
-                    attribute_2.palette_bank,
-                    tile_x,
-                    tile_y
-                );
-            } else {
-                render_tile_8bpp(
-                    &sprite_buffer,
-                    calculate_tile_start_address(4, tile_index),
-                    OBJ_PALETTE_RAM_START,
-                    tile_x,
-                    tile_y
-                );
-            }   
-        }
-    }
-
-    if (attribute_0.object_mode == 0b01 || attribute_0.object_mode == 0b11) {
-        Matrix<int16_t> transform_matrix = Matrix<int16_t>(2, 2);
-        transform_matrix.for_each([&](Word x, Word y){
-            Word index = (y*2+x+1);
-            transform_matrix.set(x, y, memory->read_halfword_from_memory(OAM_START + ((4*index)-1)*2 + attribute_1.affine_index*32)); 
-        });
-
-        bool double_sized = attribute_0.object_mode == 0b11;
-        apply_affine_transformation_sprite(&sprite_buffer, &transform_matrix, attribute_1.x, attribute_0.y, double_sized);
-    } else {
-        if (attribute_1.horizontal_flip == 1) {
-            Matrix<HalfWord> hflip_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
-            sprite_buffer.for_each([&hflip_buffer, &sprite_buffer](Word x, Word y) mutable {
-                hflip_buffer.set(x, y, sprite_buffer.get((-(x-32))+31, y));
-            });
-
-            sprite_buffer.copy(&hflip_buffer);
-        }
-
-        if (attribute_1.vertical_flip == 1) {
-            Matrix<HalfWord> vflip_buffer = Matrix<HalfWord>(pixel_size_x, pixel_size_y);
-            sprite_buffer.for_each([&vflip_buffer, &sprite_buffer](Word x, Word y) mutable {
-                vflip_buffer.set(x, y, sprite_buffer.get(x, (-(y-32))+31));
-            });
-
-            sprite_buffer.copy(&vflip_buffer);
-        } 
-
-        sprite_buffer.for_each([&](Word x, Word y){
-            Word screen_x = attribute_1.x+x;
-            Word screen_y = attribute_0.y+y;
-            screen_x %= 512;
-            screen_y %= 256;
-            set_screen_pixel(screen_x, screen_y, sprite_buffer.get(x, y), BUFFER_SPIRTE);
-        });
     }
 }
 
@@ -496,14 +428,14 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
     HalfWord tile_size_y = pixel_size_y / 8;
     
     auto get_pixel_4bpp = [&](Word x, Word y){
-        return get_sprite_pixel_4bpp(
+        return get_tile_pixel_4bpp(
             x, 
             y, 
             attribute_2.tile_index, 
             4, 
             OBJ_PALETTE_RAM_START,
             attribute_2.palette_bank, 
-            pixel_size_y
+            pixel_size_x
         );
     };
 
@@ -513,8 +445,6 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
             Word index = (y*2+x+1);
             transform_matrix.set(x, y, memory->read_halfword_from_memory(OAM_START + ((4*index)-1)*2 + attribute_1.affine_index*32)); 
         });
-
-        
 
         int32_t half_sprite_width = pixel_size_x/2;
         int32_t half_sprite_height = pixel_size_y/2;
@@ -540,16 +470,7 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
             Word target_sprite_pixel_y = mapped_pixel_y+half_sprite_height;
             if (target_sprite_pixel_x < 0 || target_sprite_pixel_x >= pixel_size_x || target_sprite_pixel_y < 0 || target_sprite_pixel_y >= pixel_size_y) {continue;}
 
-            HalfWord mapped_pixel_color = 
-            get_sprite_pixel_4bpp(
-                target_sprite_pixel_x, 
-                target_sprite_pixel_y, 
-                attribute_2.tile_index, 
-                4, 
-                OBJ_PALETTE_RAM_START,
-                attribute_2.palette_bank, 
-                pixel_size_x
-            );
+            HalfWord mapped_pixel_color = get_pixel_4bpp(target_sprite_pixel_x, target_sprite_pixel_y);
 
             Word screen_x = base_x+x;
             Word screen_y = base_y+relative_y;
@@ -569,39 +490,6 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
             Word screen_x = attribute_1.x+x;
             screen_x %= 512;
             set_screen_pixel(screen_x, y, pixel_color, BUFFER_SPIRTE);
-        }
-    }
-}
-
-void Display::apply_affine_transformation_sprite(Matrix<HalfWord> * sprite, Matrix<int16_t> * transformation, Word sprite_x, Word sprite_y, bool double_render_area) {
-    int32_t half_sprite_width = sprite->width/2;
-    int32_t half_sprite_height = sprite->height/2;
-
-    int32_t render_area_width = half_sprite_width;
-    int32_t render_area_height = half_sprite_height;
-
-    if (double_render_area) {
-        render_area_width *= 2;
-        render_area_height *= 2;
-    }
-    // BASE = CENTER OF SPRITE SCREEN COORDS
-    Word base_x = sprite_x+render_area_width;
-    Word base_y = sprite_y+render_area_height;
-
-    for (int y = -render_area_height; y < render_area_height; y++) {
-        for (int x = -render_area_width; x < render_area_width; x++) {
-            int16_t mapped_pixel_x = (transformation->get(0, 0)*x + transformation->get(1, 0)*y)>>8;
-            int16_t mapped_pixel_y = (transformation->get(0, 1)*x + transformation->get(1, 1)*y)>>8;
-
-            Word target_sprite_pixel_x = mapped_pixel_x+half_sprite_width;
-            Word target_sprite_pixel_y = mapped_pixel_y+half_sprite_height;
-            if (target_sprite_pixel_x < 0 || target_sprite_pixel_x >= sprite->width || target_sprite_pixel_y < 0 || target_sprite_pixel_y >= sprite->height) {continue;}
-            HalfWord mapped_pixel_color = sprite->get(target_sprite_pixel_x, target_sprite_pixel_y);
-            Word screen_x = base_x+x;
-            Word screen_y = base_y+y;
-            screen_x %= 512;
-            screen_y %= 256;
-            set_screen_pixel(screen_x, screen_y, mapped_pixel_color, BUFFER_SPIRTE);
         }
     }
 }
@@ -632,31 +520,7 @@ void Display::render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_addres
     }
 }
 
-void Display::render_tile_scanline_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y, int offset_y) {
-    Byte * vram = memory->memory_region(VRAM_START);
-
-    for (int offset_x = 0; offset_x < 4; offset_x += 1) {
-        Byte palette_index_low;
-        Byte palette_index_high;
-
-        palette_index_low = vram[tile_start_address + offset_x + (offset_y * 4)] & 0xF;
-        palette_index_high = (vram[tile_start_address + offset_x + (offset_y * 4)] >> 4) & 0xF;
-
-        palette_index_low |= (palbank << 4);
-        palette_index_high |= (palbank << 4);
-
-        Word buffer_x = offset_x*2 + x;
-        Word buffer_y = y;
-
-        HalfWord low_palette_color = get_palette_color(palette_index_low, palette_start_address);
-        HalfWord high_palette_color = get_palette_color(palette_index_high, palette_start_address);
-
-        buffer->set(buffer_x, buffer_y, low_palette_color);
-        buffer->set(buffer_x+1, buffer_y, high_palette_color);
-    }
-}
-
-HalfWord Display::get_sprite_pixel_4bpp(Word x, Word y, Word tile_base, Word charblock, Word palette_start, Word palette_bank, Word sprite_width) {
+HalfWord Display::get_tile_pixel_4bpp(Word x, Word y, Word tile_base, Word charblock, Word palette_start, Word palette_bank, Word width) {
     Word tile_x, tile_y;
     tile_x = (x - (x % 8))/8;
     tile_y = (y - (y % 8))/8;
@@ -664,7 +528,7 @@ HalfWord Display::get_sprite_pixel_4bpp(Word x, Word y, Word tile_base, Word cha
     bool one_dimensional = display_control.vram_mapping.get() == 1;
     Word tile_index;
     if (one_dimensional) {
-        Word tile_width = (sprite_width/8);
+        Word tile_width = (width/8);
         tile_index = tile_base + (tile_x + tile_y*tile_width);
     } else {
         tile_index = tile_base + (tile_x + tile_y*0x20);
@@ -708,20 +572,20 @@ void Display::render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_addres
     }
 }
 
-void Display::render_tile_scanline_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y, int offset_y) {
-    Byte * vram = memory->memory_region(VRAM_START);
+// void Display::render_tile_scanline_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y, int offset_y) {
+//     Byte * vram = memory->memory_region(VRAM_START);
 
-    for (int offset_x = 0; offset_x < 8; offset_x += 1) {
-        Byte palette_index;
+//     for (int offset_x = 0; offset_x < 8; offset_x += 1) {
+//         Byte palette_index;
 
-        palette_index = vram[tile_start_address + offset_x + (offset_y * 8)];
+//         palette_index = vram[tile_start_address + offset_x + (offset_y * 8)];
 
-        Word buffer_x = offset_x + x;
-        Word buffer_y = offset_y + y;
+//         Word buffer_x = offset_x + x;
+//         Word buffer_y = offset_y + y;
 
-        buffer->set(buffer_x, buffer_y, get_palette_color(palette_index, palette_start_address));
-    }
-}
+//         buffer->set(buffer_x, buffer_y, get_palette_color(palette_index, palette_start_address));
+//     }
+// }
 
 void Display::render() {
     SDL_RenderClear(renderer);
@@ -783,9 +647,6 @@ void Display::render() {
                             break;
                     }
 
-                    if (i == 0 && background_color != COLOR_TRANSPARENT) {
-                        SDL_Log("i: %d %d", background_enabled, background_setting);
-                    }
                     if (background_color != COLOR_TRANSPARENT && background_enabled && background_setting) {
                         
                         color = background_color;

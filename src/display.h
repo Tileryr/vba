@@ -192,13 +192,12 @@ typedef struct Display {
 
     void render_tiled_background_affine(TiledBackground background_number);
     void render_tiled_background(TiledBackground background);
-    void render_sprite(Byte sprite_number);
 
     void render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y);
     void render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y);
 
-    HalfWord get_sprite_pixel_4bpp(Word x, Word y, Word tile_index, Word charblock, Word palette_start, Word palette_bank, Word sprite_width);
-
+    HalfWord get_tile_pixel_4bpp(Word x, Word y, Word tile_index, Word charblock, Word palette_start, Word palette_bank, Word sprite_width);
+    HalfWord get_tile_pixel_8bpp(Word x, Word y, Word tile_index, Word charblock, Word palette_start, Word sprite_width);
     void update_scanline(int y);
 
     void render_tiled_background_affine_scanline(TiledBackground background_number, int y);
@@ -206,11 +205,7 @@ typedef struct Display {
     void render_sprite_scanline(Byte sprite_number, int y);
 
     Word flip(Word number, Word flip_value);
-
-    void render_tile_scanline_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y, int offset_y);
-    void render_tile_scanline_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y, int offset_y);
     
-    void apply_affine_transformation_sprite(Matrix<HalfWord> * sprite, Matrix<int16_t> * transformation, Word sprite_x, Word sprite_y, bool double_render_area);
     inline Word calculate_tile_start_address(Word charblock, Word tile);
 
     void render();
