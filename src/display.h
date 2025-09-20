@@ -60,34 +60,41 @@ typedef struct Display {
         BitRegion vcount_setting;
     } display_status;
 
+     
     typedef struct AttributeZero {
-        AttributeZero(HalfWord value);
-        unsigned int y : 8;
-        unsigned int object_mode : 2;
-        unsigned int gfx_mode : 2;
-        unsigned int mosiac : 1;
-        unsigned int color_mode : 1;
-        unsigned int sprite_shape : 2;
+        AttributeZero(Byte * oam_start);
+        BitRegion y;
+        BitRegion object_mode;
+        BitRegion gfx_mode;
+        BitRegion mosiac;
+        BitRegion color_mode;
+        BitRegion sprite_shape;
     } AttributeZero;
 
     typedef struct AttributeOne {
-        AttributeOne(HalfWord value);
-        unsigned int x : 9;
-        
-        unsigned int affine_index : 5;
+        AttributeOne(Byte * oam_start);
+        BitRegion x;
+        BitRegion affine_index;
 
-        unsigned int horizontal_flip : 1;
-        unsigned int vertical_flip : 1;
+        BitRegion horizontal_flip;
+        BitRegion vertical_flip;
 
-        unsigned int sprite_size : 2;
+        BitRegion sprite_size;
     } AttributeOne;
 
     typedef struct AttributeTwo {
-        AttributeTwo(HalfWord value);
-        unsigned int tile_index : 10;
-        unsigned int priority : 2;
-        unsigned int palette_bank : 4;
+        AttributeTwo(Byte * oam_start);
+        BitRegion tile_index;
+        BitRegion priority;
+        BitRegion palette_bank;
     } AttributeTwo;
+
+    struct Sprite {
+        Sprite(Memory * memory, int number);
+        AttributeZero attribute_0;
+        AttributeOne attribute_1;
+        AttributeTwo attribute_2;
+    } * sprites;
 
     typedef struct TiledBackground {
         TiledBackground(Memory * memory, Byte number);
@@ -180,33 +187,24 @@ typedef struct Display {
 
     HalfWord screen_buffers[5][SCREEN_WIDTH][SCREEN_HEIGHT];
 
-    void update_screen();
-    void update_screen_bgmode_0();
-    void update_screen_bgmode_1();
-    void update_screen_bgmode_2();
-    void update_screen_bgmode_3();
-    void update_screen_bgmode_4();
-    void update_screen_bgmode_5();
+    void update_scanline(int y);
 
-    void update_sprites();
-
-    void render_tiled_background_affine(TiledBackground background_number);
-    void render_tiled_background(TiledBackground background);
-
-    void render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y);
-    void render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y);
+    void update_scanline_bgmode_0(int y);
+    void update_scanline_bgmode_1(int y);
+    void update_scanline_bgmode_2(int y);
+    void update_scanline_bgmode_3(int y);
+    void update_scanline_bgmode_4(int y); 
+    void update_scanline_bgmode_5(int y);
 
     HalfWord get_tile_pixel_4bpp(Word x, Word y, Word tile_index, Word charblock, Word palette_start, Word palette_bank, Word sprite_width);
     HalfWord get_tile_pixel_8bpp(Word x, Word y, Word tile_index, Word charblock, Word palette_start, Word sprite_width);
-    void update_scanline(int y);
-
-    void render_tiled_background_affine_scanline(TiledBackground background_number, int y);
-    void render_tiled_background_scanline(TiledBackground background, int y);
-    void render_sprite_scanline(Byte sprite_number, int y);
-
-    Word flip(Word number, Word flip_value);
     
-    inline Word calculate_tile_start_address(Word charblock, Word tile);
+    void render_tiled_background_affine_scanline(TiledBackground background, int y);
+    void render_tiled_background_scanline(TiledBackground background, int y);
+
+    void render_sprite_scanline(Sprite sprite, int y);
+
+    inline Word flip(Word number, Word flip_value);
 
     void render();
     

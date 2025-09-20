@@ -1,0 +1,1556 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 27.19      0.31     0.31 433097835     0.00     0.00  Utils::read_bit_range(unsigned long, unsigned int, unsigned int)
+ 15.79      0.49     0.18     2921     0.06     0.24  Scheduler::tick()
+  7.02      0.57     0.08 16384000     0.00     0.00  Display::AttributeOne::AttributeOne(unsigned short)
+  7.02      0.65     0.08 16384000     0.00     0.00  Display::AttributeZero::AttributeZero(unsigned short)
+  7.02      0.73     0.08 16384000     0.00     0.00  Display::render_sprite_scanline(unsigned char, int)
+  5.26      0.79     0.06 75608703     0.00     0.00  Memory::read_word_from_memory(unsigned char*, unsigned int)
+  4.39      0.84     0.05 75482827     0.00     0.00  BitRegion::get()
+  2.63      0.87     0.03 100890841     0.00     0.00  Utils::read_bit(unsigned long, unsigned int)
+  2.63      0.90     0.03 20795373     0.00     0.00  Memory::read_halfword_from_memory(unsigned int)
+  2.63      0.93     0.03 10193173     0.00     0.00  ArithmaticLogicUnit::rotate_right(unsigned int, unsigned int)
+  1.75      0.95     0.02 21193922     0.00     0.00  RegisterSet::write_register(int, unsigned int)
+  1.75      0.97     0.02 21136923     0.00     0.00  ARM7TDMI::write_register(int, unsigned int)
+  1.75      0.99     0.02 15679970     0.00     0.00  ARM7TDMI::run_next_opcode()
+  1.75      1.01     0.02  5099593     0.00     0.00  ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short)
+  1.75      1.03     0.02  4989313     0.00     0.00  OpcodeHalfWordSignedDataTransferBuilder::set_flags(bool, bool, bool)
+  0.88      1.04     0.01 31041429     0.00     0.00  Memory::memory_region(unsigned int)
+  0.88      1.05     0.01 21018351     0.00     0.00  ARM7TDMI::read_register(int)
+  0.88      1.06     0.01 15579038     0.00     0.00  ARM7TDMI::decode_opcode_thumb(unsigned short)
+  0.88      1.07     0.01  5321480     0.00     0.00  OpcodeDataProcess::run(ARM7TDMI*)
+  0.88      1.08     0.01  5111242     0.00     0.00  Utils::sign_extend(int, int)
+  0.88      1.09     0.01  5087647     0.00     0.00  ARM7TDMI::thumb_opcode_conditional_branch(unsigned short)
+  0.88      1.10     0.01  4989313     0.00     0.00  OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*)
+  0.88      1.11     0.01  4987149     0.00     0.00  ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short)
+  0.88      1.12     0.01   143428     0.00     0.00  BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char)
+  0.88      1.13     0.01     3561     0.00     0.00  Memory::write_halfword_to_memory(unsigned int, unsigned short)
+  0.88      1.14     0.01        6     1.67     3.07  Display::render()
+  0.00      1.14     0.00 49340999     0.00     0.00  Memory::read_halfword_from_memory(unsigned char*, unsigned int)
+  0.00      1.14     0.00  7106560     0.00     0.00  Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int)
+  0.00      1.14     0.00  5321480     0.00     0.00  OpcodeDataProcess::calculate_instruction(ArithmaticLogicUnit*, OpcodeDataProcess::InstructionType, unsigned int, unsigned int, bool)
+  0.00      1.14     0.00  5279188     0.00     0.00  OpcodeDataProcessingBuilder::get_product()
+  0.00      1.14     0.00  5279188     0.00     0.00  OpcodeDataProcessingBuilder::set_destination_register(unsigned int)
+  0.00      1.14     0.00  5279188     0.00     0.00  OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool)
+  0.00      1.14     0.00  5247333     0.00     0.00  OpcodeDataProcessingBuilder::set_source_register(unsigned int)
+  0.00      1.14     0.00  5188579     0.00     0.00  ARM7TDMI::condition_field(int)
+  0.00      1.14     0.00  5151603     0.00     0.00  OpcodeDataProcessingBuilder::set_immediate_op2(unsigned char, unsigned int)
+  0.00      1.14     0.00  5118779     0.00     0.00  ArithmaticLogicUnit::subtract(int, unsigned int, ...)
+  0.00      1.14     0.00  5093540     0.00     0.00  OpcodeBranch::branch(ARM7TDMI*, unsigned int, unsigned int, unsigned char)
+  0.00      1.14     0.00  5049873     0.00     0.00  DataTransfer::calculate_address(ARM7TDMI*, unsigned int)
+  0.00      1.14     0.00  5047548     0.00     0.00  DataTransfer::DataTransfer()
+  0.00      1.14     0.00  4989313     0.00     0.00  OpcodeHalfWordSignedDataTransferBuilder::get_product()
+  0.00      1.14     0.00  4989313     0.00     0.00  OpcodeHalfWordSignedDataTransferBuilder::set_datatype(OpcodeHalfWordSignedDataTransfer::DataType)
+  0.00      1.14     0.00  4989313     0.00     0.00  OpcodeHalfWordSignedDataTransferBuilder::OpcodeHalfWordSignedDataTransferBuilder(bool, unsigned int, unsigned int)
+  0.00      1.14     0.00  4987149     0.00     0.00  OpcodeHalfWordSignedDataTransferBuilder::set_offset_immediate(unsigned char)
+  0.00      1.14     0.00   816640     0.00     0.00  Matrix<unsigned short>::Matrix(unsigned int, unsigned int)
+  0.00      1.14     0.00   816640     0.00     0.00  Matrix<unsigned short>::~Matrix()
+  0.00      1.14     0.00   768000     0.00     0.00  Matrix<short>::get(unsigned int, unsigned int)
+  0.00      1.14     0.00   384000     0.00     0.00  Display::SizableWindow::update_inside(unsigned int, unsigned int)
+  0.00      1.14     0.00   267057     0.00     0.00  std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)
+  0.00      1.14     0.00   267055     0.00     0.00  std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)
+  0.00      1.14     0.00   232320     0.00     0.00  Display::Window::get_render_settings()
+  0.00      1.14     0.00   192442     0.00     0.00  Memory::read_word_from_memory(unsigned int)
+  0.00      1.14     0.00   152071     0.00     0.00  Memory::read_from_memory(unsigned int)
+  0.00      1.14     0.00   149606     0.00     0.00  OpcodeDataProcess::shift_op2(ArithmaticLogicUnit*, unsigned int, unsigned char, OpcodeDataProcess::BitShiftType, bool)
+  0.00      1.14     0.00   148146     0.00     0.00  Display::get_tile_pixel_8bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int)
+  0.00      1.14     0.00   147220     0.00     0.00  Memory::write_word_to_memory(unsigned int, unsigned int)
+  0.00      1.14     0.00   147220     0.00     0.00  ARM7TDMI::write_word_to_memory(unsigned int, unsigned int)
+  0.00      1.14     0.00   143422     0.00     0.00  BitRegion::BitRegion(unsigned char*, unsigned char)
+  0.00      1.14     0.00   127585     0.00     0.00  OpcodeDataProcessingBuilder::set_register_op2(unsigned char, unsigned char)
+  0.00      1.14     0.00   125882     0.00     0.00  Utils::write_bit_range(unsigned int*, unsigned int, unsigned int, unsigned int)
+  0.00      1.14     0.00   125876     0.00     0.00  Memory::write_word_to_memory(unsigned char*, unsigned int, unsigned int)
+  0.00      1.14     0.00   125876     0.00     0.00  BitRegion::set(unsigned int)
+  0.00      1.14     0.00   124487     0.00     0.00  OpcodeDataProcessingBuilder::set_register_op2_shift_immediate(unsigned char)
+  0.00      1.14     0.00   103693     0.00     0.00  OpcodeBlockDataTransfer::run(ARM7TDMI*)
+  0.00      1.14     0.00   103693     0.00     0.00  ARM7TDMI::is_priviledged()
+  0.00      1.14     0.00   103693     0.00     0.00  ARM7TDMI::current_register_set()
+  0.00      1.14     0.00   100932     0.00     0.00  ARM7TDMI::decode_opcode_arm(unsigned int)
+  0.00      1.14     0.00    98817     0.00     0.00  OpcodeBlockDataTransferBuilder::get_product()
+  0.00      1.14     0.00    98817     0.00     0.00  OpcodeBlockDataTransferBuilder::set_register_list(unsigned short)
+  0.00      1.14     0.00    98817     0.00     0.00  OpcodeBlockDataTransferBuilder::set_flags(bool, bool, bool, bool)
+  0.00      1.14     0.00    98817     0.00     0.00  OpcodeBlockDataTransferBuilder::OpcodeBlockDataTransferBuilder(bool, unsigned char)
+  0.00      1.14     0.00    91510     0.00     0.00  ARM7TDMI::read_word_from_memory(unsigned int)
+  0.00      1.14     0.00    86330     0.00     0.00  ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short)
+  0.00      1.14     0.00    82390     0.00     0.00  ARM7TDMI::warn(char const*)
+  0.00      1.14     0.00    76302     0.00     0.00  Scheduler::schedule_event(unsigned int, std::function<void ()>)
+  0.00      1.14     0.00    71680     0.00     0.00  Display::TiledBackground::ScreenEntry::ScreenEntry(unsigned char*)
+  0.00      1.14     0.00    69400     0.00     0.00  ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short)
+  0.00      1.14     0.00    63213     0.00     0.00  ArithmaticLogicUnit::add(int, ...)
+  0.00      1.14     0.00    60560     0.00     0.00  OpcodeSingleDataTransfer::run(ARM7TDMI*)
+  0.00      1.14     0.00    58235     0.00     0.00  OpcodeSingleDataTransferBuilder::get_product()
+  0.00      1.14     0.00    58235     0.00     0.00  OpcodeSingleDataTransferBuilder::set_flags(bool, bool, bool, bool)
+  0.00      1.14     0.00    58235     0.00     0.00  OpcodeSingleDataTransferBuilder::OpcodeSingleDataTransferBuilder(bool, unsigned int, unsigned int)
+  0.00      1.14     0.00    58065     0.00     0.00  OpcodeSingleDataTransferBuilder::set_offset_immediate(unsigned int)
+  0.00      1.14     0.00    51796     0.00     0.00  ARM7TDMI::thumb_opcode_add_subtract(unsigned short)
+  0.00      1.14     0.00    42292     0.00     0.00  OpcodeDataProcess::OpcodeDataProcess(unsigned int)
+  0.00      1.14     0.00    42292     0.00     0.00  ARM7TDMI::arm_opcode_data_processing(unsigned int)
+  0.00      1.14     0.00    38437     0.00     0.00  OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool)
+  0.00      1.14     0.00    38151     0.00     0.00  Display::start_draw_loop(Scheduler*)
+  0.00      1.14     0.00    38151     0.00     0.00  std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&)
+  0.00      1.14     0.00    38150     0.00     0.00  std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_invoke(std::_Any_data const&)
+  0.00      1.14     0.00    31084     0.00     0.00  ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short)
+  0.00      1.14     0.00    29417     0.00     0.00  ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short)
+  0.00      1.14     0.00    28757     0.00     0.00  ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short)
+  0.00      1.14     0.00    26121     0.00     0.00  ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short)
+  0.00      1.14     0.00    25698     0.00     0.00  ARM7TDMI::thumb_opcode_alu_operations(unsigned short)
+  0.00      1.14     0.00    24862     0.00     0.00  ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short)
+  0.00      1.14     0.00    20816     0.00     0.00  OpcodeBranchExchange::run(ARM7TDMI*)
+  0.00      1.14     0.00    20786     0.00     0.00  ArithmaticLogicUnit::logical_right_shift(unsigned int, unsigned int)
+  0.00      1.14     0.00    18544     0.00     0.00  ArithmaticLogicUnit::logical_left_shift(unsigned int, unsigned int)
+  0.00      1.14     0.00    13665     0.00     0.00  OpcodeBranchExchange::build(OpcodeBranchExchange*, unsigned int)
+  0.00      1.14     0.00    13665     0.00     0.00  OpcodeBranchExchange::OpcodeBranchExchange()
+  0.00      1.14     0.00    11062     0.00     0.00  OpcodeBranch::OpcodeBranch(unsigned int)
+  0.00      1.14     0.00    11062     0.00     0.00  ARM7TDMI::arm_opcode_branch(unsigned int)
+  0.00      1.14     0.00     9068     0.00     0.00  OpcodeMultiply::run(ARM7TDMI*)
+  0.00      1.14     0.00     8759     0.00     0.00  ARM7TDMI::thumb_opcode_unconditional_branch(unsigned short)
+  0.00      1.14     0.00     7520     0.00     0.00  OpcodeMultiplyBuilder::get_product()
+  0.00      1.14     0.00     7520     0.00     0.00  OpcodeMultiplyBuilder::OpcodeMultiplyBuilder(unsigned char, unsigned char, unsigned char, bool)
+  0.00      1.14     0.00     7151     0.00     0.00  OpcodeBranchExchange::OpcodeBranchExchange(unsigned int)
+  0.00      1.14     0.00     7151     0.00     0.00  ARM7TDMI::arm_opcode_branch_exchange(unsigned int)
+  0.00      1.14     0.00     7082     0.00     0.00  ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short)
+  0.00      1.14     0.00     7032     0.00     0.00  ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short)
+  0.00      1.14     0.00     5977     0.00     0.00  ARM7TDMI::thumb_opcode_load_address(unsigned short)
+  0.00      1.14     0.00     4876     0.00     0.00  OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(unsigned int)
+  0.00      1.14     0.00     4876     0.00     0.00  ARM7TDMI::arm_opcode_block_data_transfer(unsigned int)
+  0.00      1.14     0.00     3200     0.00     0.00  Matrix<short>::set(unsigned int, unsigned int, short)
+  0.00      1.14     0.00     3098     0.00     0.00  OpcodeDataProcessingBuilder::set_register_op2_shift_register(unsigned char)
+  0.00      1.14     0.00     2325     0.00     0.00  DataTransfer::DataTransfer(unsigned int)
+  0.00      1.14     0.00     2325     0.00     0.00  OpcodeSingleDataTransfer::OpcodeSingleDataTransfer(unsigned int)
+  0.00      1.14     0.00     2325     0.00     0.00  ARM7TDMI::arm_opcode_single_data_transfer(unsigned int)
+  0.00      1.14     0.00     2240     0.00     0.01  Display::render_tiled_background_scanline(Display::TiledBackground, int)
+  0.00      1.14     0.00     2164     0.00     0.00  OpcodeHalfWordSignedDataTransferBuilder::set_offset_register(unsigned char)
+  0.00      1.14     0.00     2164     0.00     0.00  ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short)
+  0.00      1.14     0.00     1996     0.00     0.00  ArithmaticLogicUnit::arithmetic_right_shift(int, unsigned int)
+  0.00      1.14     0.00     1548     0.00     0.00  OpcodeMultiply::OpcodeMultiply(unsigned int)
+  0.00      1.14     0.00     1548     0.00     0.00  ARM7TDMI::arm_opcode_multiply(unsigned int)
+  0.00      1.14     0.00      960     0.00     0.43  Display::update_scanline(int)
+  0.00      1.14     0.00      889     0.00     0.00  Memory::write_to_memory(unsigned int, unsigned char)
+  0.00      1.14     0.00      800     0.00     0.00  Matrix<short>::Matrix(unsigned int, unsigned int)
+  0.00      1.14     0.00      800     0.00     0.00  Matrix<short>::~Matrix()
+  0.00      1.14     0.00      800     0.00     0.02  Display::update_scanline_bgmode_1(int)
+  0.00      1.14     0.00      800     0.00     0.00  Display::render_tiled_background_affine_scanline(Display::TiledBackground, int)
+  0.00      1.14     0.00      170     0.00     0.00  OpcodeSingleDataTransferBuilder::set_offset_register(unsigned char, unsigned char, unsigned char)
+  0.00      1.14     0.00      170     0.00     0.00  ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short)
+  0.00      1.14     0.00       91     0.00     0.00  ARM7TDMI::write_halfword_to_memory(unsigned int, unsigned short)
+  0.00      1.14     0.00       91     0.00     0.00  ARM7TDMI::read_halfword_from_memory(unsigned int)
+  0.00      1.14     0.00       13     0.00     0.00  ProgramStatusRegister::ProgramStatusRegister()
+  0.00      1.14     0.00       12     0.00     0.00  RegisterSet::RegisterSet()
+  0.00      1.14     0.00        7     0.00     0.04  SDL_AppEvent
+  0.00      1.14     0.00        4     0.00     0.00  ProgramStatusRegister::write_value(unsigned int)
+  0.00      1.14     0.00        4     0.00     0.00  Display::TiledBackground::AffineData::AffineData(unsigned char*)
+  0.00      1.14     0.00        4     0.00     0.00  Display::TiledBackground::TiledBackgroundControl::TiledBackgroundControl(unsigned char*)
+  0.00      1.14     0.00        4     0.00     0.00  Display::TiledBackground::TiledBackground(Memory*, unsigned char)
+  0.00      1.14     0.00        4     0.00     0.00  Display::Window::Window(unsigned char*, bool)
+  0.00      1.14     0.00        4     0.00     0.00  Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int)
+  0.00      1.14     0.00        3     0.00     0.00  SDL_AppInit
+  0.00      1.14     0.00        2     0.00     0.00  OpcodePsrTransfer::OpcodePsrTransfer(unsigned int)
+  0.00      1.14     0.00        2     0.00     0.00  ProgramStatusRegister::value()
+  0.00      1.14     0.00        2     0.00     0.00  Display::SizableWindow::SizableWindow(unsigned char*, bool, unsigned char*, unsigned char*)
+  0.00      1.14     0.00        2     0.00     0.00  ARM7TDMI::arm_opcode_psr_transfer(unsigned int)
+  0.00      1.14     0.00        1     0.00     0.00  Memory::Memory(unsigned int)
+  0.00      1.14     0.00        1     0.00     0.00  Memory::~Memory()
+  0.00      1.14     0.00        1     0.00     0.00  Display::DisplayStatus::DisplayStatus(unsigned char*)
+  0.00      1.14     0.00        1     0.00     0.00  Display::DisplayControl::DisplayControl(unsigned char*)
+  0.00      1.14     0.00        1     0.00     0.00  Display::Display(SDL_Renderer*, Memory*)
+  0.00      1.14     0.00        1     0.00     0.00  ARM7TDMI::mode_to_register_set(OperatingMode)
+  0.00      1.14     0.00        1     0.00     0.00  ARM7TDMI::skip_bios()
+  0.00      1.14     0.00        1     0.00     0.00  ARM7TDMI::ARM7TDMI()
+  0.00      1.14     0.00        1     0.00     0.00  Scheduler::Scheduler(ARM7TDMI*)
+  0.00      1.14     0.00        1     0.00     0.00  std::map<SDL_Scancode, unsigned short, std::less<SDL_Scancode>, std::allocator<std::pair<SDL_Scancode const, unsigned short> > >::map(std::initializer_list<std::pair<SDL_Scancode const, unsigned short> >, std::less<SDL_Scancode> const&, std::allocator<std::pair<SDL_Scancode const, unsigned short> > const&)
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2024 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.88% of 1.14 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]    100.0    0.00    1.14                 SDL_AppIterate [1]
+                0.18    0.52    2921/2921        Scheduler::tick() [2]
+                0.00    0.42     960/960         Display::update_scanline(int) [3]
+                0.01    0.01       6/6           Display::render() [24]
+-----------------------------------------------
+                0.18    0.52    2921/2921        SDL_AppIterate [1]
+[2]     61.8    0.18    0.52    2921         Scheduler::tick() [2]
+                0.02    0.35 15679970/15679970     ARM7TDMI::run_next_opcode() [5]
+                0.04    0.05 62719880/75482827     BitRegion::get() [10]
+                0.04    0.00 62719880/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.01    0.00 10545095/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.01    0.00 10545095/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00   38150/38151       Display::start_draw_loop(Scheduler*) [53]
+                0.00    0.00   38151/38151       std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&) [55]
+                0.00    0.00   38150/38150       std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_invoke(std::_Any_data const&) [66]
+                0.00    0.00  114453/267057      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) [124]
+                0.00    0.00  114450/267055      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) [125]
+-----------------------------------------------
+                0.00    0.42     960/960         SDL_AppIterate [1]
+[3]     36.6    0.00    0.42     960         Display::update_scanline(int) [3]
+                0.08    0.32 16384000/16384000     Display::render_sprite_scanline(unsigned char, int) [4]
+                0.00    0.01     800/800         Display::update_scanline_bgmode_1(int) [26]
+                0.00    0.00     640/2240        Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+                0.00    0.00    1920/75482827     BitRegion::get() [10]
+                0.00    0.00    1920/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+-----------------------------------------------
+                0.08    0.32 16384000/16384000     Display::update_scanline(int) [3]
+[4]     35.1    0.08    0.32 16384000         Display::render_sprite_scanline(unsigned char, int) [4]
+                0.08    0.06 16384000/16384000     Display::AttributeZero::AttributeZero(unsigned short) [7]
+                0.08    0.04 16384000/16384000     Display::AttributeOne::AttributeOne(unsigned short) [8]
+                0.04    0.00 49152000/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.02 6533120/7106560     Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [19]
+                0.01    0.00 16384000/31041429     Memory::memory_region(unsigned int) [28]
+                0.00    0.00 49152000/49340999     Memory::read_halfword_from_memory(unsigned char*, unsigned int) [108]
+                0.00    0.00  816640/816640      Matrix<unsigned short>::Matrix(unsigned int, unsigned int) [121]
+                0.00    0.00  816640/816640      Matrix<unsigned short>::~Matrix() [122]
+-----------------------------------------------
+                0.02    0.35 15679970/15679970     Scheduler::tick() [2]
+[5]     32.3    0.02    0.35 15679970         ARM7TDMI::run_next_opcode() [5]
+                0.01    0.11 15579038/15579038     ARM7TDMI::decode_opcode_thumb(unsigned short) [9]
+                0.01    0.09 4987149/4987149     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+                0.02    0.04 5099593/5099593     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+                0.02    0.00 15579038/20795373     Memory::read_halfword_from_memory(unsigned int) [18]
+                0.01    0.01 5087647/5087647     ARM7TDMI::thumb_opcode_conditional_branch(unsigned short) [23]
+                0.00    0.01 5082478/5093540     OpcodeBranch::branch(ARM7TDMI*, unsigned int, unsigned int, unsigned char) [32]
+                0.00    0.00 5113562/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00 5113562/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00   69400/69400       ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+                0.00    0.00   86330/86330       ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00  100932/100932      ARM7TDMI::decode_opcode_arm(unsigned int) [42]
+                0.00    0.00   42292/42292       ARM7TDMI::arm_opcode_data_processing(unsigned int) [43]
+                0.00    0.00   51796/51796       ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   29417/29417       ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   28757/28757       ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   25698/25698       ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   26121/26121       ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+                0.00    0.00   24862/24862       ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   31084/31084       ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short) [56]
+                0.00    0.00    4876/4876        ARM7TDMI::arm_opcode_block_data_transfer(unsigned int) [59]
+                0.00    0.00  100932/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   11062/11062       ARM7TDMI::arm_opcode_branch(unsigned int) [60]
+                0.00    0.00    7032/7032        ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00    5977/5977        ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7082/7082        ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00    2164/2164        ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00    2325/2325        ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+                0.00    0.00    7151/7151        ARM7TDMI::arm_opcode_branch_exchange(unsigned int) [69]
+                0.00    0.00    1548/1548        ARM7TDMI::arm_opcode_multiply(unsigned int) [75]
+                0.00    0.00    8759/8759        ARM7TDMI::thumb_opcode_unconditional_branch(unsigned short) [76]
+                0.00    0.00     170/170         ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00       2/2           ARM7TDMI::arm_opcode_psr_transfer(unsigned int) [95]
+                0.00    0.00  100932/5188579     ARM7TDMI::condition_field(int) [114]
+                0.00    0.00  100932/192442      Memory::read_word_from_memory(unsigned int) [126]
+-----------------------------------------------
+                0.00    0.00       4/433097835     Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int) [90]
+                0.00    0.00       4/433097835     ProgramStatusRegister::write_value(unsigned int) [96]
+                0.00    0.00       4/433097835     ARM7TDMI::arm_opcode_psr_transfer(unsigned int) [95]
+                0.00    0.00       8/433097835     OpcodePsrTransfer::OpcodePsrTransfer(unsigned int) [97]
+                0.00    0.00     510/433097835     ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    1920/433097835     Display::update_scanline(int) [3]
+                0.00    0.00    3264/433097835     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00    6192/433097835     OpcodeMultiply::OpcodeMultiply(unsigned int) [82]
+                0.00    0.00    6492/433097835     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00    6975/433097835     DataTransfer::DataTransfer(unsigned int) [77]
+                0.00    0.00    6975/433097835     OpcodeSingleDataTransfer::OpcodeSingleDataTransfer(unsigned int) [73]
+                0.00    0.00    7032/433097835     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00    7151/433097835     OpcodeBranchExchange::OpcodeBranchExchange(unsigned int) [83]
+                0.00    0.00    8759/433097835     ARM7TDMI::thumb_opcode_unconditional_branch(unsigned short) [76]
+                0.00    0.00    9752/433097835     OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(unsigned int) [72]
+                0.00    0.00   11062/433097835     OpcodeBranch::OpcodeBranch(unsigned int) [74]
+                0.00    0.00   11954/433097835     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00   14164/433097835     ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00   29417/433097835     ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   31084/433097835     ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short) [56]
+                0.00    0.00   38151/433097835     std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&) [55]
+                0.00    0.00   49407/433097835     Display::start_draw_loop(Scheduler*) [53]
+                0.00    0.00   49724/433097835     ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   77094/433097835     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   78363/433097835     ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+                0.00    0.00  100932/433097835     ARM7TDMI::run_next_opcode() [5]
+                0.00    0.00  115028/433097835     ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00  125986/433097835     OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00  138800/433097835     ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+                0.00    0.00  148146/433097835     Display::get_tile_pixel_8bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [46]
+                0.00    0.00  155388/433097835     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00  258990/433097835     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00  380628/433097835     OpcodeDataProcess::OpcodeDataProcess(unsigned int) [47]
+                0.00    0.00  728946/433097835     Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+                0.00    0.00  826965/433097835     ARM7TDMI::decode_opcode_arm(unsigned int) [42]
+                0.00    0.00 1151893/433097835     Display::render() [24]
+                0.00    0.00 1299200/433097835     Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+                0.00    0.00 1393920/433097835     Display::Window::get_render_settings() [35]
+                0.00    0.00 1536000/433097835     Display::SizableWindow::update_inside(unsigned int, unsigned int) [34]
+                0.01    0.00 7106560/433097835     Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [19]
+                0.01    0.00 10175294/433097835     ARM7TDMI::thumb_opcode_conditional_branch(unsigned short) [23]
+                0.01    0.00 14961447/433097835     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+                0.01    0.00 15298779/433097835     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+                0.04    0.00 49152000/433097835     Display::AttributeOne::AttributeOne(unsigned short) [8]
+                0.04    0.00 49152000/433097835     Display::render_sprite_scanline(unsigned char, int) [4]
+                0.04    0.00 62719880/433097835     Scheduler::tick() [2]
+                0.05    0.00 65536000/433097835     Display::AttributeZero::AttributeZero(unsigned short) [7]
+                0.11    0.00 150179591/433097835     ARM7TDMI::decode_opcode_thumb(unsigned short) [9]
+[6]     27.2    0.31    0.00 433097835         Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+-----------------------------------------------
+                0.08    0.06 16384000/16384000     Display::render_sprite_scanline(unsigned char, int) [4]
+[7]     12.0    0.08    0.06 16384000         Display::AttributeZero::AttributeZero(unsigned short) [7]
+                0.05    0.00 65536000/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.01    0.00 32768000/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.08    0.04 16384000/16384000     Display::render_sprite_scanline(unsigned char, int) [4]
+[8]     11.0    0.08    0.04 16384000         Display::AttributeOne::AttributeOne(unsigned short) [8]
+                0.04    0.00 49152000/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.01    0.00 32768000/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.01    0.11 15579038/15579038     ARM7TDMI::run_next_opcode() [5]
+[9]     10.3    0.01    0.11 15579038         ARM7TDMI::decode_opcode_thumb(unsigned short) [9]
+                0.11    0.00 150179591/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    4498/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00       4/75482827     Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int) [90]
+                0.00    0.00    1920/75482827     Display::update_scanline(int) [3]
+                0.00    0.00   38151/75482827     std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&) [55]
+                0.00    0.00   49407/75482827     Display::start_draw_loop(Scheduler*) [53]
+                0.00    0.00  148146/75482827     Display::get_tile_pixel_8bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [46]
+                0.00    0.00  460693/75482827     Display::render() [24]
+                0.00    0.00  728946/75482827     Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+                0.00    0.00 1299200/75482827     Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+                0.00    0.00 1393920/75482827     Display::Window::get_render_settings() [35]
+                0.00    0.00 1536000/75482827     Display::SizableWindow::update_inside(unsigned int, unsigned int) [34]
+                0.00    0.01 7106560/75482827     Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [19]
+                0.04    0.05 62719880/75482827     Scheduler::tick() [2]
+[10]     9.6    0.05    0.06 75482827         BitRegion::get() [10]
+                0.06    0.00 75482827/75608703     Memory::read_word_from_memory(unsigned char*, unsigned int) [13]
+-----------------------------------------------
+                0.01    0.09 4987149/4987149     ARM7TDMI::run_next_opcode() [5]
+[11]     9.0    0.01    0.09 4987149         ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+                0.01    0.03 4987149/4989313     OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [14]
+                0.02    0.00 4987149/4989313     OpcodeHalfWordSignedDataTransferBuilder::set_flags(bool, bool, bool) [22]
+                0.01    0.00 14961447/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.01    0.00    3467/3561        Memory::write_halfword_to_memory(unsigned int, unsigned short) [31]
+                0.00    0.00 4983682/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00 4983682/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00 4987149/4989313     OpcodeHalfWordSignedDataTransferBuilder::set_datatype(OpcodeHalfWordSignedDataTransfer::DataType) [36]
+                0.00    0.00 4987149/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00 4987149/4989313     OpcodeHalfWordSignedDataTransferBuilder::OpcodeHalfWordSignedDataTransferBuilder(bool, unsigned int, unsigned int) [119]
+                0.00    0.00 4987149/4989313     OpcodeHalfWordSignedDataTransferBuilder::get_product() [118]
+                0.00    0.00 4987149/4987149     OpcodeHalfWordSignedDataTransferBuilder::set_offset_immediate(unsigned char) [120]
+-----------------------------------------------
+                0.02    0.04 5099593/5099593     ARM7TDMI::run_next_opcode() [5]
+[12]     5.3    0.02    0.04 5099593         ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+                0.01    0.02 5099593/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.01    0.00 15298779/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   91392/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   91392/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00 5099593/5279188     OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [112]
+                0.00    0.00 5099593/5247333     OpcodeDataProcessingBuilder::set_source_register(unsigned int) [113]
+                0.00    0.00 5099593/5279188     OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [111]
+                0.00    0.00 5099593/5151603     OpcodeDataProcessingBuilder::set_immediate_op2(unsigned char, unsigned int) [115]
+                0.00    0.00 5099593/5279188     OpcodeDataProcessingBuilder::get_product() [110]
+-----------------------------------------------
+                0.00    0.00  125876/75608703     BitRegion::set(unsigned int) [58]
+                0.06    0.00 75482827/75608703     BitRegion::get() [10]
+[13]     5.3    0.06    0.00 75608703         Memory::read_word_from_memory(unsigned char*, unsigned int) [13]
+-----------------------------------------------
+                0.00    0.00    2164/4989313     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.01    0.03 4987149/4989313     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+[14]     3.3    0.01    0.03 4989313         OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [14]
+                0.01    0.00 4985844/10193173     ArithmaticLogicUnit::rotate_right(unsigned int, unsigned int) [15]
+                0.01    0.00 4985844/20795373     Memory::read_halfword_from_memory(unsigned int) [18]
+                0.00    0.00 4991477/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00 4989313/5049873     DataTransfer::calculate_address(ARM7TDMI*, unsigned int) [37]
+                0.00    0.00    2160/5111242     Utils::sign_extend(int, int) [30]
+-----------------------------------------------
+                0.00    0.00   34512/10193173     OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.01    0.00 4985844/10193173     OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [14]
+                0.02    0.00 5172817/10193173     OpcodeDataProcess::run(ARM7TDMI*) [16]
+[15]     2.9    0.03    0.00 10193173         ArithmaticLogicUnit::rotate_right(unsigned int, unsigned int) [15]
+                0.00    0.00 10193173/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00    5977/5321480     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/5321480     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00   18178/5321480     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   28757/5321480     ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   42292/5321480     ARM7TDMI::arm_opcode_data_processing(unsigned int) [43]
+                0.00    0.00   51796/5321480     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   67855/5321480     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.01    0.02 5099593/5321480     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+[16]     2.7    0.01    0.02 5321480         OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.02    0.00 5172817/10193173     ArithmaticLogicUnit::rotate_right(unsigned int, unsigned int) [15]
+                0.00    0.00 5618806/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00 5225198/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00   20786/20786       ArithmaticLogicUnit::logical_right_shift(unsigned int, unsigned int) [80]
+                0.00    0.00   18544/18544       ArithmaticLogicUnit::logical_left_shift(unsigned int, unsigned int) [81]
+                0.00    0.00    3264/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    1996/1996        ArithmaticLogicUnit::arithmetic_right_shift(int, unsigned int) [89]
+                0.00    0.00 5321480/5321480     OpcodeDataProcess::calculate_instruction(ArithmaticLogicUnit*, OpcodeDataProcess::InstructionType, unsigned int, unsigned int, bool) [109]
+                0.00    0.00  148662/149606      OpcodeDataProcess::shift_op2(ArithmaticLogicUnit*, unsigned int, unsigned char, OpcodeDataProcess::BitShiftType, bool) [128]
+-----------------------------------------------
+                0.00    0.00      10/100890841     OpcodePsrTransfer::OpcodePsrTransfer(unsigned int) [97]
+                0.00    0.00      28/100890841     ProgramStatusRegister::write_value(unsigned int) [96]
+                0.00    0.00     340/100890841     ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    1996/100890841     ArithmaticLogicUnit::arithmetic_right_shift(int, unsigned int) [89]
+                0.00    0.00    3096/100890841     OpcodeMultiply::OpcodeMultiply(unsigned int) [82]
+                0.00    0.00    4328/100890841     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00    4498/100890841     ARM7TDMI::decode_opcode_thumb(unsigned short) [9]
+                0.00    0.00    4650/100890841     OpcodeSingleDataTransfer::OpcodeSingleDataTransfer(unsigned int) [73]
+                0.00    0.00    5977/100890841     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/100890841     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00    7520/100890841     OpcodeMultiply::run(ARM7TDMI*) [71]
+                0.00    0.00    9300/100890841     DataTransfer::DataTransfer(unsigned int) [77]
+                0.00    0.00   11062/100890841     OpcodeBranch::OpcodeBranch(unsigned int) [74]
+                0.00    0.00   18544/100890841     ArithmaticLogicUnit::logical_left_shift(unsigned int, unsigned int) [81]
+                0.00    0.00   20786/100890841     ArithmaticLogicUnit::logical_right_shift(unsigned int, unsigned int) [80]
+                0.00    0.00   20816/100890841     OpcodeBranchExchange::run(ARM7TDMI*) [70]
+                0.00    0.00   24380/100890841     OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(unsigned int) [72]
+                0.00    0.00   24862/100890841     ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   31084/100890841     ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short) [56]
+                0.00    0.00   52242/100890841     ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+                0.00    0.00   58834/100890841     ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   65338/100890841     ARM7TDMI::decode_opcode_arm(unsigned int) [42]
+                0.00    0.00   69400/100890841     ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+                0.00    0.00  103592/100890841     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00  126876/100890841     OpcodeDataProcess::OpcodeDataProcess(unsigned int) [47]
+                0.00    0.00  172660/100890841     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00  803268/100890841     Display::render() [24]
+                0.00    0.00 3318176/100890841     OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00 4987149/100890841     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+                0.00    0.00 5225198/100890841     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00 9978626/100890841     OpcodeHalfWordSignedDataTransferBuilder::set_datatype(OpcodeHalfWordSignedDataTransfer::DataType) [36]
+                0.00    0.00 10193173/100890841     ArithmaticLogicUnit::rotate_right(unsigned int, unsigned int) [15]
+                0.01    0.00 32768000/100890841     Display::AttributeZero::AttributeZero(unsigned short) [7]
+                0.01    0.00 32768000/100890841     Display::AttributeOne::AttributeOne(unsigned short) [8]
+[17]     2.6    0.03    0.00 100890841         Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00      91/20795373     SDL_AppEvent <cycle 1> [50]
+                0.00    0.00  230400/20795373     Display::render() [24]
+                0.01    0.00 4985844/20795373     OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [14]
+                0.02    0.00 15579038/20795373     ARM7TDMI::run_next_opcode() [5]
+[18]     2.6    0.03    0.00 20795373         Memory::read_halfword_from_memory(unsigned int) [18]
+-----------------------------------------------
+                0.00    0.00  573440/7106560     Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+                0.00    0.02 6533120/7106560     Display::render_sprite_scanline(unsigned char, int) [4]
+[19]     1.8    0.00    0.02 7106560         Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [19]
+                0.00    0.01 7106560/75482827     BitRegion::get() [10]
+                0.01    0.00 7106560/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00 14213120/31041429     Memory::memory_region(unsigned int) [28]
+                0.00    0.00   71065/49340999     Memory::read_halfword_from_memory(unsigned char*, unsigned int) [108]
+-----------------------------------------------
+                0.00    0.00       1/21193922     ARM7TDMI::skip_bios() [98]
+                0.00    0.00     167/21193922     ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    1548/21193922     ARM7TDMI::arm_opcode_multiply(unsigned int) [75]
+                0.00    0.00    2162/21193922     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00    2324/21193922     ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+                0.00    0.00    5977/21193922     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/21193922     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00    7082/21193922     ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00    7151/21193922     ARM7TDMI::arm_opcode_branch_exchange(unsigned int) [69]
+                0.00    0.00   13384/21193922     ARM7TDMI::arm_opcode_branch(unsigned int) [60]
+                0.00    0.00   13399/21193922     ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   15465/21193922     ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+                0.00    0.00   15542/21193922     ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short) [56]
+                0.00    0.00   21094/21193922     ARM7TDMI::arm_opcode_data_processing(unsigned int) [43]
+                0.00    0.00   21231/21193922     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   28757/21193922     ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   51796/21193922     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   85388/21193922     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00   91392/21193922     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+                0.00    0.00  160691/21193922     OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00 4983682/21193922     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+                0.00    0.00 5113562/21193922     ARM7TDMI::run_next_opcode() [5]
+                0.01    0.00 10545095/21193922     Scheduler::tick() [2]
+[20]     1.8    0.02    0.00 21193922         RegisterSet::write_register(int, unsigned int) [20]
+-----------------------------------------------
+                0.00    0.00     167/21136923     ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    1548/21136923     ARM7TDMI::arm_opcode_multiply(unsigned int) [75]
+                0.00    0.00    2162/21136923     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00    2324/21136923     ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+                0.00    0.00    5977/21136923     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/21136923     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00    7082/21136923     ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00    7151/21136923     ARM7TDMI::arm_opcode_branch_exchange(unsigned int) [69]
+                0.00    0.00   13384/21136923     ARM7TDMI::arm_opcode_branch(unsigned int) [60]
+                0.00    0.00   13399/21136923     ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   15465/21136923     ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+                0.00    0.00   15542/21136923     ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short) [56]
+                0.00    0.00   21094/21136923     ARM7TDMI::arm_opcode_data_processing(unsigned int) [43]
+                0.00    0.00   21231/21136923     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   28757/21136923     ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   51796/21136923     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   85388/21136923     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00   91392/21136923     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+                0.00    0.00  103693/21136923     OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00 4983682/21136923     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+                0.00    0.00 5113562/21136923     ARM7TDMI::run_next_opcode() [5]
+                0.01    0.00 10545095/21136923     Scheduler::tick() [2]
+[21]     1.8    0.02    0.00 21136923         ARM7TDMI::write_register(int, unsigned int) [21]
+-----------------------------------------------
+                0.00    0.00    2164/4989313     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.02    0.00 4987149/4989313     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+[22]     1.8    0.02    0.00 4989313         OpcodeHalfWordSignedDataTransferBuilder::set_flags(bool, bool, bool) [22]
+-----------------------------------------------
+                0.01    0.01 5087647/5087647     ARM7TDMI::run_next_opcode() [5]
+[23]     1.7    0.01    0.01 5087647         ARM7TDMI::thumb_opcode_conditional_branch(unsigned short) [23]
+                0.01    0.00 10175294/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00 5073719/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00 5087647/5188579     ARM7TDMI::condition_field(int) [114]
+-----------------------------------------------
+                0.01    0.01       6/6           SDL_AppIterate [1]
+[24]     1.6    0.01    0.01       6         Display::render() [24]
+                0.00    0.00  384000/384000      Display::SizableWindow::update_inside(unsigned int, unsigned int) [34]
+                0.00    0.00  232320/232320      Display::Window::get_render_settings() [35]
+                0.00    0.00 1151893/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00  460693/75482827     BitRegion::get() [10]
+                0.00    0.00  230400/20795373     Memory::read_halfword_from_memory(unsigned int) [18]
+                0.00    0.00  803268/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00     640/2240        Display::update_scanline(int) [3]
+                0.00    0.01    1600/2240        Display::update_scanline_bgmode_1(int) [26]
+[25]     1.3    0.00    0.01    2240         Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+                0.00    0.00   71680/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+                0.00    0.00   71680/71680       Display::TiledBackground::ScreenEntry::ScreenEntry(unsigned char*) [33]
+                0.00    0.00 1299200/75482827     BitRegion::get() [10]
+                0.00    0.00  573440/7106560     Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [19]
+                0.00    0.00 1299200/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   71680/31041429     Memory::memory_region(unsigned int) [28]
+-----------------------------------------------
+                0.00    0.01     800/800         Display::update_scanline(int) [3]
+[26]     1.1    0.00    0.01     800         Display::update_scanline_bgmode_1(int) [26]
+                0.00    0.01    1600/2240        Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+                0.00    0.00     800/800         Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+-----------------------------------------------
+                0.00    0.00       2/143428      Display::DisplayControl::DisplayControl(unsigned char*) [94]
+                0.00    0.00       2/143428      Display::Display(SDL_Renderer*, Memory*) [84]
+                0.00    0.00       8/143428      Display::SizableWindow::SizableWindow(unsigned char*, bool, unsigned char*, unsigned char*) [93]
+                0.00    0.00       8/143428      Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int) [90]
+                0.00    0.00      12/143428      Display::TiledBackground::TiledBackgroundControl::TiledBackgroundControl(unsigned char*) [88]
+                0.00    0.00      16/143428      Display::TiledBackground::TiledBackground(Memory*, unsigned char) [85]
+                0.00    0.00      20/143428      Display::TiledBackground::AffineData::AffineData(unsigned char*) [87]
+                0.00    0.00   71680/143428      Display::TiledBackground::ScreenEntry::ScreenEntry(unsigned char*) [33]
+                0.00    0.00   71680/143428      Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+[27]     0.9    0.01    0.00  143428         BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+-----------------------------------------------
+                0.00    0.00       8/31041429     Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int) [90]
+                0.00    0.00      11/31041429     Display::Display(SDL_Renderer*, Memory*) [84]
+                0.00    0.00      16/31041429     Display::TiledBackground::TiledBackground(Memory*, unsigned char) [85]
+                0.00    0.00   71680/31041429     Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+                0.00    0.00   76302/31041429     Scheduler::schedule_event(unsigned int, std::function<void ()>) [68]
+                0.00    0.00  296292/31041429     Display::get_tile_pixel_8bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [46]
+                0.00    0.00 14213120/31041429     Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [19]
+                0.01    0.00 16384000/31041429     Display::render_sprite_scanline(unsigned char, int) [4]
+[28]     0.9    0.01    0.00 31041429         Memory::memory_region(unsigned int) [28]
+-----------------------------------------------
+                0.00    0.00       2/21018351     ARM7TDMI::arm_opcode_psr_transfer(unsigned int) [95]
+                0.00    0.00    4810/21018351     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00    8759/21018351     ARM7TDMI::thumb_opcode_unconditional_branch(unsigned short) [76]
+                0.00    0.00   11062/21018351     ARM7TDMI::arm_opcode_branch(unsigned int) [60]
+                0.00    0.00   20816/21018351     OpcodeBranchExchange::run(ARM7TDMI*) [70]
+                0.00    0.00   27204/21018351     OpcodeMultiply::run(ARM7TDMI*) [71]
+                0.00    0.00   46626/21018351     ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short) [56]
+                0.00    0.00   61504/21018351     OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00  103693/21018351     OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00 4991477/21018351     OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [14]
+                0.00    0.00 5049873/21018351     DataTransfer::calculate_address(ARM7TDMI*, unsigned int) [37]
+                0.00    0.00 5073719/21018351     ARM7TDMI::thumb_opcode_conditional_branch(unsigned short) [23]
+                0.00    0.00 5618806/21018351     OpcodeDataProcess::run(ARM7TDMI*) [16]
+[29]     0.9    0.01    0.00 21018351         ARM7TDMI::read_register(int) [29]
+-----------------------------------------------
+                0.00    0.00    2160/5111242     OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [14]
+                0.00    0.00   15542/5111242     ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short) [56]
+                0.01    0.00 5093540/5111242     OpcodeBranch::branch(ARM7TDMI*, unsigned int, unsigned int, unsigned char) [32]
+[30]     0.9    0.01    0.00 5111242         Utils::sign_extend(int, int) [30]
+-----------------------------------------------
+                0.00    0.00       1/3561        SDL_AppInit [78]
+                0.00    0.00       2/3561        ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00      91/3561        SDL_AppEvent <cycle 1> [50]
+                0.01    0.00    3467/3561        ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+[31]     0.9    0.01    0.00    3561         Memory::write_halfword_to_memory(unsigned int, unsigned short) [31]
+-----------------------------------------------
+                0.00    0.00   11062/5093540     ARM7TDMI::arm_opcode_branch(unsigned int) [60]
+                0.00    0.01 5082478/5093540     ARM7TDMI::run_next_opcode() [5]
+[32]     0.9    0.00    0.01 5093540         OpcodeBranch::branch(ARM7TDMI*, unsigned int, unsigned int, unsigned char) [32]
+                0.01    0.00 5093540/5111242     Utils::sign_extend(int, int) [30]
+-----------------------------------------------
+                0.00    0.00   71680/71680       Display::render_tiled_background_scanline(Display::TiledBackground, int) [25]
+[33]     0.4    0.00    0.00   71680         Display::TiledBackground::ScreenEntry::ScreenEntry(unsigned char*) [33]
+                0.00    0.00   71680/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+                0.00    0.00  143360/143422      BitRegion::BitRegion(unsigned char*, unsigned char) [131]
+-----------------------------------------------
+                0.00    0.00  384000/384000      Display::render() [24]
+[34]     0.3    0.00    0.00  384000         Display::SizableWindow::update_inside(unsigned int, unsigned int) [34]
+                0.00    0.00 1536000/75482827     BitRegion::get() [10]
+                0.00    0.00 1536000/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+-----------------------------------------------
+                0.00    0.00  232320/232320      Display::render() [24]
+[35]     0.3    0.00    0.00  232320         Display::Window::get_render_settings() [35]
+                0.00    0.00 1393920/75482827     BitRegion::get() [10]
+                0.00    0.00 1393920/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+-----------------------------------------------
+                0.00    0.00    2164/4989313     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00 4987149/4989313     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+[36]     0.3    0.00    0.00 4989313         OpcodeHalfWordSignedDataTransferBuilder::set_datatype(OpcodeHalfWordSignedDataTransfer::DataType) [36]
+                0.00    0.00 9978626/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00   60560/5049873     OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00 4989313/5049873     OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [14]
+[37]     0.2    0.00    0.00 5049873         DataTransfer::calculate_address(ARM7TDMI*, unsigned int) [37]
+                0.00    0.00 5049873/21018351     ARM7TDMI::read_register(int) [29]
+-----------------------------------------------
+                0.00    0.00     800/800         Display::update_scanline_bgmode_1(int) [26]
+[38]     0.2    0.00    0.00     800         Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+                0.00    0.00  728946/75482827     BitRegion::get() [10]
+                0.00    0.00  728946/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00  148146/148146      Display::get_tile_pixel_8bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [46]
+                0.00    0.00  768000/768000      Matrix<short>::get(unsigned int, unsigned int) [123]
+                0.00    0.00  148146/152071      Memory::read_from_memory(unsigned int) [127]
+                0.00    0.00    3200/3200        Matrix<short>::set(unsigned int, unsigned int, short) [153]
+                0.00    0.00     800/800         Matrix<short>::Matrix(unsigned int, unsigned int) [157]
+                0.00    0.00     800/800         Matrix<short>::~Matrix() [158]
+-----------------------------------------------
+                0.00    0.00    4876/103693      ARM7TDMI::arm_opcode_block_data_transfer(unsigned int) [59]
+                0.00    0.00   29417/103693      ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   69400/103693      ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+[39]     0.1    0.00    0.00  103693         OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00 3318176/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00  160691/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00  103693/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00  125986/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00  103693/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00  125986/147220      Memory::write_word_to_memory(unsigned int, unsigned int) [129]
+                0.00    0.00  125986/147220      ARM7TDMI::write_word_to_memory(unsigned int, unsigned int) [130]
+                0.00    0.00  103693/103693      ARM7TDMI::is_priviledged() [136]
+                0.00    0.00  103693/103693      ARM7TDMI::current_register_set() [137]
+                0.00    0.00   82390/82390       ARM7TDMI::warn(char const*) [143]
+                0.00    0.00   56998/192442      Memory::read_word_from_memory(unsigned int) [126]
+                0.00    0.00   56998/91510       ARM7TDMI::read_word_from_memory(unsigned int) [142]
+-----------------------------------------------
+                0.00    0.00   69400/69400       ARM7TDMI::run_next_opcode() [5]
+[40]     0.1    0.00    0.00   69400         ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+                0.00    0.00   69400/103693      OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00  138800/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   69400/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00   69400/98817       OpcodeBlockDataTransferBuilder::OpcodeBlockDataTransferBuilder(bool, unsigned char) [141]
+                0.00    0.00   69400/98817       OpcodeBlockDataTransferBuilder::set_flags(bool, bool, bool, bool) [140]
+                0.00    0.00   69400/98817       OpcodeBlockDataTransferBuilder::set_register_list(unsigned short) [139]
+                0.00    0.00   69400/98817       OpcodeBlockDataTransferBuilder::get_product() [138]
+-----------------------------------------------
+                0.00    0.00   86330/86330       ARM7TDMI::run_next_opcode() [5]
+[41]     0.1    0.00    0.00   86330         ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00   67855/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00  258990/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   85388/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   85388/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00  172660/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00   13665/20816       OpcodeBranchExchange::run(ARM7TDMI*) [70]
+                0.00    0.00    4810/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00   67855/5279188     OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [112]
+                0.00    0.00   67855/5279188     OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [111]
+                0.00    0.00   67855/5247333     OpcodeDataProcessingBuilder::set_source_register(unsigned int) [113]
+                0.00    0.00   67855/124487      OpcodeDataProcessingBuilder::set_register_op2_shift_immediate(unsigned char) [135]
+                0.00    0.00   67855/127585      OpcodeDataProcessingBuilder::set_register_op2(unsigned char, unsigned char) [132]
+                0.00    0.00   67855/5279188     OpcodeDataProcessingBuilder::get_product() [110]
+                0.00    0.00   13665/13665       OpcodeBranchExchange::OpcodeBranchExchange() [150]
+                0.00    0.00   13665/13665       OpcodeBranchExchange::build(OpcodeBranchExchange*, unsigned int) [149]
+-----------------------------------------------
+                0.00    0.00  100932/100932      ARM7TDMI::run_next_opcode() [5]
+[42]     0.1    0.00    0.00  100932         ARM7TDMI::decode_opcode_arm(unsigned int) [42]
+                0.00    0.00  826965/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   65338/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00   42292/42292       ARM7TDMI::run_next_opcode() [5]
+[43]     0.1    0.00    0.00   42292         ARM7TDMI::arm_opcode_data_processing(unsigned int) [43]
+                0.00    0.00   42292/42292       OpcodeDataProcess::OpcodeDataProcess(unsigned int) [47]
+                0.00    0.00   42292/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00   21094/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   21094/21193922     RegisterSet::write_register(int, unsigned int) [20]
+-----------------------------------------------
+                0.00    0.00   51796/51796       ARM7TDMI::run_next_opcode() [5]
+[44]     0.0    0.00    0.00   51796         ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   51796/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00  155388/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   51796/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   51796/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00  103592/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00   51796/5279188     OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [112]
+                0.00    0.00   51796/5279188     OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [111]
+                0.00    0.00   51796/5247333     OpcodeDataProcessingBuilder::set_source_register(unsigned int) [113]
+                0.00    0.00   51796/5279188     OpcodeDataProcessingBuilder::get_product() [110]
+                0.00    0.00   38335/5151603     OpcodeDataProcessingBuilder::set_immediate_op2(unsigned char, unsigned int) [115]
+                0.00    0.00   13461/127585      OpcodeDataProcessingBuilder::set_register_op2(unsigned char, unsigned char) [132]
+                0.00    0.00   13461/124487      OpcodeDataProcessingBuilder::set_register_op2_shift_immediate(unsigned char) [135]
+-----------------------------------------------
+                0.00    0.00   29417/29417       ARM7TDMI::run_next_opcode() [5]
+[45]     0.0    0.00    0.00   29417         ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   29417/103693      OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00   29417/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   58834/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00   29417/98817       OpcodeBlockDataTransferBuilder::OpcodeBlockDataTransferBuilder(bool, unsigned char) [141]
+                0.00    0.00   29417/98817       OpcodeBlockDataTransferBuilder::set_flags(bool, bool, bool, bool) [140]
+                0.00    0.00   29417/98817       OpcodeBlockDataTransferBuilder::set_register_list(unsigned short) [139]
+                0.00    0.00   29417/98817       OpcodeBlockDataTransferBuilder::get_product() [138]
+-----------------------------------------------
+                0.00    0.00  148146/148146      Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+[46]     0.0    0.00    0.00  148146         Display::get_tile_pixel_8bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [46]
+                0.00    0.00  148146/75482827     BitRegion::get() [10]
+                0.00    0.00  148146/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00  296292/31041429     Memory::memory_region(unsigned int) [28]
+                0.00    0.00  117934/49340999     Memory::read_halfword_from_memory(unsigned char*, unsigned int) [108]
+-----------------------------------------------
+                0.00    0.00   42292/42292       ARM7TDMI::arm_opcode_data_processing(unsigned int) [43]
+[47]     0.0    0.00    0.00   42292         OpcodeDataProcess::OpcodeDataProcess(unsigned int) [47]
+                0.00    0.00  380628/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00  126876/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00   28757/28757       ARM7TDMI::run_next_opcode() [5]
+[48]     0.0    0.00    0.00   28757         ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   28757/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00  115028/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   28757/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   28757/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00   28757/5279188     OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [112]
+                0.00    0.00   28757/127585      OpcodeDataProcessingBuilder::set_register_op2(unsigned char, unsigned char) [132]
+                0.00    0.00   28757/5279188     OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [111]
+                0.00    0.00   28757/124487      OpcodeDataProcessingBuilder::set_register_op2_shift_immediate(unsigned char) [135]
+                0.00    0.00   28757/5279188     OpcodeDataProcessingBuilder::get_product() [110]
+-----------------------------------------------
+                                   7             std::map<SDL_Scancode, unsigned short, std::less<SDL_Scancode>, std::allocator<std::pair<SDL_Scancode const, unsigned short> > >::map(std::initializer_list<std::pair<SDL_Scancode const, unsigned short> >, std::less<SDL_Scancode> const&, std::allocator<std::pair<SDL_Scancode const, unsigned short> > const&) <cycle 1> [171]
+[50]     0.0    0.00    0.00       7         SDL_AppEvent <cycle 1> [50]
+                0.00    0.00      91/3561        Memory::write_halfword_to_memory(unsigned int, unsigned short) [31]
+                0.00    0.00      91/20795373     Memory::read_halfword_from_memory(unsigned int) [18]
+                0.00    0.00      91/91          ARM7TDMI::read_halfword_from_memory(unsigned int) [161]
+                0.00    0.00      91/91          ARM7TDMI::write_halfword_to_memory(unsigned int, unsigned short) [160]
+                                   1             std::map<SDL_Scancode, unsigned short, std::less<SDL_Scancode>, std::allocator<std::pair<SDL_Scancode const, unsigned short> > >::map(std::initializer_list<std::pair<SDL_Scancode const, unsigned short> >, std::less<SDL_Scancode> const&, std::allocator<std::pair<SDL_Scancode const, unsigned short> > const&) <cycle 1> [171]
+-----------------------------------------------
+                0.00    0.00   25698/25698       ARM7TDMI::run_next_opcode() [5]
+[51]     0.0    0.00    0.00   25698         ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   18178/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00   77094/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   21231/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   21231/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00    7520/9068        OpcodeMultiply::run(ARM7TDMI*) [71]
+                0.00    0.00   18178/5279188     OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [112]
+                0.00    0.00   18178/5279188     OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [111]
+                0.00    0.00   18178/5279188     OpcodeDataProcessingBuilder::get_product() [110]
+                0.00    0.00   17512/127585      OpcodeDataProcessingBuilder::set_register_op2(unsigned char, unsigned char) [132]
+                0.00    0.00   15080/5247333     OpcodeDataProcessingBuilder::set_source_register(unsigned int) [113]
+                0.00    0.00   14414/124487      OpcodeDataProcessingBuilder::set_register_op2_shift_immediate(unsigned char) [135]
+                0.00    0.00    7520/7520        OpcodeMultiplyBuilder::OpcodeMultiplyBuilder(unsigned char, unsigned char, unsigned char, bool) [152]
+                0.00    0.00    7520/7520        OpcodeMultiplyBuilder::get_product() [151]
+                0.00    0.00    3098/3098        OpcodeDataProcessingBuilder::set_register_op2_shift_register(unsigned char) [154]
+                0.00    0.00     666/5151603     OpcodeDataProcessingBuilder::set_immediate_op2(unsigned char, unsigned int) [115]
+-----------------------------------------------
+                0.00    0.00   26121/26121       ARM7TDMI::run_next_opcode() [5]
+[52]     0.0    0.00    0.00   26121         ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+                0.00    0.00   78363/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   15465/38437       OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00   26121/60560       OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00   52242/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00   15465/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   15465/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00   26121/58235       OpcodeSingleDataTransferBuilder::OpcodeSingleDataTransferBuilder(bool, unsigned int, unsigned int) [147]
+                0.00    0.00   26121/58235       OpcodeSingleDataTransferBuilder::set_flags(bool, bool, bool, bool) [146]
+                0.00    0.00   26121/58235       OpcodeSingleDataTransferBuilder::get_product() [145]
+                0.00    0.00   26121/58065       OpcodeSingleDataTransferBuilder::set_offset_immediate(unsigned int) [148]
+                0.00    0.00    9767/147220      Memory::write_word_to_memory(unsigned int, unsigned int) [129]
+                0.00    0.00    9767/147220      ARM7TDMI::write_word_to_memory(unsigned int, unsigned int) [130]
+                0.00    0.00     889/889         Memory::write_to_memory(unsigned int, unsigned char) [156]
+-----------------------------------------------
+                0.00    0.00       1/38151       SDL_AppInit [78]
+                0.00    0.00   38150/38151       Scheduler::tick() [2]
+[53]     0.0    0.00    0.00   38151         Display::start_draw_loop(Scheduler*) [53]
+                0.00    0.00   49407/75482827     BitRegion::get() [10]
+                0.00    0.00   49575/125876      BitRegion::set(unsigned int) [58]
+                0.00    0.00   49407/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   38151/76302       Scheduler::schedule_event(unsigned int, std::function<void ()>) [68]
+                0.00    0.00   38151/267057      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) [124]
+-----------------------------------------------
+                0.00    0.00   24862/24862       ARM7TDMI::run_next_opcode() [5]
+[54]     0.0    0.00    0.00   24862         ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   13399/38437       OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00   49724/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   24862/60560       OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00   13399/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   13399/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00   24862/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00   24862/58235       OpcodeSingleDataTransferBuilder::OpcodeSingleDataTransferBuilder(bool, unsigned int, unsigned int) [147]
+                0.00    0.00   24862/58235       OpcodeSingleDataTransferBuilder::set_flags(bool, bool, bool, bool) [146]
+                0.00    0.00   24862/58235       OpcodeSingleDataTransferBuilder::get_product() [145]
+                0.00    0.00   24862/58065       OpcodeSingleDataTransferBuilder::set_offset_immediate(unsigned int) [148]
+                0.00    0.00   11463/147220      Memory::write_word_to_memory(unsigned int, unsigned int) [129]
+                0.00    0.00   11463/147220      ARM7TDMI::write_word_to_memory(unsigned int, unsigned int) [130]
+-----------------------------------------------
+                0.00    0.00   38151/38151       Scheduler::tick() [2]
+[55]     0.0    0.00    0.00   38151         std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&) [55]
+                0.00    0.00   38151/75482827     BitRegion::get() [10]
+                0.00    0.00   38151/125876      BitRegion::set(unsigned int) [58]
+                0.00    0.00   38151/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   38151/76302       Scheduler::schedule_event(unsigned int, std::function<void ()>) [68]
+                0.00    0.00   38151/267055      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) [125]
+-----------------------------------------------
+                0.00    0.00   31084/31084       ARM7TDMI::run_next_opcode() [5]
+[56]     0.0    0.00    0.00   31084         ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short) [56]
+                0.00    0.00   15542/5111242     Utils::sign_extend(int, int) [30]
+                0.00    0.00   31084/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   46626/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00   15542/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   15542/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00   31084/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00     167/38437       ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    2324/38437       ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+                0.00    0.00    7082/38437       ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00   13399/38437       ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   15465/38437       ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+[57]     0.0    0.00    0.00   38437         OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00   34512/10193173     ArithmaticLogicUnit::rotate_right(unsigned int, unsigned int) [15]
+                0.00    0.00   34512/192442      Memory::read_word_from_memory(unsigned int) [126]
+                0.00    0.00   34512/91510       ARM7TDMI::read_word_from_memory(unsigned int) [142]
+                0.00    0.00    3925/152071      Memory::read_from_memory(unsigned int) [127]
+-----------------------------------------------
+                0.00    0.00   38150/125876      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_invoke(std::_Any_data const&) [66]
+                0.00    0.00   38151/125876      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&) [55]
+                0.00    0.00   49575/125876      Display::start_draw_loop(Scheduler*) [53]
+[58]     0.0    0.00    0.00  125876         BitRegion::set(unsigned int) [58]
+                0.00    0.00  125876/75608703     Memory::read_word_from_memory(unsigned char*, unsigned int) [13]
+                0.00    0.00  125876/125882      Utils::write_bit_range(unsigned int*, unsigned int, unsigned int, unsigned int) [133]
+                0.00    0.00  125876/125876      Memory::write_word_to_memory(unsigned char*, unsigned int, unsigned int) [134]
+-----------------------------------------------
+                0.00    0.00    4876/4876        ARM7TDMI::run_next_opcode() [5]
+[59]     0.0    0.00    0.00    4876         ARM7TDMI::arm_opcode_block_data_transfer(unsigned int) [59]
+                0.00    0.00    4876/103693      OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00    4876/4876        OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(unsigned int) [72]
+-----------------------------------------------
+                0.00    0.00   11062/11062       ARM7TDMI::run_next_opcode() [5]
+[60]     0.0    0.00    0.00   11062         ARM7TDMI::arm_opcode_branch(unsigned int) [60]
+                0.00    0.00   11062/5093540     OpcodeBranch::branch(ARM7TDMI*, unsigned int, unsigned int, unsigned char) [32]
+                0.00    0.00   13384/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00   13384/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00   11062/11062       OpcodeBranch::OpcodeBranch(unsigned int) [74]
+                0.00    0.00   11062/21018351     ARM7TDMI::read_register(int) [29]
+-----------------------------------------------
+                0.00    0.00    7032/7032        ARM7TDMI::run_next_opcode() [5]
+[61]     0.0    0.00    0.00    7032         ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00    7032/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00    7032/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00    7032/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00    7032/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    7032/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00    7032/5279188     OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [112]
+                0.00    0.00    7032/5279188     OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [111]
+                0.00    0.00    7032/5247333     OpcodeDataProcessingBuilder::set_source_register(unsigned int) [113]
+                0.00    0.00    7032/5279188     OpcodeDataProcessingBuilder::get_product() [110]
+                0.00    0.00    7032/5151603     OpcodeDataProcessingBuilder::set_immediate_op2(unsigned char, unsigned int) [115]
+-----------------------------------------------
+                0.00    0.00     170/60560       ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    2325/60560       ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+                0.00    0.00    7082/60560       ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00   24862/60560       ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   26121/60560       ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+[62]     0.0    0.00    0.00   60560         OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00   61504/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00   60560/5049873     DataTransfer::calculate_address(ARM7TDMI*, unsigned int) [37]
+                0.00    0.00     944/149606      OpcodeDataProcess::shift_op2(ArithmaticLogicUnit*, unsigned int, unsigned char, OpcodeDataProcess::BitShiftType, bool) [128]
+-----------------------------------------------
+                0.00    0.00    5977/5977        ARM7TDMI::run_next_opcode() [5]
+[63]     0.0    0.00    0.00    5977         ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    5977/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+                0.00    0.00   11954/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    5977/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00    5977/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00    5977/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00    5977/5279188     OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [112]
+                0.00    0.00    5977/5247333     OpcodeDataProcessingBuilder::set_source_register(unsigned int) [113]
+                0.00    0.00    5977/5279188     OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [111]
+                0.00    0.00    5977/5279188     OpcodeDataProcessingBuilder::get_product() [110]
+                0.00    0.00    5977/5151603     OpcodeDataProcessingBuilder::set_immediate_op2(unsigned char, unsigned int) [115]
+-----------------------------------------------
+                0.00    0.00    7082/7082        ARM7TDMI::run_next_opcode() [5]
+[64]     0.0    0.00    0.00    7082         ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00    7082/38437       OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00   14164/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    7082/60560       OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00    7082/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00    7082/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00    7082/58235       OpcodeSingleDataTransferBuilder::OpcodeSingleDataTransferBuilder(bool, unsigned int, unsigned int) [147]
+                0.00    0.00    7082/58235       OpcodeSingleDataTransferBuilder::set_flags(bool, bool, bool, bool) [146]
+                0.00    0.00    7082/58235       OpcodeSingleDataTransferBuilder::get_product() [145]
+                0.00    0.00    7082/58065       OpcodeSingleDataTransferBuilder::set_offset_immediate(unsigned int) [148]
+-----------------------------------------------
+                0.00    0.00    2164/2164        ARM7TDMI::run_next_opcode() [5]
+[65]     0.0    0.00    0.00    2164         ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00    2164/4989313     OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [14]
+                0.00    0.00    2164/4989313     OpcodeHalfWordSignedDataTransferBuilder::set_flags(bool, bool, bool) [22]
+                0.00    0.00       2/3561        Memory::write_halfword_to_memory(unsigned int, unsigned short) [31]
+                0.00    0.00    6492/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    2162/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00    2162/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00    4328/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00    2164/4989313     OpcodeHalfWordSignedDataTransferBuilder::set_datatype(OpcodeHalfWordSignedDataTransfer::DataType) [36]
+                0.00    0.00    2164/4989313     OpcodeHalfWordSignedDataTransferBuilder::OpcodeHalfWordSignedDataTransferBuilder(bool, unsigned int, unsigned int) [119]
+                0.00    0.00    2164/4989313     OpcodeHalfWordSignedDataTransferBuilder::get_product() [118]
+                0.00    0.00    2164/2164        OpcodeHalfWordSignedDataTransferBuilder::set_offset_register(unsigned char) [155]
+-----------------------------------------------
+                0.00    0.00   38150/38150       Scheduler::tick() [2]
+[66]     0.0    0.00    0.00   38150         std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_invoke(std::_Any_data const&) [66]
+                0.00    0.00   38150/125876      BitRegion::set(unsigned int) [58]
+-----------------------------------------------
+                0.00    0.00    2325/2325        ARM7TDMI::run_next_opcode() [5]
+[67]     0.0    0.00    0.00    2325         ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+                0.00    0.00    2325/2325        OpcodeSingleDataTransfer::OpcodeSingleDataTransfer(unsigned int) [73]
+                0.00    0.00    2324/38437       OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00    2325/60560       OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00    2324/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00    2324/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00       1/147220      Memory::write_word_to_memory(unsigned int, unsigned int) [129]
+                0.00    0.00       1/147220      ARM7TDMI::write_word_to_memory(unsigned int, unsigned int) [130]
+-----------------------------------------------
+                0.00    0.00   38151/76302       std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&) [55]
+                0.00    0.00   38151/76302       Display::start_draw_loop(Scheduler*) [53]
+[68]     0.0    0.00    0.00   76302         Scheduler::schedule_event(unsigned int, std::function<void ()>) [68]
+                0.00    0.00   76302/31041429     Memory::memory_region(unsigned int) [28]
+                0.00    0.00  114453/267055      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) [125]
+                0.00    0.00  114453/267057      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) [124]
+-----------------------------------------------
+                0.00    0.00    7151/7151        ARM7TDMI::run_next_opcode() [5]
+[69]     0.0    0.00    0.00    7151         ARM7TDMI::arm_opcode_branch_exchange(unsigned int) [69]
+                0.00    0.00    7151/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00    7151/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00    7151/20816       OpcodeBranchExchange::run(ARM7TDMI*) [70]
+                0.00    0.00    7151/7151        OpcodeBranchExchange::OpcodeBranchExchange(unsigned int) [83]
+-----------------------------------------------
+                0.00    0.00    7151/20816       ARM7TDMI::arm_opcode_branch_exchange(unsigned int) [69]
+                0.00    0.00   13665/20816       ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+[70]     0.0    0.00    0.00   20816         OpcodeBranchExchange::run(ARM7TDMI*) [70]
+                0.00    0.00   20816/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00   20816/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00    1548/9068        ARM7TDMI::arm_opcode_multiply(unsigned int) [75]
+                0.00    0.00    7520/9068        ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+[71]     0.0    0.00    0.00    9068         OpcodeMultiply::run(ARM7TDMI*) [71]
+                0.00    0.00   27204/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00    7520/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00    4876/4876        ARM7TDMI::arm_opcode_block_data_transfer(unsigned int) [59]
+[72]     0.0    0.00    0.00    4876         OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(unsigned int) [72]
+                0.00    0.00   24380/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00    9752/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+-----------------------------------------------
+                0.00    0.00    2325/2325        ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+[73]     0.0    0.00    0.00    2325         OpcodeSingleDataTransfer::OpcodeSingleDataTransfer(unsigned int) [73]
+                0.00    0.00    2325/2325        DataTransfer::DataTransfer(unsigned int) [77]
+                0.00    0.00    6975/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    4650/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00   11062/11062       ARM7TDMI::arm_opcode_branch(unsigned int) [60]
+[74]     0.0    0.00    0.00   11062         OpcodeBranch::OpcodeBranch(unsigned int) [74]
+                0.00    0.00   11062/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00   11062/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00    1548/1548        ARM7TDMI::run_next_opcode() [5]
+[75]     0.0    0.00    0.00    1548         ARM7TDMI::arm_opcode_multiply(unsigned int) [75]
+                0.00    0.00    1548/1548        OpcodeMultiply::OpcodeMultiply(unsigned int) [82]
+                0.00    0.00    1548/9068        OpcodeMultiply::run(ARM7TDMI*) [71]
+                0.00    0.00    1548/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00    1548/21193922     RegisterSet::write_register(int, unsigned int) [20]
+-----------------------------------------------
+                0.00    0.00    8759/8759        ARM7TDMI::run_next_opcode() [5]
+[76]     0.0    0.00    0.00    8759         ARM7TDMI::thumb_opcode_unconditional_branch(unsigned short) [76]
+                0.00    0.00    8759/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    8759/21018351     ARM7TDMI::read_register(int) [29]
+-----------------------------------------------
+                0.00    0.00    2325/2325        OpcodeSingleDataTransfer::OpcodeSingleDataTransfer(unsigned int) [73]
+[77]     0.0    0.00    0.00    2325         DataTransfer::DataTransfer(unsigned int) [77]
+                0.00    0.00    6975/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    9300/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00       3/3           std::map<SDL_Scancode, unsigned short, std::less<SDL_Scancode>, std::allocator<std::pair<SDL_Scancode const, unsigned short> > >::~map() [79]
+[78]     0.0    0.00    0.00       3         SDL_AppInit [78]
+                0.00    0.00       1/1           Display::Display(SDL_Renderer*, Memory*) [84]
+                0.00    0.00       1/3561        Memory::write_halfword_to_memory(unsigned int, unsigned short) [31]
+                0.00    0.00       1/1           ARM7TDMI::skip_bios() [98]
+                0.00    0.00       1/38151       Display::start_draw_loop(Scheduler*) [53]
+-----------------------------------------------
+                                                 <spontaneous>
+[79]     0.0    0.00    0.00                 std::map<SDL_Scancode, unsigned short, std::less<SDL_Scancode>, std::allocator<std::pair<SDL_Scancode const, unsigned short> > >::~map() [79]
+                0.00    0.00       3/3           SDL_AppInit [78]
+-----------------------------------------------
+                0.00    0.00   20786/20786       OpcodeDataProcess::run(ARM7TDMI*) [16]
+[80]     0.0    0.00    0.00   20786         ArithmaticLogicUnit::logical_right_shift(unsigned int, unsigned int) [80]
+                0.00    0.00   20786/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00   18544/18544       OpcodeDataProcess::run(ARM7TDMI*) [16]
+[81]     0.0    0.00    0.00   18544         ArithmaticLogicUnit::logical_left_shift(unsigned int, unsigned int) [81]
+                0.00    0.00   18544/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00    1548/1548        ARM7TDMI::arm_opcode_multiply(unsigned int) [75]
+[82]     0.0    0.00    0.00    1548         OpcodeMultiply::OpcodeMultiply(unsigned int) [82]
+                0.00    0.00    6192/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00    3096/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00    7151/7151        ARM7TDMI::arm_opcode_branch_exchange(unsigned int) [69]
+[83]     0.0    0.00    0.00    7151         OpcodeBranchExchange::OpcodeBranchExchange(unsigned int) [83]
+                0.00    0.00    7151/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+-----------------------------------------------
+                0.00    0.00       1/1           SDL_AppInit [78]
+[84]     0.0    0.00    0.00       1         Display::Display(SDL_Renderer*, Memory*) [84]
+                0.00    0.00       4/4           Display::TiledBackground::TiledBackground(Memory*, unsigned char) [85]
+                0.00    0.00       2/2           Display::SizableWindow::SizableWindow(unsigned char*, bool, unsigned char*, unsigned char*) [93]
+                0.00    0.00       2/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+                0.00    0.00       1/1           Display::DisplayControl::DisplayControl(unsigned char*) [94]
+                0.00    0.00      11/31041429     Memory::memory_region(unsigned int) [28]
+                0.00    0.00       2/4           Display::Window::Window(unsigned char*, bool) [164]
+                0.00    0.00       1/143422      BitRegion::BitRegion(unsigned char*, unsigned char) [131]
+                0.00    0.00       1/1           Display::DisplayStatus::DisplayStatus(unsigned char*) [168]
+-----------------------------------------------
+                0.00    0.00       4/4           Display::Display(SDL_Renderer*, Memory*) [84]
+[85]     0.0    0.00    0.00       4         Display::TiledBackground::TiledBackground(Memory*, unsigned char) [85]
+                0.00    0.00       4/4           Display::TiledBackground::AffineData::AffineData(unsigned char*) [87]
+                0.00    0.00      16/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+                0.00    0.00       4/4           Display::TiledBackground::TiledBackgroundControl::TiledBackgroundControl(unsigned char*) [88]
+                0.00    0.00      16/31041429     Memory::memory_region(unsigned int) [28]
+-----------------------------------------------
+                0.00    0.00     170/170         ARM7TDMI::run_next_opcode() [5]
+[86]     0.0    0.00    0.00     170         ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00     167/38437       OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00     510/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00     170/60560       OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00     167/21136923     ARM7TDMI::write_register(int, unsigned int) [21]
+                0.00    0.00     167/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00     340/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00     170/58235       OpcodeSingleDataTransferBuilder::OpcodeSingleDataTransferBuilder(bool, unsigned int, unsigned int) [147]
+                0.00    0.00     170/58235       OpcodeSingleDataTransferBuilder::set_flags(bool, bool, bool, bool) [146]
+                0.00    0.00     170/170         OpcodeSingleDataTransferBuilder::set_offset_register(unsigned char, unsigned char, unsigned char) [159]
+                0.00    0.00     170/58235       OpcodeSingleDataTransferBuilder::get_product() [145]
+                0.00    0.00       3/147220      Memory::write_word_to_memory(unsigned int, unsigned int) [129]
+                0.00    0.00       3/147220      ARM7TDMI::write_word_to_memory(unsigned int, unsigned int) [130]
+-----------------------------------------------
+                0.00    0.00       4/4           Display::TiledBackground::TiledBackground(Memory*, unsigned char) [85]
+[87]     0.0    0.00    0.00       4         Display::TiledBackground::AffineData::AffineData(unsigned char*) [87]
+                0.00    0.00      20/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+-----------------------------------------------
+                0.00    0.00       4/4           Display::TiledBackground::TiledBackground(Memory*, unsigned char) [85]
+[88]     0.0    0.00    0.00       4         Display::TiledBackground::TiledBackgroundControl::TiledBackgroundControl(unsigned char*) [88]
+                0.00    0.00      12/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+                0.00    0.00      12/143422      BitRegion::BitRegion(unsigned char*, unsigned char) [131]
+-----------------------------------------------
+                0.00    0.00    1996/1996        OpcodeDataProcess::run(ARM7TDMI*) [16]
+[89]     0.0    0.00    0.00    1996         ArithmaticLogicUnit::arithmetic_right_shift(int, unsigned int) [89]
+                0.00    0.00    1996/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00       4/4           Scheduler::Scheduler(ARM7TDMI*) [91]
+[90]     0.0    0.00    0.00       4         Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int) [90]
+                0.00    0.00       8/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+                0.00    0.00       4/75482827     BitRegion::get() [10]
+                0.00    0.00       4/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00       8/31041429     Memory::memory_region(unsigned int) [28]
+                0.00    0.00      12/143422      BitRegion::BitRegion(unsigned char*, unsigned char) [131]
+-----------------------------------------------
+                0.00    0.00       1/1           _GLOBAL__sub_I_SDL_main [92]
+[91]     0.0    0.00    0.00       1         Scheduler::Scheduler(ARM7TDMI*) [91]
+                0.00    0.00       4/4           Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int) [90]
+-----------------------------------------------
+                                                 <spontaneous>
+[92]     0.0    0.00    0.00                 _GLOBAL__sub_I_SDL_main [92]
+                0.00    0.00       1/1           Scheduler::Scheduler(ARM7TDMI*) [91]
+                0.00    0.00       1/1           ARM7TDMI::ARM7TDMI() [170]
+-----------------------------------------------
+                0.00    0.00       2/2           Display::Display(SDL_Renderer*, Memory*) [84]
+[93]     0.0    0.00    0.00       2         Display::SizableWindow::SizableWindow(unsigned char*, bool, unsigned char*, unsigned char*) [93]
+                0.00    0.00       8/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+                0.00    0.00       2/4           Display::Window::Window(unsigned char*, bool) [164]
+-----------------------------------------------
+                0.00    0.00       1/1           Display::Display(SDL_Renderer*, Memory*) [84]
+[94]     0.0    0.00    0.00       1         Display::DisplayControl::DisplayControl(unsigned char*) [94]
+                0.00    0.00       2/143428      BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char) [27]
+                0.00    0.00       7/143422      BitRegion::BitRegion(unsigned char*, unsigned char) [131]
+-----------------------------------------------
+                0.00    0.00       2/2           ARM7TDMI::run_next_opcode() [5]
+[95]     0.0    0.00    0.00       2         ARM7TDMI::arm_opcode_psr_transfer(unsigned int) [95]
+                0.00    0.00       2/2           OpcodePsrTransfer::OpcodePsrTransfer(unsigned int) [97]
+                0.00    0.00       2/4           ProgramStatusRegister::write_value(unsigned int) [96]
+                0.00    0.00       4/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00       2/21018351     ARM7TDMI::read_register(int) [29]
+                0.00    0.00       4/125882      Utils::write_bit_range(unsigned int*, unsigned int, unsigned int, unsigned int) [133]
+                0.00    0.00       2/2           ProgramStatusRegister::value() [165]
+-----------------------------------------------
+                0.00    0.00       2/4           ARM7TDMI::skip_bios() [98]
+                0.00    0.00       2/4           ARM7TDMI::arm_opcode_psr_transfer(unsigned int) [95]
+[96]     0.0    0.00    0.00       4         ProgramStatusRegister::write_value(unsigned int) [96]
+                0.00    0.00      28/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+                0.00    0.00       4/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+-----------------------------------------------
+                0.00    0.00       2/2           ARM7TDMI::arm_opcode_psr_transfer(unsigned int) [95]
+[97]     0.0    0.00    0.00       2         OpcodePsrTransfer::OpcodePsrTransfer(unsigned int) [97]
+                0.00    0.00       8/433097835     Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [6]
+                0.00    0.00      10/100890841     Utils::read_bit(unsigned long, unsigned int) [17]
+-----------------------------------------------
+                0.00    0.00       1/1           SDL_AppInit [78]
+[98]     0.0    0.00    0.00       1         ARM7TDMI::skip_bios() [98]
+                0.00    0.00       2/4           ProgramStatusRegister::write_value(unsigned int) [96]
+                0.00    0.00       1/21193922     RegisterSet::write_register(int, unsigned int) [20]
+                0.00    0.00       1/1           ARM7TDMI::mode_to_register_set(OperatingMode) [169]
+-----------------------------------------------
+                0.00    0.00   71065/49340999     Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [19]
+                0.00    0.00  117934/49340999     Display::get_tile_pixel_8bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [46]
+                0.00    0.00 49152000/49340999     Display::render_sprite_scanline(unsigned char, int) [4]
+[108]    0.0    0.00    0.00 49340999         Memory::read_halfword_from_memory(unsigned char*, unsigned int) [108]
+-----------------------------------------------
+                0.00    0.00 5321480/5321480     OpcodeDataProcess::run(ARM7TDMI*) [16]
+[109]    0.0    0.00    0.00 5321480         OpcodeDataProcess::calculate_instruction(ArithmaticLogicUnit*, OpcodeDataProcess::InstructionType, unsigned int, unsigned int, bool) [109]
+                0.00    0.00 5118779/5118779     ArithmaticLogicUnit::subtract(int, unsigned int, ...) [116]
+                0.00    0.00   63213/63213       ArithmaticLogicUnit::add(int, ...) [144]
+-----------------------------------------------
+                0.00    0.00    5977/5279188     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/5279188     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00   18178/5279188     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   28757/5279188     ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   51796/5279188     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   67855/5279188     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00 5099593/5279188     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+[110]    0.0    0.00    0.00 5279188         OpcodeDataProcessingBuilder::get_product() [110]
+-----------------------------------------------
+                0.00    0.00    5977/5279188     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/5279188     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00   18178/5279188     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   28757/5279188     ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   51796/5279188     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   67855/5279188     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00 5099593/5279188     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+[111]    0.0    0.00    0.00 5279188         OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [111]
+-----------------------------------------------
+                0.00    0.00    5977/5279188     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/5279188     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00   18178/5279188     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   28757/5279188     ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   51796/5279188     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   67855/5279188     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00 5099593/5279188     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+[112]    0.0    0.00    0.00 5279188         OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [112]
+-----------------------------------------------
+                0.00    0.00    5977/5247333     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/5247333     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00   15080/5247333     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   51796/5247333     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   67855/5247333     ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+                0.00    0.00 5099593/5247333     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+[113]    0.0    0.00    0.00 5247333         OpcodeDataProcessingBuilder::set_source_register(unsigned int) [113]
+-----------------------------------------------
+                0.00    0.00  100932/5188579     ARM7TDMI::run_next_opcode() [5]
+                0.00    0.00 5087647/5188579     ARM7TDMI::thumb_opcode_conditional_branch(unsigned short) [23]
+[114]    0.0    0.00    0.00 5188579         ARM7TDMI::condition_field(int) [114]
+-----------------------------------------------
+                0.00    0.00     666/5151603     ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00    5977/5151603     ARM7TDMI::thumb_opcode_load_address(unsigned short) [63]
+                0.00    0.00    7032/5151603     ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short) [61]
+                0.00    0.00   38335/5151603     ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00 5099593/5151603     ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short) [12]
+[115]    0.0    0.00    0.00 5151603         OpcodeDataProcessingBuilder::set_immediate_op2(unsigned char, unsigned int) [115]
+-----------------------------------------------
+                0.00    0.00 5118779/5118779     OpcodeDataProcess::calculate_instruction(ArithmaticLogicUnit*, OpcodeDataProcess::InstructionType, unsigned int, unsigned int, bool) [109]
+[116]    0.0    0.00    0.00 5118779         ArithmaticLogicUnit::subtract(int, unsigned int, ...) [116]
+-----------------------------------------------
+                0.00    0.00   58235/5047548     OpcodeSingleDataTransferBuilder::OpcodeSingleDataTransferBuilder(bool, unsigned int, unsigned int) [147]
+                0.00    0.00 4989313/5047548     OpcodeHalfWordSignedDataTransferBuilder::OpcodeHalfWordSignedDataTransferBuilder(bool, unsigned int, unsigned int) [119]
+[117]    0.0    0.00    0.00 5047548         DataTransfer::DataTransfer() [117]
+-----------------------------------------------
+                0.00    0.00    2164/4989313     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00 4987149/4989313     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+[118]    0.0    0.00    0.00 4989313         OpcodeHalfWordSignedDataTransferBuilder::get_product() [118]
+-----------------------------------------------
+                0.00    0.00    2164/4989313     ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+                0.00    0.00 4987149/4989313     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+[119]    0.0    0.00    0.00 4989313         OpcodeHalfWordSignedDataTransferBuilder::OpcodeHalfWordSignedDataTransferBuilder(bool, unsigned int, unsigned int) [119]
+                0.00    0.00 4989313/5047548     DataTransfer::DataTransfer() [117]
+-----------------------------------------------
+                0.00    0.00 4987149/4987149     ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short) [11]
+[120]    0.0    0.00    0.00 4987149         OpcodeHalfWordSignedDataTransferBuilder::set_offset_immediate(unsigned char) [120]
+-----------------------------------------------
+                0.00    0.00  816640/816640      Display::render_sprite_scanline(unsigned char, int) [4]
+[121]    0.0    0.00    0.00  816640         Matrix<unsigned short>::Matrix(unsigned int, unsigned int) [121]
+-----------------------------------------------
+                0.00    0.00  816640/816640      Display::render_sprite_scanline(unsigned char, int) [4]
+[122]    0.0    0.00    0.00  816640         Matrix<unsigned short>::~Matrix() [122]
+-----------------------------------------------
+                0.00    0.00  768000/768000      Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+[123]    0.0    0.00    0.00  768000         Matrix<short>::get(unsigned int, unsigned int) [123]
+-----------------------------------------------
+                0.00    0.00   38151/267057      Display::start_draw_loop(Scheduler*) [53]
+                0.00    0.00  114453/267057      Scheduler::schedule_event(unsigned int, std::function<void ()>) [68]
+                0.00    0.00  114453/267057      Scheduler::tick() [2]
+[124]    0.0    0.00    0.00  267057         std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) [124]
+-----------------------------------------------
+                0.00    0.00       1/267055      SDL_AppQuit [99]
+                0.00    0.00   38151/267055      std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&) [55]
+                0.00    0.00  114450/267055      Scheduler::tick() [2]
+                0.00    0.00  114453/267055      Scheduler::schedule_event(unsigned int, std::function<void ()>) [68]
+[125]    0.0    0.00    0.00  267055         std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) [125]
+-----------------------------------------------
+                0.00    0.00   34512/192442      OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00   56998/192442      OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+                0.00    0.00  100932/192442      ARM7TDMI::run_next_opcode() [5]
+[126]    0.0    0.00    0.00  192442         Memory::read_word_from_memory(unsigned int) [126]
+-----------------------------------------------
+                0.00    0.00    3925/152071      OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00  148146/152071      Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+[127]    0.0    0.00    0.00  152071         Memory::read_from_memory(unsigned int) [127]
+-----------------------------------------------
+                0.00    0.00     944/149606      OpcodeSingleDataTransfer::run(ARM7TDMI*) [62]
+                0.00    0.00  148662/149606      OpcodeDataProcess::run(ARM7TDMI*) [16]
+[128]    0.0    0.00    0.00  149606         OpcodeDataProcess::shift_op2(ArithmaticLogicUnit*, unsigned int, unsigned char, OpcodeDataProcess::BitShiftType, bool) [128]
+-----------------------------------------------
+                0.00    0.00       1/147220      ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+                0.00    0.00       3/147220      ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    9767/147220      ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+                0.00    0.00   11463/147220      ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00  125986/147220      OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+[129]    0.0    0.00    0.00  147220         Memory::write_word_to_memory(unsigned int, unsigned int) [129]
+-----------------------------------------------
+                0.00    0.00       1/147220      ARM7TDMI::arm_opcode_single_data_transfer(unsigned int) [67]
+                0.00    0.00       3/147220      ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    9767/147220      ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+                0.00    0.00   11463/147220      ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00  125986/147220      OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+[130]    0.0    0.00    0.00  147220         ARM7TDMI::write_word_to_memory(unsigned int, unsigned int) [130]
+-----------------------------------------------
+                0.00    0.00       1/143422      Display::Display(SDL_Renderer*, Memory*) [84]
+                0.00    0.00       6/143422      Display::DisplayStatus::DisplayStatus(unsigned char*) [168]
+                0.00    0.00       7/143422      Display::DisplayControl::DisplayControl(unsigned char*) [94]
+                0.00    0.00      12/143422      Display::TiledBackground::TiledBackgroundControl::TiledBackgroundControl(unsigned char*) [88]
+                0.00    0.00      12/143422      Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int) [90]
+                0.00    0.00      24/143422      Display::Window::Window(unsigned char*, bool) [164]
+                0.00    0.00  143360/143422      Display::TiledBackground::ScreenEntry::ScreenEntry(unsigned char*) [33]
+[131]    0.0    0.00    0.00  143422         BitRegion::BitRegion(unsigned char*, unsigned char) [131]
+-----------------------------------------------
+                0.00    0.00   13461/127585      ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   17512/127585      ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   28757/127585      ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   67855/127585      ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+[132]    0.0    0.00    0.00  127585         OpcodeDataProcessingBuilder::set_register_op2(unsigned char, unsigned char) [132]
+-----------------------------------------------
+                0.00    0.00       2/125882      ProgramStatusRegister::value() [165]
+                0.00    0.00       4/125882      ARM7TDMI::arm_opcode_psr_transfer(unsigned int) [95]
+                0.00    0.00  125876/125882      BitRegion::set(unsigned int) [58]
+[133]    0.0    0.00    0.00  125882         Utils::write_bit_range(unsigned int*, unsigned int, unsigned int, unsigned int) [133]
+-----------------------------------------------
+                0.00    0.00  125876/125876      BitRegion::set(unsigned int) [58]
+[134]    0.0    0.00    0.00  125876         Memory::write_word_to_memory(unsigned char*, unsigned int, unsigned int) [134]
+-----------------------------------------------
+                0.00    0.00   13461/124487      ARM7TDMI::thumb_opcode_add_subtract(unsigned short) [44]
+                0.00    0.00   14414/124487      ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+                0.00    0.00   28757/124487      ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short) [48]
+                0.00    0.00   67855/124487      ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+[135]    0.0    0.00    0.00  124487         OpcodeDataProcessingBuilder::set_register_op2_shift_immediate(unsigned char) [135]
+-----------------------------------------------
+                0.00    0.00  103693/103693      OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+[136]    0.0    0.00    0.00  103693         ARM7TDMI::is_priviledged() [136]
+-----------------------------------------------
+                0.00    0.00  103693/103693      OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+[137]    0.0    0.00    0.00  103693         ARM7TDMI::current_register_set() [137]
+-----------------------------------------------
+                0.00    0.00   29417/98817       ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   69400/98817       ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+[138]    0.0    0.00    0.00   98817         OpcodeBlockDataTransferBuilder::get_product() [138]
+-----------------------------------------------
+                0.00    0.00   29417/98817       ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   69400/98817       ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+[139]    0.0    0.00    0.00   98817         OpcodeBlockDataTransferBuilder::set_register_list(unsigned short) [139]
+-----------------------------------------------
+                0.00    0.00   29417/98817       ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   69400/98817       ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+[140]    0.0    0.00    0.00   98817         OpcodeBlockDataTransferBuilder::set_flags(bool, bool, bool, bool) [140]
+-----------------------------------------------
+                0.00    0.00   29417/98817       ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short) [45]
+                0.00    0.00   69400/98817       ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short) [40]
+[141]    0.0    0.00    0.00   98817         OpcodeBlockDataTransferBuilder::OpcodeBlockDataTransferBuilder(bool, unsigned char) [141]
+-----------------------------------------------
+                0.00    0.00   34512/91510       OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [57]
+                0.00    0.00   56998/91510       OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+[142]    0.0    0.00    0.00   91510         ARM7TDMI::read_word_from_memory(unsigned int) [142]
+-----------------------------------------------
+                0.00    0.00   82390/82390       OpcodeBlockDataTransfer::run(ARM7TDMI*) [39]
+[143]    0.0    0.00    0.00   82390         ARM7TDMI::warn(char const*) [143]
+-----------------------------------------------
+                0.00    0.00   63213/63213       OpcodeDataProcess::calculate_instruction(ArithmaticLogicUnit*, OpcodeDataProcess::InstructionType, unsigned int, unsigned int, bool) [109]
+[144]    0.0    0.00    0.00   63213         ArithmaticLogicUnit::add(int, ...) [144]
+-----------------------------------------------
+                0.00    0.00     170/58235       ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    7082/58235       ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00   24862/58235       ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   26121/58235       ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+[145]    0.0    0.00    0.00   58235         OpcodeSingleDataTransferBuilder::get_product() [145]
+-----------------------------------------------
+                0.00    0.00     170/58235       ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    7082/58235       ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00   24862/58235       ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   26121/58235       ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+[146]    0.0    0.00    0.00   58235         OpcodeSingleDataTransferBuilder::set_flags(bool, bool, bool, bool) [146]
+-----------------------------------------------
+                0.00    0.00     170/58235       ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+                0.00    0.00    7082/58235       ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00   24862/58235       ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   26121/58235       ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+[147]    0.0    0.00    0.00   58235         OpcodeSingleDataTransferBuilder::OpcodeSingleDataTransferBuilder(bool, unsigned int, unsigned int) [147]
+                0.00    0.00   58235/5047548     DataTransfer::DataTransfer() [117]
+-----------------------------------------------
+                0.00    0.00    7082/58065       ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short) [64]
+                0.00    0.00   24862/58065       ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short) [54]
+                0.00    0.00   26121/58065       ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+[148]    0.0    0.00    0.00   58065         OpcodeSingleDataTransferBuilder::set_offset_immediate(unsigned int) [148]
+-----------------------------------------------
+                0.00    0.00   13665/13665       ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+[149]    0.0    0.00    0.00   13665         OpcodeBranchExchange::build(OpcodeBranchExchange*, unsigned int) [149]
+-----------------------------------------------
+                0.00    0.00   13665/13665       ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short) [41]
+[150]    0.0    0.00    0.00   13665         OpcodeBranchExchange::OpcodeBranchExchange() [150]
+-----------------------------------------------
+                0.00    0.00    7520/7520        ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+[151]    0.0    0.00    0.00    7520         OpcodeMultiplyBuilder::get_product() [151]
+-----------------------------------------------
+                0.00    0.00    7520/7520        ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+[152]    0.0    0.00    0.00    7520         OpcodeMultiplyBuilder::OpcodeMultiplyBuilder(unsigned char, unsigned char, unsigned char, bool) [152]
+-----------------------------------------------
+                0.00    0.00    3200/3200        Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+[153]    0.0    0.00    0.00    3200         Matrix<short>::set(unsigned int, unsigned int, short) [153]
+-----------------------------------------------
+                0.00    0.00    3098/3098        ARM7TDMI::thumb_opcode_alu_operations(unsigned short) [51]
+[154]    0.0    0.00    0.00    3098         OpcodeDataProcessingBuilder::set_register_op2_shift_register(unsigned char) [154]
+-----------------------------------------------
+                0.00    0.00    2164/2164        ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short) [65]
+[155]    0.0    0.00    0.00    2164         OpcodeHalfWordSignedDataTransferBuilder::set_offset_register(unsigned char) [155]
+-----------------------------------------------
+                0.00    0.00     889/889         ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short) [52]
+[156]    0.0    0.00    0.00     889         Memory::write_to_memory(unsigned int, unsigned char) [156]
+-----------------------------------------------
+                0.00    0.00     800/800         Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+[157]    0.0    0.00    0.00     800         Matrix<short>::Matrix(unsigned int, unsigned int) [157]
+-----------------------------------------------
+                0.00    0.00     800/800         Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [38]
+[158]    0.0    0.00    0.00     800         Matrix<short>::~Matrix() [158]
+-----------------------------------------------
+                0.00    0.00     170/170         ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short) [86]
+[159]    0.0    0.00    0.00     170         OpcodeSingleDataTransferBuilder::set_offset_register(unsigned char, unsigned char, unsigned char) [159]
+-----------------------------------------------
+                0.00    0.00      91/91          SDL_AppEvent <cycle 1> [50]
+[160]    0.0    0.00    0.00      91         ARM7TDMI::write_halfword_to_memory(unsigned int, unsigned short) [160]
+-----------------------------------------------
+                0.00    0.00      91/91          SDL_AppEvent <cycle 1> [50]
+[161]    0.0    0.00    0.00      91         ARM7TDMI::read_halfword_from_memory(unsigned int) [161]
+-----------------------------------------------
+                0.00    0.00       1/13          ARM7TDMI::ARM7TDMI() [170]
+                0.00    0.00      12/13          RegisterSet::RegisterSet() [163]
+[162]    0.0    0.00    0.00      13         ProgramStatusRegister::ProgramStatusRegister() [162]
+-----------------------------------------------
+                0.00    0.00      12/12          ARM7TDMI::ARM7TDMI() [170]
+[163]    0.0    0.00    0.00      12         RegisterSet::RegisterSet() [163]
+                0.00    0.00      12/13          ProgramStatusRegister::ProgramStatusRegister() [162]
+-----------------------------------------------
+                0.00    0.00       2/4           Display::SizableWindow::SizableWindow(unsigned char*, bool, unsigned char*, unsigned char*) [93]
+                0.00    0.00       2/4           Display::Display(SDL_Renderer*, Memory*) [84]
+[164]    0.0    0.00    0.00       4         Display::Window::Window(unsigned char*, bool) [164]
+                0.00    0.00      24/143422      BitRegion::BitRegion(unsigned char*, unsigned char) [131]
+-----------------------------------------------
+                0.00    0.00       2/2           ARM7TDMI::arm_opcode_psr_transfer(unsigned int) [95]
+[165]    0.0    0.00    0.00       2         ProgramStatusRegister::value() [165]
+                0.00    0.00       2/125882      Utils::write_bit_range(unsigned int*, unsigned int, unsigned int, unsigned int) [133]
+-----------------------------------------------
+                0.00    0.00       1/1           ARM7TDMI::ARM7TDMI() [170]
+[166]    0.0    0.00    0.00       1         Memory::Memory(unsigned int) [166]
+-----------------------------------------------
+                0.00    0.00       1/1           SDL_AppQuit [99]
+[167]    0.0    0.00    0.00       1         Memory::~Memory() [167]
+-----------------------------------------------
+                0.00    0.00       1/1           Display::Display(SDL_Renderer*, Memory*) [84]
+[168]    0.0    0.00    0.00       1         Display::DisplayStatus::DisplayStatus(unsigned char*) [168]
+                0.00    0.00       6/143422      BitRegion::BitRegion(unsigned char*, unsigned char) [131]
+-----------------------------------------------
+                0.00    0.00       1/1           ARM7TDMI::skip_bios() [98]
+[169]    0.0    0.00    0.00       1         ARM7TDMI::mode_to_register_set(OperatingMode) [169]
+-----------------------------------------------
+                0.00    0.00       1/1           _GLOBAL__sub_I_SDL_main [92]
+[170]    0.0    0.00    0.00       1         ARM7TDMI::ARM7TDMI() [170]
+                0.00    0.00      12/12          RegisterSet::RegisterSet() [163]
+                0.00    0.00       1/13          ProgramStatusRegister::ProgramStatusRegister() [162]
+                0.00    0.00       1/1           Memory::Memory(unsigned int) [166]
+-----------------------------------------------
+                                   1             SDL_AppEvent <cycle 1> [50]
+[171]    0.0    0.00    0.00       1         std::map<SDL_Scancode, unsigned short, std::less<SDL_Scancode>, std::allocator<std::pair<SDL_Scancode const, unsigned short> > >::map(std::initializer_list<std::pair<SDL_Scancode const, unsigned short> >, std::less<SDL_Scancode> const&, std::allocator<std::pair<SDL_Scancode const, unsigned short> > const&) <cycle 1> [171]
+                                   7             SDL_AppEvent <cycle 1> [50]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2024 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [50] SDL_AppEvent           [14] OpcodeHalfWordSignedDataTransfer::run(ARM7TDMI*) [21] ARM7TDMI::write_register(int, unsigned int)
+  [78] SDL_AppInit           [118] OpcodeHalfWordSignedDataTransferBuilder::get_product() [114] ARM7TDMI::condition_field(int)
+  [20] RegisterSet::write_register(int, unsigned int) [36] OpcodeHalfWordSignedDataTransferBuilder::set_datatype(OpcodeHalfWordSignedDataTransfer::DataType) [5] ARM7TDMI::run_next_opcode()
+ [163] RegisterSet::RegisterSet() [155] OpcodeHalfWordSignedDataTransferBuilder::set_offset_register(unsigned char) [60] ARM7TDMI::arm_opcode_branch(unsigned int)
+  [37] DataTransfer::calculate_address(ARM7TDMI*, unsigned int) [120] OpcodeHalfWordSignedDataTransferBuilder::set_offset_immediate(unsigned char) [42] ARM7TDMI::decode_opcode_arm(unsigned int)
+  [77] DataTransfer::DataTransfer(unsigned int) [22] OpcodeHalfWordSignedDataTransferBuilder::set_flags(bool, bool, bool) [75] ARM7TDMI::arm_opcode_multiply(unsigned int)
+ [117] DataTransfer::DataTransfer() [119] OpcodeHalfWordSignedDataTransferBuilder::OpcodeHalfWordSignedDataTransferBuilder(bool, unsigned int, unsigned int) [9] ARM7TDMI::decode_opcode_thumb(unsigned short)
+  [32] OpcodeBranch::branch(ARM7TDMI*, unsigned int, unsigned int, unsigned char) [30] Utils::sign_extend(int, int) [137] ARM7TDMI::current_register_set()
+  [74] OpcodeBranch::OpcodeBranch(unsigned int) [6] Utils::read_bit_range(unsigned long, unsigned int, unsigned int) [169] ARM7TDMI::mode_to_register_set(OperatingMode)
+  [71] OpcodeMultiply::run(ARM7TDMI*) [133] Utils::write_bit_range(unsigned int*, unsigned int, unsigned int, unsigned int) [130] ARM7TDMI::write_word_to_memory(unsigned int, unsigned int)
+  [82] OpcodeMultiply::OpcodeMultiply(unsigned int) [17] Utils::read_bit(unsigned long, unsigned int) [142] ARM7TDMI::read_word_from_memory(unsigned int)
+ [109] OpcodeDataProcess::calculate_instruction(ArithmaticLogicUnit*, OpcodeDataProcess::InstructionType, unsigned int, unsigned int, bool) [123] Matrix<short>::get(unsigned int, unsigned int) [95] ARM7TDMI::arm_opcode_psr_transfer(unsigned int)
+  [16] OpcodeDataProcess::run(ARM7TDMI*) [153] Matrix<short>::set(unsigned int, unsigned int, short) [160] ARM7TDMI::write_halfword_to_memory(unsigned int, unsigned short)
+ [128] OpcodeDataProcess::shift_op2(ArithmaticLogicUnit*, unsigned int, unsigned char, OpcodeDataProcess::BitShiftType, bool) [157] Matrix<short>::Matrix(unsigned int, unsigned int) [161] ARM7TDMI::read_halfword_from_memory(unsigned int)
+  [47] OpcodeDataProcess::OpcodeDataProcess(unsigned int) [158] Matrix<short>::~Matrix() [44] ARM7TDMI::thumb_opcode_add_subtract(unsigned short)
+  [97] OpcodePsrTransfer::OpcodePsrTransfer(unsigned int) [121] Matrix<unsigned short>::Matrix(unsigned int, unsigned int) [63] ARM7TDMI::thumb_opcode_load_address(unsigned short)
+  [15] ArithmaticLogicUnit::rotate_right(unsigned int, unsigned int) [122] Matrix<unsigned short>::~Matrix() [69] ARM7TDMI::arm_opcode_branch_exchange(unsigned int)
+  [81] ArithmaticLogicUnit::logical_left_shift(unsigned int, unsigned int) [28] Memory::memory_region(unsigned int) [43] ARM7TDMI::arm_opcode_data_processing(unsigned int)
+  [80] ArithmaticLogicUnit::logical_right_shift(unsigned int, unsigned int) [156] Memory::write_to_memory(unsigned int, unsigned char) [51] ARM7TDMI::thumb_opcode_alu_operations(unsigned short)
+  [89] ArithmaticLogicUnit::arithmetic_right_shift(int, unsigned int) [127] Memory::read_from_memory(unsigned int) [64] ARM7TDMI::thumb_opcode_pc_relative_load(unsigned short)
+ [144] ArithmaticLogicUnit::add(int, ...) [134] Memory::write_word_to_memory(unsigned char*, unsigned int, unsigned int) [59] ARM7TDMI::arm_opcode_block_data_transfer(unsigned int)
+ [116] ArithmaticLogicUnit::subtract(int, unsigned int, ...) [129] Memory::write_word_to_memory(unsigned int, unsigned int) [67] ARM7TDMI::arm_opcode_single_data_transfer(unsigned int)
+  [70] OpcodeBranchExchange::run(ARM7TDMI*) [13] Memory::read_word_from_memory(unsigned char*, unsigned int) [23] ARM7TDMI::thumb_opcode_conditional_branch(unsigned short)
+ [149] OpcodeBranchExchange::build(OpcodeBranchExchange*, unsigned int) [126] Memory::read_word_from_memory(unsigned int) [45] ARM7TDMI::thumb_opcode_push_pop_registers(unsigned short)
+  [83] OpcodeBranchExchange::OpcodeBranchExchange(unsigned int) [31] Memory::write_halfword_to_memory(unsigned int, unsigned short) [11] ARM7TDMI::thumb_opcode_load_store_halfword(unsigned short)
+ [150] OpcodeBranchExchange::OpcodeBranchExchange() [108] Memory::read_halfword_from_memory(unsigned char*, unsigned int) [40] ARM7TDMI::thumb_opcode_multiple_load_store(unsigned short)
+ [151] OpcodeMultiplyBuilder::get_product() [18] Memory::read_halfword_from_memory(unsigned int) [76] ARM7TDMI::thumb_opcode_unconditional_branch(unsigned short)
+ [152] OpcodeMultiplyBuilder::OpcodeMultiplyBuilder(unsigned char, unsigned char, unsigned char, bool) [166] Memory::Memory(unsigned int) [56] ARM7TDMI::thumb_opcode_long_branch_with_link(unsigned short)
+  [96] ProgramStatusRegister::write_value(unsigned int) [167] Memory::~Memory() [48] ARM7TDMI::thumb_opcode_move_shifted_register(unsigned short)
+ [165] ProgramStatusRegister::value() [8] Display::AttributeOne::AttributeOne(unsigned short) [54] ARM7TDMI::thumb_opcode_sp_relative_load_store(unsigned short)
+ [162] ProgramStatusRegister::ProgramStatusRegister() [7] Display::AttributeZero::AttributeZero(unsigned short) [12] ARM7TDMI::thumb_opcode_move_compare_add_subtract(unsigned short)
+  [39] OpcodeBlockDataTransfer::run(ARM7TDMI*) [168] Display::DisplayStatus::DisplayStatus(unsigned char*) [86] ARM7TDMI::thumb_opcode_load_store_register_offset(unsigned short)
+  [72] OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(unsigned int) [34] Display::SizableWindow::update_inside(unsigned int, unsigned int) [61] ARM7TDMI::thumb_opcode_add_offset_to_stack_pointer(unsigned short)
+  [62] OpcodeSingleDataTransfer::run(ARM7TDMI*) [93] Display::SizableWindow::SizableWindow(unsigned char*, bool, unsigned char*, unsigned char*) [52] ARM7TDMI::thumb_opcode_load_store_immediate_offset(unsigned short)
+  [57] OpcodeSingleDataTransfer::load(ARM7TDMI*, unsigned int, unsigned char, bool) [94] Display::DisplayControl::DisplayControl(unsigned char*) [143] ARM7TDMI::warn(char const*)
+  [73] OpcodeSingleDataTransfer::OpcodeSingleDataTransfer(unsigned int) [87] Display::TiledBackground::AffineData::AffineData(unsigned char*) [41] ARM7TDMI::thumb_opcode_hi_register_operations_branch_exchange(unsigned short)
+ [110] OpcodeDataProcessingBuilder::get_product() [33] Display::TiledBackground::ScreenEntry::ScreenEntry(unsigned char*) [65] ARM7TDMI::thumb_opcode_load_store_sign_extended_byte_halfword(unsigned short)
+ [132] OpcodeDataProcessingBuilder::set_register_op2(unsigned char, unsigned char) [88] Display::TiledBackground::TiledBackgroundControl::TiledBackgroundControl(unsigned char*) [98] ARM7TDMI::skip_bios()
+ [115] OpcodeDataProcessingBuilder::set_immediate_op2(unsigned char, unsigned int) [85] Display::TiledBackground::TiledBackground(Memory*, unsigned char) [170] ARM7TDMI::ARM7TDMI()
+ [113] OpcodeDataProcessingBuilder::set_source_register(unsigned int) [53] Display::start_draw_loop(Scheduler*) [10] BitRegion::get()
+ [111] OpcodeDataProcessingBuilder::set_destination_register(unsigned int) [3] Display::update_scanline(int) [58] BitRegion::set(unsigned int)
+ [154] OpcodeDataProcessingBuilder::set_register_op2_shift_register(unsigned char) [19] Display::get_tile_pixel_4bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [131] BitRegion::BitRegion(unsigned char*, unsigned char)
+ [135] OpcodeDataProcessingBuilder::set_register_op2_shift_immediate(unsigned char) [46] Display::get_tile_pixel_8bpp(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int) [27] BitRegion::BitRegion(unsigned char*, unsigned char, unsigned char)
+ [112] OpcodeDataProcessingBuilder::OpcodeDataProcessingBuilder(unsigned int, bool) [4] Display::render_sprite_scanline(unsigned char, int) [68] Scheduler::schedule_event(unsigned int, std::function<void ()>)
+ [138] OpcodeBlockDataTransferBuilder::get_product() [26] Display::update_scanline_bgmode_1(int) [2] Scheduler::tick()
+ [139] OpcodeBlockDataTransferBuilder::set_register_list(unsigned short) [25] Display::render_tiled_background_scanline(Display::TiledBackground, int) [90] Scheduler::Timer::Timer(Memory*, Scheduler::Timer*, unsigned int)
+ [140] OpcodeBlockDataTransferBuilder::set_flags(bool, bool, bool, bool) [38] Display::render_tiled_background_affine_scanline(Display::TiledBackground, int) [91] Scheduler::Scheduler(ARM7TDMI*)
+ [141] OpcodeBlockDataTransferBuilder::OpcodeBlockDataTransferBuilder(bool, unsigned char) [35] Display::Window::get_render_settings() [124] std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (std_function.h)
+ [145] OpcodeSingleDataTransferBuilder::get_product() [164] Display::Window::Window(unsigned char*, bool) [55] std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}>::_M_invoke(std::_Any_data const&) (std_function.h)
+ [159] OpcodeSingleDataTransferBuilder::set_offset_register(unsigned char, unsigned char, unsigned char) [24] Display::render() [125] std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (std_function.h)
+ [148] OpcodeSingleDataTransferBuilder::set_offset_immediate(unsigned int) [84] Display::Display(SDL_Renderer*, Memory*) [66] std::_Function_handler<void (), Display::start_draw_loop(Scheduler*)::{lambda()#1}::operator()() const::{lambda()#1}>::_M_invoke(std::_Any_data const&) (std_function.h)
+ [146] OpcodeSingleDataTransferBuilder::set_flags(bool, bool, bool, bool) [29] ARM7TDMI::read_register(int) [171] std::map<SDL_Scancode, unsigned short, std::less<SDL_Scancode>, std::allocator<std::pair<SDL_Scancode const, unsigned short> > >::map(std::initializer_list<std::pair<SDL_Scancode const, unsigned short> >, std::less<SDL_Scancode> const&, std::allocator<std::pair<SDL_Scancode const, unsigned short> > const&)
+ [147] OpcodeSingleDataTransferBuilder::OpcodeSingleDataTransferBuilder(bool, unsigned int, unsigned int) [136] ARM7TDMI::is_priviledged() (49) <cycle 1>

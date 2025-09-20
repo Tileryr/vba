@@ -115,16 +115,23 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     return SDL_APP_CONTINUE;
 }   
 
+int current_scanline = 0;
+
 SDL_AppResult SDL_AppIterate(void *appstate) {   
     scheduler->tick();
 
     ticks_since_last_render += scheduler->passed_milliseconds;
     if (ticks_since_last_render > 1000/60) {
-        SDL_Log("Render");
-        display->update_screen();
+        current_scanline %= SCREEN_HEIGHT;
+        if (current_scanline == 0) {
+            memset(display->screen_buffers, 0xFF, sizeof(display->screen_buffers));
+        }
+        display->update_scanline(current_scanline++);
+
         display->render();
         ticks_since_last_render = 0;
     }
+    
     
     return SDL_APP_CONTINUE;
 }

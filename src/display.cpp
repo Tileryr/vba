@@ -23,58 +23,63 @@ window_0(memory->memory_region(0x04000048), true, memory->memory_region(0x040000
 window_1(memory->memory_region(0x04000048), false, memory->memory_region(0x04000042),  memory->memory_region(0x04000046)),
 window_obj(memory->memory_region(0x0400004a), false),
 window_outside(memory->memory_region(0x0400004a), true)
-{}
+{
+    sprites = (Sprite *)malloc(sizeof(Sprite)*128);
+    for (int i = 0; i < 128; i++) {
+        sprites[i] = Sprite(memory, i);
+    }
 
-void Display::update_screen() {
     memset(screen_buffers, 0xFF, sizeof(screen_buffers));
+}
 
+void Display::update_scanline(int scanline) {
     switch (display_control.mode.get())
     {  
         case 0:
-            update_screen_bgmode_0();
+            update_scanline_bgmode_0(scanline);
             break;
         case 1:
-            update_screen_bgmode_1();
+            update_scanline_bgmode_1(scanline);
             break;
         case 2:
-            update_screen_bgmode_2();
+            update_scanline_bgmode_2(scanline);
             break;
         case 3:
-            update_screen_bgmode_3();
+            update_scanline_bgmode_3(scanline);
             break;
         case 4:
-            update_screen_bgmode_4();
+            update_scanline_bgmode_4(scanline);
             break;
         case 5:
-            update_screen_bgmode_5();
+            update_scanline_bgmode_5(scanline);
             break;
     }
 
     if (display_control.display_objects.get()) {
-        update_sprites();
-    }
-}
-
-void Display::update_screen_bgmode_0() {
-    for (int i=0;i<4;i++) {
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            render_tiled_background_scanline(tiled_backgrounds[i], y);
+        for (int i = 127; i >= 0; i--) {
+            render_sprite_scanline(sprites[i], scanline);
         }
     }
 }
 
-void Display::update_screen_bgmode_1() {
-    render_tiled_background(tiled_backgrounds[0]);
-    render_tiled_background(tiled_backgrounds[1]);
-    render_tiled_background_affine(tiled_backgrounds[2]);
+void Display::update_scanline_bgmode_0(int scanline) {
+    for (int i=0;i<4;i++) {
+        render_tiled_background_scanline(tiled_backgrounds[i], scanline);
+    }
 }
 
-void Display::update_screen_bgmode_2() {
-    render_tiled_background_affine(tiled_backgrounds[2]);
-    render_tiled_background_affine(tiled_backgrounds[3]);
+void Display::update_scanline_bgmode_1(int scanline) {
+    render_tiled_background_scanline(tiled_backgrounds[0], scanline);
+    render_tiled_background_scanline(tiled_backgrounds[1], scanline);
+    render_tiled_background_affine_scanline(tiled_backgrounds[2], scanline);
 }
 
-void Display::update_screen_bgmode_3() {
+void Display::update_scanline_bgmode_2(int scanline) {
+    render_tiled_background_affine_scanline(tiled_backgrounds[2], scanline);
+    render_tiled_background_affine_scanline(tiled_backgrounds[3], scanline);
+}
+
+void Display::update_scanline_bgmode_3(int scanline) {
     Byte * vram = memory->memory_region(VRAM_START);
     
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
@@ -85,7 +90,7 @@ void Display::update_screen_bgmode_3() {
     }
 }
 
-void Display::update_screen_bgmode_4() {
+void Display::update_scanline_bgmode_4(int scanline) {
     Byte * vram = memory->memory_region(VRAM_START);
     Byte * background_palette = memory->memory_region(BG_PALETTE_RAM_START);
 
@@ -102,7 +107,7 @@ void Display::update_screen_bgmode_4() {
     }
 }
 
-void Display::update_screen_bgmode_5() {
+void Display::update_scanline_bgmode_5(int scanline) {
     Byte * vram = memory->memory_region(VRAM_START);
     
     for (int y = 0; y < MODE_5_SCREEN_HEIGHT; y++) {
@@ -118,16 +123,8 @@ void Display::update_screen_bgmode_5() {
     }
 }
 
-void Display::update_sprites() {
-    for (int i = 127; i >= 0; i--) {
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            render_sprite_scanline(i, y);
-        }
-    }
-}
-
-void Display::render_tiled_background_affine(TiledBackground background) {
-    Word tile_size;
+void Display::render_tiled_background_affine_scanline(TiledBackground background, int scanline) {
+     Word tile_size;
     switch (background.control.background_size.get()) {
         case 0:
             tile_size = 16;
@@ -142,33 +139,19 @@ void Display::render_tiled_background_affine(TiledBackground background) {
             tile_size = 128;
             break;
     }
+
     Word pixel_size = tile_size*8;
-    Matrix<HalfWord> background_buffer = Matrix<HalfWord>(pixel_size, pixel_size);
     Word screenblock_base_address = VRAM_START + (0x800*background.control.base_screenblock.get());
-    Matrix<HalfWord>::iterate_xy(tile_size, tile_size, [&](Word tile_x, Word tile_y){
-        Word screen_entry_index = ((tile_y*tile_size)+tile_x);
-        
-       
-        Word screen_entry_address = screenblock_base_address+screen_entry_index;
-
-        Word tile_index = memory->read_from_memory(screen_entry_address);
-        Word tile_start_address = calculate_tile_start_address(background.control.base_charblock.get(), tile_index)*2;
-
-        Word pixel_x = tile_x*8;
-        Word pixel_y = tile_y*8;
-
-        render_tile_8bpp(&background_buffer, tile_start_address, BG_PALETTE_RAM_START, pixel_x, pixel_y);
-    });
 
     Matrix<int16_t> transformation = Matrix<int16_t>(2, 2);
     transformation.set(0, 0, background.affine_data.pa.get());
     transformation.set(1, 0, background.affine_data.pb.get());
     transformation.set(0, 1, background.affine_data.pc.get());
     transformation.set(1, 1, background.affine_data.pd.get());
-    
-    Matrix<HalfWord>::iterate_xy(SCREEN_WIDTH, SCREEN_HEIGHT, [&](Word x, Word y){
-        Word mapped_pixel_x = (transformation.get(0, 0)*x + transformation.get(1, 0)*y);
-        Word mapped_pixel_y = (transformation.get(0, 1)*x + transformation.get(1, 1)*y);
+
+    for (int screen_x = 0; screen_x < SCREEN_WIDTH; screen_x++) {
+        Word mapped_pixel_x = (transformation.get(0, 0)*screen_x + transformation.get(1, 0)*scanline);
+        Word mapped_pixel_y = (transformation.get(0, 1)*screen_x + transformation.get(1, 1)*scanline);
         mapped_pixel_x += background.affine_data.displacement_x.get();
         mapped_pixel_y += background.affine_data.displacement_y.get();
         mapped_pixel_x = mapped_pixel_x >> 8;
@@ -180,91 +163,36 @@ void Display::render_tiled_background_affine(TiledBackground background) {
         } 
 
         if (mapped_pixel_x > 0 && mapped_pixel_x < pixel_size && mapped_pixel_y > 0 && mapped_pixel_y < pixel_size) {
-            HalfWord mapped_pixel_color = background_buffer.get(mapped_pixel_x, mapped_pixel_y);
-            set_screen_pixel(x, y, mapped_pixel_color, number_to_bg_buffer_type(background.number));
+            HalfWord mapped_pixel_color;
+            Word mapped_tile_x = mapped_pixel_x/8;
+            Word mapped_tile_y = mapped_pixel_y/8;
+            Word tile_pixel_x = mapped_pixel_x%8;
+            Word tile_pixel_y = mapped_pixel_y%8;
+
+            Word screen_entry_index = ((mapped_tile_y*tile_size)+mapped_tile_x);
+            Word screen_entry_address = screenblock_base_address+screen_entry_index;
+            Word tile_index = memory->read_from_memory(screen_entry_address);
+
+            mapped_pixel_color = get_tile_pixel_8bpp(
+                tile_pixel_x,
+                tile_pixel_y,
+                tile_index,
+                background.control.base_charblock.get(),
+                BG_PALETTE_RAM_START,
+                8
+            );
+
+            set_screen_pixel(screen_x, scanline, mapped_pixel_color, number_to_bg_buffer_type(background.number));
         }
-    });
-}
-
-void Display::render_tiled_background(TiledBackground background) {
-    int tile_width;
-    int tile_height;
-    switch (background.control.background_size.get()) {
-        case 0:
-            tile_width = 32;
-            tile_height = 32;
-            break;
-        case 1:
-            tile_width = 64;
-            tile_height = 32;
-            break;
-        case 2:
-            tile_width = 32;
-            tile_height = 64;
-            break;
-        case 3:
-            tile_width = 64;
-            tile_height = 64;
-            break;
-    }
-
-    Word pixel_width = tile_width*8;
-    Word pixel_height = tile_height*8;
-    Matrix<HalfWord> background_buffer = Matrix<HalfWord>(pixel_width, pixel_height);
-
-    Word screenblock_width = tile_width/32;
-    Word screenblock_height = tile_height/32;
+    }   
     
-    Matrix<HalfWord>::iterate_xy(screenblock_width, screenblock_height, [&](Word screenblock_x, Word screenblock_y){
-        Word screenblock_index = background.control.base_screenblock.get() + (screenblock_y*screenblock_width + screenblock_x);
-        Word screenblock_base_address = VRAM_START + (0x800*screenblock_index);
-
-        for (int y = 0; y < 32; y++) {
-            for (int x = 0; x < 32; x++) {
-                Word screen_entry_index = (y*32+x);
-                Word screen_entry_address = screenblock_base_address+(screen_entry_index*2);
-                TiledBackground::ScreenEntry screen_entry = TiledBackground::ScreenEntry(memory->memory_region(screen_entry_address));
-
-                Word tile_start_address = calculate_tile_start_address(background.control.base_charblock.get(), screen_entry.tile_index.get());
-                
-                Word pixel_x = x*8 + screenblock_x*256;
-                Word pixel_y = y*8 + screenblock_y*256;
-
-                if (background.control.color_mode.get() == 0) {
-                    render_tile_4bpp(
-                        &background_buffer, 
-                        tile_start_address,
-                        BG_PALETTE_RAM_START,
-                        screen_entry.palette_bank.get(),
-                        pixel_x,
-                        pixel_y
-                    );
-                } else {
-                    SDL_Log("YADDA");
-                    render_tile_8bpp(
-                        &background_buffer, 
-                        tile_start_address*2,
-                        BG_PALETTE_RAM_START,
-                        pixel_x,
-                        pixel_y
-                    );
-                }       
-            }
-        }   
-    });
-
-    for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        for (int x = 0; x < SCREEN_WIDTH; x++) {
-            Word target_pixel_x = x+background.h_scroll.get();
-            Word target_pixel_y = y+background.v_scroll.get();
-            target_pixel_x %= pixel_width;
-            target_pixel_y %= pixel_height;
-            set_screen_pixel(x, y, background_buffer.get(target_pixel_x, target_pixel_y), number_to_bg_buffer_type(background.number));
-        }
-    }
 }
 
 void Display::render_tiled_background_scanline(TiledBackground background, int scanline) {
+    // NEEDS TILE FLIPPING;
+    // NEEDS 8BPP/4BPP;
+    // NEEDS MOSIAC;
+
     int tile_width;
     int tile_height;
     switch (background.control.background_size.get()) {
@@ -335,27 +263,18 @@ void Display::render_tiled_background_scanline(TiledBackground background, int s
     }
 }
 
-void Display::render_sprite_scanline(Byte sprite_number, int y) {
-    Byte * oam = memory->memory_region(OAM_START);
-    Byte * object_attributes_start = &oam[sprite_number * 8];
+void Display::render_sprite_scanline(Sprite sprite, int y) {
+    // NEEDS 8BPP/4BPP;
+    // NEEDS MOSIAC;
 
-    HalfWord attribute_0_value = Memory::read_halfword_from_memory(object_attributes_start, 0);
-    AttributeZero attribute_0 = AttributeZero(attribute_0_value);
-
-    HalfWord attribute_1_value = Memory::read_halfword_from_memory(object_attributes_start, 2);
-    AttributeOne attribute_1 = AttributeOne(attribute_1_value);
-
-    HalfWord attribute_2_value = Memory::read_halfword_from_memory(object_attributes_start, 4);
-    AttributeTwo attribute_2 = AttributeTwo(attribute_2_value);
-
-    if (attribute_0.object_mode == 0b10) {
+    if (sprite.attribute_0.object_mode.get() == 0b10) {
         return;
     }
 
     HalfWord pixel_size_x;
     HalfWord pixel_size_y;
     HalfWord base_pixel_size;
-    switch (attribute_1.sprite_size)
+    switch (sprite.attribute_1.sprite_size.get())
     {
         case 0b00:
             base_pixel_size = 8;
@@ -371,21 +290,21 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
             break;
     }
 
-    if (attribute_0.sprite_shape != 0b00) {
-        if (attribute_1.sprite_size == 0b01) {
+    if (sprite.attribute_0.sprite_shape.get() != 0b00) {
+        if (sprite.attribute_1.sprite_size.get() == 0b01) {
             pixel_size_x = 32;
             pixel_size_y = 8;
         } else {
             pixel_size_x = base_pixel_size;
             pixel_size_y = base_pixel_size/2;
 
-            if (attribute_1.sprite_size == 0b00) {
+            if (sprite.attribute_1.sprite_size.get() == 0b00) {
                 pixel_size_x *= 2;
                 pixel_size_y *= 2;
             }
         }
         
-        if (attribute_0.sprite_shape == 0b10) {
+        if (sprite.attribute_0.sprite_shape.get() == 0b10) {
             std::swap(pixel_size_x, pixel_size_y);
         }
     } else {
@@ -393,32 +312,32 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
         pixel_size_y = base_pixel_size;
     }
 
-    bool affine = attribute_0.object_mode == 0b01 || attribute_0.object_mode == 0b11;
-    bool double_sized = attribute_0.object_mode == 0b11;
+    bool affine = sprite.attribute_0.object_mode.get() == 0b01 || sprite.attribute_0.object_mode.get() == 0b11;
+    bool double_sized = sprite.attribute_0.object_mode.get() == 0b11;
 
     Word y_max_limit;
     if (affine && double_sized) {
-        y_max_limit = attribute_0.y+(pixel_size_y*2);
+        y_max_limit = sprite.attribute_0.y.get()+(pixel_size_y*2);
     } else {
-        y_max_limit = attribute_0.y+pixel_size_y;
+        y_max_limit = sprite.attribute_0.y.get()+pixel_size_y;
     }
 
-    if (attribute_0.y + pixel_size_y > 255) {
-        if (y < attribute_0.y && y >= y_max_limit%256) {  
+    if (sprite.attribute_0.y.get() + pixel_size_y > 255) {
+        if (y < sprite.attribute_0.y.get() && y >= y_max_limit%256) {  
             return;
         }
     } else {
-        if (y < attribute_0.y || y >= y_max_limit) {
+        if (y < sprite.attribute_0.y.get() || y >= y_max_limit) {
             return;
         }
     }
 
-    Word y_offset_from_base = y - attribute_0.y;
-    if (y < attribute_0.y) {
-        y_offset_from_base = (y + 256) - attribute_0.y; 
+    Word y_offset_from_base = y - sprite.attribute_0.y.get();
+    if (y < sprite.attribute_0.y.get()) {
+        y_offset_from_base = (y + 256) - sprite.attribute_0.y.get(); 
     }
 
-    if (attribute_1.vertical_flip == 1) {
+    if (sprite.attribute_1.vertical_flip.get() == 1) {
         y_offset_from_base = flip(y_offset_from_base, pixel_size_y/2);
     }
 
@@ -431,10 +350,10 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
         return get_tile_pixel_4bpp(
             x, 
             y, 
-            attribute_2.tile_index, 
+            sprite.attribute_2.tile_index.get(), 
             4, 
             OBJ_PALETTE_RAM_START,
-            attribute_2.palette_bank, 
+            sprite.attribute_2.palette_bank.get(), 
             pixel_size_x
         );
     };
@@ -443,7 +362,7 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
         Matrix<int16_t> transform_matrix = Matrix<int16_t>(2, 2);
         transform_matrix.for_each([&](Word x, Word y){
             Word index = (y*2+x+1);
-            transform_matrix.set(x, y, memory->read_halfword_from_memory(OAM_START + ((4*index)-1)*2 + attribute_1.affine_index*32)); 
+            transform_matrix.set(x, y, memory->read_halfword_from_memory(OAM_START + ((4*index)-1)*2 + sprite.attribute_1.affine_index.get()*32)); 
         });
 
         int32_t half_sprite_width = pixel_size_x/2;
@@ -457,8 +376,8 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
             render_area_height *= 2;
         }
 
-        Word base_x = attribute_1.x+render_area_width;
-        Word base_y = attribute_0.y+render_area_height;
+        Word base_x = sprite.attribute_1.x.get()+render_area_width;
+        Word base_y = sprite.attribute_0.y.get()+render_area_height;
 
         int relative_y = y - base_y;
 
@@ -481,41 +400,15 @@ void Display::render_sprite_scanline(Byte sprite_number, int y) {
     } else {
         for (int x = 0; x < pixel_size_x; x++) {
             Word mapped_x = x;
-            if (attribute_1.horizontal_flip == 1) {
+            if (sprite.attribute_1.horizontal_flip.get() == 1) {
                 mapped_x = flip(mapped_x, pixel_size_x/2);
             }
 
             HalfWord pixel_color = get_pixel_4bpp(mapped_x, y_offset_from_base);
 
-            Word screen_x = attribute_1.x+x;
+            Word screen_x = sprite.attribute_1.x.get()+x;
             screen_x %= 512;
             set_screen_pixel(screen_x, y, pixel_color, BUFFER_SPIRTE);
-        }
-    }
-}
-
-void Display::render_tile_4bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, Byte palbank, HalfWord x, HalfWord y) {
-    Byte * vram = memory->memory_region(VRAM_START);
-
-    for (int offset_y = 0; offset_y < 8; offset_y++) {
-        for (int offset_x = 0; offset_x < 4; offset_x += 1) {
-            Byte palette_index_low;
-            Byte palette_index_high;
-
-            palette_index_low = vram[tile_start_address + offset_x + (offset_y * 4)] & 0xF;
-            palette_index_high = (vram[tile_start_address + offset_x + (offset_y * 4)] >> 4) & 0xF;
-
-            palette_index_low |= (palbank << 4);
-            palette_index_high |= (palbank << 4);
-
-            Word buffer_x = offset_x*2 + x;
-            Word buffer_y = offset_y + y;
-
-            HalfWord low_palette_color = get_palette_color(palette_index_low, palette_start_address);
-            HalfWord high_palette_color = get_palette_color(palette_index_high, palette_start_address);
-
-            buffer->set(buffer_x, buffer_y, low_palette_color);
-            buffer->set(buffer_x+1, buffer_y, high_palette_color);
         }
     }
 }
@@ -555,37 +448,32 @@ HalfWord Display::get_tile_pixel_4bpp(Word x, Word y, Word tile_base, Word charb
     return palette_color;
 }
 
-void Display::render_tile_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y) {
+HalfWord Display::get_tile_pixel_8bpp(Word x, Word y, Word tile_base, Word charblock, Word palette_start, Word width) {
+    Word tile_x, tile_y;
+    tile_x = x/8;
+    tile_y = y/8;
+
+    bool one_dimensional = display_control.vram_mapping.get() == 1;
+    Word tile_index;
+    if (one_dimensional) {
+        Word tile_width = (width/8);
+        tile_index = tile_base + (tile_x + tile_y*tile_width);
+    } else {
+        tile_index = tile_base + (tile_x + tile_y*0x20);
+    }
+
+    Word tile_start_address = (charblock * 0x4000) + tile_index * 0x40;
+
     Byte * vram = memory->memory_region(VRAM_START);
 
-    for (int offset_y = 0; offset_y < 8; offset_y++) {
-        for (int offset_x = 0; offset_x < 8; offset_x += 1) {
-            Byte palette_index;
+    Word x_offset = x % 8;
+    Word y_offset = y % 8;
 
-            palette_index = vram[tile_start_address + offset_x + (offset_y * 8)];
+    Byte palette_index = vram[tile_start_address + x_offset + (y_offset * 8)];
+    HalfWord palette_color = get_palette_color(palette_index, palette_start);
 
-            Word buffer_x = offset_x + x;
-            Word buffer_y = offset_y + y;
-
-            buffer->set(buffer_x, buffer_y, get_palette_color(palette_index, palette_start_address));
-        }
-    }
+    return palette_color;
 }
-
-// void Display::render_tile_scanline_8bpp(Matrix<HalfWord> * buffer, Word tile_start_address, Word palette_start_address, HalfWord x, HalfWord y, int offset_y) {
-//     Byte * vram = memory->memory_region(VRAM_START);
-
-//     for (int offset_x = 0; offset_x < 8; offset_x += 1) {
-//         Byte palette_index;
-
-//         palette_index = vram[tile_start_address + offset_x + (offset_y * 8)];
-
-//         Word buffer_x = offset_x + x;
-//         Word buffer_y = offset_y + y;
-
-//         buffer->set(buffer_x, buffer_y, get_palette_color(palette_index, palette_start_address));
-//     }
-// }
 
 void Display::render() {
     SDL_RenderClear(renderer);
@@ -664,6 +552,8 @@ void Display::render() {
         }
     }
     
+    memset(screen_buffers, 0xFF, sizeof(screen_buffers));
+
     SDL_RenderPresent(renderer);
 }
 
@@ -681,10 +571,6 @@ HalfWord Display::get_palette_color(Byte index, Word palatte_start_address) {
         return COLOR_TRANSPARENT;
     } 
     return Memory::read_halfword_from_memory(palette, index*2) & (~0x8000);
-}
-
-Word Display::calculate_tile_start_address(Word charblock, Word tile) {
-    return (charblock * 0x4000) + tile * 0x20;
 }
 
 Word Display::flip(Word number, Word flip_value) {
@@ -711,6 +597,7 @@ void Display::start_draw_loop(Scheduler * scheduler) {
         display_status.vblank.set(false);
         scanline = 0;
     } else if (scanline >= 160) {
+        
         display_status.vblank.set(true);
         if (display_status.vblank_irq.get() == true) {
             // DO IRQ   
@@ -724,6 +611,7 @@ void Display::start_draw_loop(Scheduler * scheduler) {
     vcount.set(scanline);
 
     scheduler->schedule_event(HDRAW_CYCLE_LENGTH, [scheduler, this](){
+        // update_scanline(scanline);
         display_status.hblank.set(true);
         if (display_status.hblank_irq.get() == true) {
             // DO IRQ   
@@ -832,25 +720,30 @@ void Display::SizableWindow::update_inside(Word x, Word y) {
     inside = inside_h && inside_v;
 }
 
-Display::AttributeZero::AttributeZero(HalfWord value) {
-    y = Utils::read_bit_range(value, 0, 7);
-    object_mode = Utils::read_bit_range(value, 8, 9);
-    gfx_mode = Utils::read_bit_range(value, 0xA, 0xB);
-    mosiac = Utils::read_bit(value, 0xC);
-    color_mode = Utils::read_bit(value, 0xD);
-    sprite_shape = Utils::read_bit_range(value, 0xE, 0xF);
-}
+Display::AttributeZero::AttributeZero(Byte * oam_address) :
+    y(oam_address, 0, 7),
+    object_mode(oam_address, 8, 9),
+    gfx_mode(oam_address, 0xA, 0xB),
+    mosiac(oam_address, 0xC),
+    color_mode(oam_address, 0xD),
+    sprite_shape(oam_address, 0xE, 0xF)
+{}
 
-Display::AttributeOne::AttributeOne(HalfWord value) {
-    x = Utils::read_bit_range(value, 0, 8);
-    affine_index = Utils::read_bit_range(value, 9, 0xD);
-    horizontal_flip = Utils::read_bit(value, 0xC);
-    vertical_flip = Utils::read_bit(value, 0xD);
-    sprite_size = Utils::read_bit_range(value, 0xE, 0xF);
-}
+Display::AttributeOne::AttributeOne(Byte * oam_address) :
+    x(oam_address, 0, 8),
+    affine_index(oam_address, 9, 0xD),
+    horizontal_flip(oam_address, 0xC),
+    vertical_flip(oam_address, 0xD),
+    sprite_size(oam_address, 0xE, 0xF)
+{}
 
-Display::AttributeTwo::AttributeTwo(HalfWord value) {
-    tile_index = Utils::read_bit_range(value, 0, 9);
-    priority = Utils::read_bit_range(value, 0xA, 0xB);
-    palette_bank = Utils::read_bit_range(value, 0xC, 0xF);
-}
+Display::AttributeTwo::AttributeTwo(Byte * oam_address) :
+    tile_index(oam_address, 0, 9),
+    priority(oam_address, 0xA, 0xB),
+    palette_bank(oam_address, 0xC, 0xF)
+{}
+
+Display::Sprite::Sprite(Memory * memory, int number) :
+attribute_0(memory->memory_region(OAM_START + number*8)),
+attribute_1(memory->memory_region(OAM_START + number*8 + 2)),
+attribute_2(memory->memory_region(OAM_START + number*8 + 4))  {}
