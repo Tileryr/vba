@@ -93,7 +93,7 @@ void ARM7TDMI::write_halfword_to_memory(Word address, HalfWord value) {
 
 // Public
 
-ARM7TDMI::ARM7TDMI() : memory(0xFFFFFFF) {
+ARM7TDMI::ARM7TDMI() {
     registers_user = RegisterSet();
 
     RegisterSet * register_sets[5] = {&registers_fiq, &registers_irq, &registers_supervisor, &registers_abort, &registers_undefined};
@@ -182,18 +182,15 @@ bool ARM7TDMI::is_priviledged() {
     return cpsr.mode != MODE_USER;
 }
 
-Byte * ARM7TDMI::memory_region(Word address) {
-    return memory.memory_region(address);
-}
-
 void ARM7TDMI::skip_bios() {
-    for (Word i = 0x3007E00; i < 0x3008000; i++) {
-        memory.memory[i] = 0x0;
+    for (Word i = 0x7E00; i < 0x8000; i++) {
+        memory.wram_chip[i] = 0x0;
     }
     
     for (Word i = 0; i < 13; i++) {
         *registers_user.registers[i] = 0;
     }
+    
     *registers_supervisor.registers[REGISTER_LR] = 0;
     registers_supervisor.spsr.write_value(0); 
 

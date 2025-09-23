@@ -1,5 +1,6 @@
 #include "block_data_transfer.h"
 #include "src/utils.h"
+#include <SDL3/SDL.h>
 
 OpcodeBlockDataTransfer::OpcodeBlockDataTransfer() {}
 OpcodeBlockDataTransfer::OpcodeBlockDataTransfer(Word opcode) {

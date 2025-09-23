@@ -1,3 +1,4 @@
+#include <SDL3/SDL.h>
 #include <cstdio>
 #include <limits.h>
 #include <stdlib.h>
@@ -56,6 +57,7 @@ void ARM7TDMI::arm_opcode_software_interrupt(Word opcode)
             break;
         }
         default:
+            SDL_assert(false);
             run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
             break;
     }

@@ -7,9 +7,9 @@ Display::Display(SDL_Renderer * renderer, Memory * memory) :
 renderer(renderer), 
 memory(memory), 
 
-display_control(memory->memory_region(DISPLAY_CONTROL_ADDRESS)),
-display_status(memory->memory_region(DISPLAY_STATUS_ADDRESS)),
-vcount(memory->memory_region(VCOUNT_ADDRESS), 0, 7),
+display_control(&memory->io_registers[0x0]),
+display_status(&memory->io_registers[0x4]),
+vcount(&memory->io_registers[0x6], 0, 7),
 
 scanline(0),
 tiled_backgrounds{
@@ -19,10 +19,10 @@ tiled_backgrounds{
     TiledBackground(memory, 3),
 },
 
-window_0(memory->memory_region(0x04000048), true, memory->memory_region(0x04000040),  memory->memory_region(0x04000044)),
-window_1(memory->memory_region(0x04000048), false, memory->memory_region(0x04000042),  memory->memory_region(0x04000046)),
-window_obj(memory->memory_region(0x0400004a), false),
-window_outside(memory->memory_region(0x0400004a), true)
+window_0(&memory->io_registers[0x0048], true,  &memory->io_registers[0x0040],  &memory->io_registers[0x0044]),
+window_1(&memory->io_registers[0x0048], false, &memory->io_registers[0x0042],  &memory->io_registers[0x0046]),
+window_obj(&memory->io_registers[0x004a], false),
+window_outside(&memory->io_registers[0x004a], true)
 {
     sprites = (Sprite *)malloc(sizeof(Sprite)*128);
     for (int i = 0; i < 128; i++) {
@@ -80,36 +80,29 @@ void Display::update_scanline_bgmode_2(int scanline) {
 }
 
 void Display::update_scanline_bgmode_3(int scanline) {
-    Byte * vram = memory->memory_region(VRAM_START);
-    
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
-            HalfWord color = Memory::read_halfword_from_memory(vram, (y*SCREEN_WIDTH*2) + (x*2))&(~0x8000);
+            HalfWord color = Memory::read_halfword_from_memory(memory->vram, (y*SCREEN_WIDTH*2) + (x*2))&(~0x8000);
             set_screen_pixel(x, y, color, BUFFER_BG2);
         }
     }
 }
 
 void Display::update_scanline_bgmode_4(int scanline) {
-    Byte * vram = memory->memory_region(VRAM_START);
-    Byte * background_palette = memory->memory_region(BG_PALETTE_RAM_START);
-
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
             Word palette_address =(y*SCREEN_WIDTH) + x;
             if (display_control.display_frame_select.get() == 1) {
                 palette_address += 0xA000;
             }
-            HalfWord palette_index = vram[palette_address];
+            HalfWord palette_index = memory->vram[palette_address];
 
-            set_screen_pixel(x, y, get_palette_color(palette_index, BG_PALETTE_RAM_START), BUFFER_BG2);
+            set_screen_pixel(x, y, get_palette_color(palette_index, BG_PALETTE), BUFFER_BG2);
         }
     }
 }
 
 void Display::update_scanline_bgmode_5(int scanline) {
-    Byte * vram = memory->memory_region(VRAM_START);
-    
     for (int y = 0; y < MODE_5_SCREEN_HEIGHT; y++) {
         for (int x = 0; x < MODE_5_SCREEN_WIDTH; x++) {
             Word palette_address = ((y*MODE_5_SCREEN_WIDTH) + x)*2;
@@ -117,7 +110,7 @@ void Display::update_scanline_bgmode_5(int scanline) {
                 palette_address += 0xA000;
             }
 
-            HalfWord color = Memory::read_halfword_from_memory(vram, palette_address);
+            HalfWord color = Memory::read_halfword_from_memory(memory->vram, palette_address);
             set_screen_pixel(x, y, color, BUFFER_BG2);
         }
     }
@@ -141,7 +134,7 @@ void Display::render_tiled_background_affine_scanline(TiledBackground background
     }
 
     Word pixel_size = tile_size*8;
-    Word screenblock_base_address = VRAM_START + (0x800*background.control.base_screenblock.get());
+    Word screenblock_base_address = (0x800*background.control.base_screenblock.get());
 
     Matrix<int16_t> transformation = Matrix<int16_t>(2, 2);
     transformation.set(0, 0, background.affine_data.pa.get());
@@ -171,14 +164,14 @@ void Display::render_tiled_background_affine_scanline(TiledBackground background
 
             Word screen_entry_index = ((mapped_tile_y*tile_size)+mapped_tile_x);
             Word screen_entry_address = screenblock_base_address+screen_entry_index;
-            Word tile_index = memory->read_from_memory(screen_entry_address);
+            Word tile_index = memory->vram[screen_entry_address];
 
             mapped_pixel_color = get_tile_pixel_8bpp(
                 tile_pixel_x,
                 tile_pixel_y,
                 tile_index,
                 background.control.base_charblock.get(),
-                BG_PALETTE_RAM_START,
+                BG_PALETTE,
                 8
             );
 
@@ -232,13 +225,13 @@ void Display::render_tiled_background_scanline(TiledBackground background, int s
 
     for (int screenblock_x = 0; screenblock_x < screenblock_width; screenblock_x++) {
         Word screenblock_index = background.control.base_screenblock.get() + (screenblock_y*screenblock_width + screenblock_x);
-        Word screenblock_base_address = VRAM_START + (0x800*screenblock_index);
+        Word screenblock_base_address = 0x800*screenblock_index;
 
         for (int tile_x = 0; tile_x < 32; tile_x++) {
             Word screen_entry_index = (tile_y*32+tile_x);
 
             Word screen_entry_address = screenblock_base_address+(screen_entry_index*2);
-            TiledBackground::ScreenEntry screen_entry = TiledBackground::ScreenEntry(memory->memory_region(screen_entry_address));
+            TiledBackground::ScreenEntry screen_entry = TiledBackground::ScreenEntry(&memory->vram[screen_entry_address]);
 
             Word base_charblock = background.control.base_charblock.get();
             Word tile_index = screen_entry.tile_index.get();
@@ -252,7 +245,7 @@ void Display::render_tiled_background_scanline(TiledBackground background, int s
                     tile_offset_y,
                     tile_index,
                     base_charblock,
-                    BG_PALETTE_RAM_START,
+                    BG_PALETTE,
                     screen_entry.palette_bank.get(),
                     8
                 );
@@ -352,7 +345,7 @@ void Display::render_sprite_scanline(Sprite sprite, int y) {
             y, 
             sprite.attribute_2.tile_index.get(), 
             4, 
-            OBJ_PALETTE_RAM_START,
+            OBJ_PALETTE,
             sprite.attribute_2.palette_bank.get(), 
             pixel_size_x
         );
@@ -362,7 +355,7 @@ void Display::render_sprite_scanline(Sprite sprite, int y) {
         Matrix<int16_t> transform_matrix = Matrix<int16_t>(2, 2);
         transform_matrix.for_each([&](Word x, Word y){
             Word index = (y*2+x+1);
-            transform_matrix.set(x, y, memory->read_halfword_from_memory(OAM_START + ((4*index)-1)*2 + sprite.attribute_1.affine_index.get()*32)); 
+            transform_matrix.set(x, y, memory->oam[((4*index)-1)*2 + sprite.attribute_1.affine_index.get()*32]); 
         });
 
         int32_t half_sprite_width = pixel_size_x/2;
@@ -429,12 +422,11 @@ HalfWord Display::get_tile_pixel_4bpp(Word x, Word y, Word tile_base, Word charb
 
     Word tile_start_address = (charblock * 0x4000) + tile_index * 0x20;
 
-    Byte * vram = memory->memory_region(VRAM_START);
     Word x_offset = x % 8;
     Word y_offset = y % 8;
 
     Byte palette_index;
-    palette_index = vram[tile_start_address + (x_offset/2) + (y_offset * 4)];
+    palette_index = memory->vram[tile_start_address + (x_offset/2) + (y_offset * 4)];
 
     if (x % 2 == 1) {
         palette_index = (palette_index >> 4) & 0xF;
@@ -464,12 +456,10 @@ HalfWord Display::get_tile_pixel_8bpp(Word x, Word y, Word tile_base, Word charb
 
     Word tile_start_address = (charblock * 0x4000) + tile_index * 0x40;
 
-    Byte * vram = memory->memory_region(VRAM_START);
-
     Word x_offset = x % 8;
     Word y_offset = y % 8;
 
-    Byte palette_index = vram[tile_start_address + x_offset + (y_offset * 8)];
+    Byte palette_index = memory->vram[tile_start_address + x_offset + (y_offset * 8)];
     HalfWord palette_color = get_palette_color(palette_index, palette_start);
 
     return palette_color;
@@ -494,7 +484,7 @@ void Display::render() {
 
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
-            HalfWord color = memory->read_halfword_from_memory(BG_PALETTE_RAM_START);
+            HalfWord color = Memory::read_halfword_from_memory(memory->palette_ram, 0);
             HalfWord sprite_color = screen_buffers[BUFFER_SPIRTE][x][y];
 
             if (windows_active) {
@@ -566,7 +556,7 @@ void Display::set_screen_pixel(Word x, Word y, HalfWord color, BufferType buffer
 }
 
 HalfWord Display::get_palette_color(Byte index, Word palatte_start_address) {
-    Byte * palette = memory->memory_region(palatte_start_address);
+    Byte * palette = &memory->palette_ram[palatte_start_address];
     if (index % 16 == 0) {
         return COLOR_TRANSPARENT;
     } 
@@ -611,7 +601,7 @@ void Display::start_draw_loop(Scheduler * scheduler) {
     vcount.set(scanline);
 
     scheduler->schedule_event(HDRAW_CYCLE_LENGTH, [scheduler, this](){
-        // update_scanline(scanline);
+        update_scanline(scanline);
         display_status.hblank.set(true);
         if (display_status.hblank_irq.get() == true) {
             // DO IRQ   
@@ -647,10 +637,10 @@ vcount_setting(memory_location, 8, 15)
 {}
 
 Display::TiledBackground::TiledBackground(Memory * memory, Byte number) :
-control(memory->memory_region(0x04000008+(2*number))),
-h_scroll(memory->memory_region(0x04000010+(4*number)), 0, 15),
-v_scroll(memory->memory_region(0x04000012+(4*number)), 0, 15),
-affine_data(memory->memory_region(0x04000020+(0x10*(number-2)))),
+control(&memory->io_registers[0x00000008+(2*number)]),
+h_scroll(&memory->io_registers[0x00000010+(4*number)], 0, 15),
+v_scroll(&memory->io_registers[0x00000012+(4*number)], 0, 15),
+affine_data(&memory->io_registers[0x00000020+(0x10*(number-2))]),
 number(number)
 {}
 
@@ -744,6 +734,6 @@ Display::AttributeTwo::AttributeTwo(Byte * oam_address) :
 {}
 
 Display::Sprite::Sprite(Memory * memory, int number) :
-attribute_0(memory->memory_region(OAM_START + number*8)),
-attribute_1(memory->memory_region(OAM_START + number*8 + 2)),
-attribute_2(memory->memory_region(OAM_START + number*8 + 4))  {}
+attribute_0(&memory->oam[number*8    ]),
+attribute_1(&memory->oam[number*8 + 2]),
+attribute_2(&memory->oam[number*8 + 4])  {}

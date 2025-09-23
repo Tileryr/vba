@@ -25,6 +25,23 @@ enum Exception {
     EXCEPTION_FAST_INTERRUPT
 };
 
+enum Interrupt {
+    INTERRUPT_VBLANK,
+    INTERRUPT_HBLANK,
+    INTERRUPT_VCOUNT,
+    INTERRUPT_TIMER_0,
+    INTERRUPT_TIMER_1,
+    INTERRUPT_TIMER_2,
+    INTERRUPT_TIMER_3,
+    INTERRUPT_SERIAL_COMMUNICATION,
+    INTERRUPT_DMA_0,
+    INTERRUPT_DMA_1,
+    INTERRUPT_DMA_2,
+    INTERRUPT_DMA_3,
+    INTERRUPT_KEYPAD,
+    INTERRUPT_CARTRIDGE,
+};
+
 typedef struct ARM7TDMI {
     public:
         const Endian endian_type = ENDIAN_LITTLE;
@@ -97,8 +114,6 @@ typedef struct ARM7TDMI {
 
         void write_word_to_memory(Word address, Word value);
         void write_halfword_to_memory(Word address, HalfWord value);
-        
-        Byte * memory_region(Word address);
 
         Word read_register(int register_number);
         void write_register(int register_number, Word register_value);

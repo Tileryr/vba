@@ -68,7 +68,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         file_length = ftell(fileptr);
         rewind(fileptr);
 
-        fread(&cpu->memory.memory[GAMEPAK_ROM_START], 1, file_length, fileptr);
+        fread(&cpu->memory.game_pak_rom, 1, file_length, fileptr);
         fclose(fileptr);
     }
 
@@ -109,7 +109,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         HalfWord current_input = cpu->read_halfword_from_memory(KEY_INPUT_ADDRESS);
         bool released = event->type == SDL_EVENT_KEY_UP;
         Utils::write_bit(&current_input, target_bit, released);
-        cpu->write_halfword_to_memory(KEY_INPUT_ADDRESS, current_input);
+        // cpu->write_halfword_to_memory(KEY_INPUT_ADDRESS, current_input);
+        Memory::write_halfword_to_memory(cpu->memory.io_registers, 0x130, current_input); 
     }
     
     return SDL_APP_CONTINUE;
@@ -122,11 +123,13 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     ticks_since_last_render += scheduler->passed_milliseconds;
     if (ticks_since_last_render > 1000/60) {
-        current_scanline %= SCREEN_HEIGHT;
-        if (current_scanline == 0) {
-            memset(display->screen_buffers, 0xFF, sizeof(display->screen_buffers));
-        }
-        display->update_scanline(current_scanline++);
+        SDL_Log("%0x interrupt", cpu->read_word_from_memory(0x03FFFFFC));
+        // current_scanline %= SCREEN_HEIGHT;
+        // if (current_scanline == 0) {
+        //     memset(display->screen_buffers, 0xFF, sizeof(display->screen_buffers));
+        // }
+        
+        // display->update_scanline(current_scanline);
 
         display->render();
         ticks_since_last_render = 0;

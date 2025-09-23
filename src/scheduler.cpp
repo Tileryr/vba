@@ -80,8 +80,8 @@ void Scheduler::tick() {
 }    
 
 Scheduler::Timer::Timer(Memory * memory, Timer * next_timer, Word number) : 
-data(memory->memory_region(0x04000100 + (0x04*number)), 0, 15),
-control(memory->memory_region(0x04000102 + (0x04*number))),
+data(&memory->io_registers[0x00000100 + (0x04*number)], 0, 15),
+control(&memory->io_registers[0x00000102 + (0x04*number)]),
 next_timer(next_timer),
 cycles_until_increment(get_frequency()),
 reset_value(0)

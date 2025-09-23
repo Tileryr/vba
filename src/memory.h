@@ -3,12 +3,29 @@
 
 #include "src/cpu/cpu_types.h"
 
+#define BIOS_SIZE 0x00004000
+#define WRAM_BOARD_SIZE 0x00040000
+#define WRAM_CHIP_SIZE 0x00008000
+#define IO_REGISTERS_SIZE 0x3FF
+
+#define PALETTE_RAM_SIZE 0x400
+#define VRAM_SIZE 0x18000
+#define OAM_SIZE 0x400
+
+#define GAME_PAK_ROM_SIZE 0x06000000
+#define SRAM_SIZE 0x00010000
+
 typedef struct Memory {
-    Memory(Byte * memory);
-    Memory(Word memory_size);
-    ~Memory();
+    Byte wram_board[WRAM_BOARD_SIZE];
+    Byte wram_chip[WRAM_CHIP_SIZE];
+    Byte io_registers[IO_REGISTERS_SIZE];
+
+    Byte palette_ram[PALETTE_RAM_SIZE];
+    Byte vram[VRAM_SIZE];
+    Byte oam[OAM_SIZE];
     
-    Byte * memory;
+    Byte game_pak_rom[GAME_PAK_ROM_SIZE];
+    Byte sram[SRAM_SIZE];
 
     Word read_word_from_memory(Word address);
     HalfWord read_halfword_from_memory(Word address);
@@ -17,8 +34,6 @@ typedef struct Memory {
     void write_word_to_memory(Word address, Word value);
     void write_halfword_to_memory(Word address, HalfWord value);
     void write_to_memory(Word address, Byte value);
-
-    Byte * memory_region(Word address);
 
     static Word read_word_from_memory(Byte * memory, Word address);
     static HalfWord read_halfword_from_memory(Byte * memory, Word address);
