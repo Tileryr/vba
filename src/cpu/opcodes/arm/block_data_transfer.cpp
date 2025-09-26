@@ -53,7 +53,7 @@ void OpcodeBlockDataTransfer::run(ARM7TDMI * cpu) {
     bool pre_increment = this->u ? this->p : !this->p;
 
     RegisterSet * target_register_set = cpu->current_register_set();
-    if ((this->s == 1) && (!pc_in_transfer_list) || (this->l == 0)) {
+    if ((this->s == 1) && (!pc_in_transfer_list) && (this->l == 0)) {
         target_register_set = &cpu->registers_user;
         if (this->w == 1) {
             cpu->warn("Block Data Transfer - writeback and using user register bank");
@@ -84,7 +84,6 @@ void OpcodeBlockDataTransfer::run(ARM7TDMI * cpu) {
                 }
                 cpu->write_word_to_memory(current_address, register_value);
             }
-
         } else { // Load | Memory -> Register
             target_register_set->write_register(i, cpu->read_word_from_memory(current_address));
             if (this->s == 1 && i == REGISTER_PC) {

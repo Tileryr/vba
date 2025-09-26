@@ -3,9 +3,10 @@
 #include "src/display.h"
 #include <functional>
 
-Display::Display(SDL_Renderer * renderer, Memory * memory) : 
+Display::Display(SDL_Renderer * renderer, Context * context, Memory * memory) : 
 renderer(renderer), 
-memory(memory), 
+context(context), 
+memory(memory),
 
 display_control(&memory->io_registers[0x0]),
 display_status(&memory->io_registers[0x4]),
@@ -59,6 +60,11 @@ void Display::update_scanline(int scanline) {
         for (int i = 127; i >= 0; i--) {
             render_sprite_scanline(sprites[i], scanline);
         }
+    }
+
+    HalfWord background_color = Memory::read_halfword_from_memory(memory->palette_ram, 0);
+    for (int x = 0; x < SCREEN_WIDTH; x++) {
+        set_screen_pixel(x, scanline, background_color, BUFFER_BACKGROUND_COLOR);
     }
 }
 
@@ -484,7 +490,7 @@ void Display::render() {
 
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
-            HalfWord color = Memory::read_halfword_from_memory(memory->palette_ram, 0);
+            HalfWord color = screen_buffers[BUFFER_BACKGROUND_COLOR][x][y];
             HalfWord sprite_color = screen_buffers[BUFFER_SPIRTE][x][y];
 
             if (windows_active) {
@@ -604,6 +610,7 @@ void Display::start_draw_loop(Scheduler * scheduler) {
         update_scanline(scanline);
         display_status.hblank.set(true);
         if (display_status.hblank_irq.get() == true) {
+            context->cpu->start_interrupt(INTERRUPT_HBLANK);
             // DO IRQ   
         }
         scheduler->schedule_event(HBLANK_CYCLE_LENGTH, [scheduler, this](){

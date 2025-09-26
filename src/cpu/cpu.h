@@ -9,6 +9,7 @@
 #include "./opcodes/opcode_types.h"
 
 #include "src/memory.h"
+#include "src/cpu/irq_manager.h"
 
 #include "../utils.h"
 
@@ -25,22 +26,7 @@ enum Exception {
     EXCEPTION_FAST_INTERRUPT
 };
 
-enum Interrupt {
-    INTERRUPT_VBLANK,
-    INTERRUPT_HBLANK,
-    INTERRUPT_VCOUNT,
-    INTERRUPT_TIMER_0,
-    INTERRUPT_TIMER_1,
-    INTERRUPT_TIMER_2,
-    INTERRUPT_TIMER_3,
-    INTERRUPT_SERIAL_COMMUNICATION,
-    INTERRUPT_DMA_0,
-    INTERRUPT_DMA_1,
-    INTERRUPT_DMA_2,
-    INTERRUPT_DMA_3,
-    INTERRUPT_KEYPAD,
-    INTERRUPT_CARTRIDGE,
-};
+
 
 typedef struct ARM7TDMI {
     public:
@@ -107,6 +93,7 @@ typedef struct ARM7TDMI {
         ARM7TDMI();
 
         Memory memory;
+        IrqManager irq_manager;
         int runs = 0;
         
         Word read_word_from_memory(Word address);
@@ -122,7 +109,7 @@ typedef struct ARM7TDMI {
         bool is_priviledged();
         // Exception Functions
         void run_exception(Exception exception_type);
-        void start_interrupt();
+        void start_interrupt(Interrupt interrupt);
         void return_from_interrupt();
         
         void run_next_opcode();

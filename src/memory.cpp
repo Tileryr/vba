@@ -1,6 +1,6 @@
 #include "src/memory.h"
 #include <SDL3/SDL.h>
-
+#define SDL_Log 
 Word Memory::read_word_from_memory(Word address) {
     return (
         (read_from_memory(address  ) << 0) 
@@ -25,7 +25,7 @@ Byte Memory::read_from_memory(Word address) {
         case 0x0:
             if (address_main < 0x4000) {
                 SDL_Log("WEIRD READ - BIOS, %0x", address);
-                SDL_TriggerBreakpoint();
+                // SDL_TriggerBreakpoint();
             } else {
                 SDL_Log("WEIRD READ - UNUSED (0x0)");
             }

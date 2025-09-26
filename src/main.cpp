@@ -6,12 +6,14 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL_render.h>
 
+#include "src/cpu/irq_manager.h"
 #include "./cpu/cpu.h"
 #include "./utils.h"
 #include "./cpu/alu.h"
 #include "src/cpu/opcodes/arm/data_processing.h"
 #include "src/display.h"
 #include "src/scheduler.h"
+#include "src/context.h"
 
 #include <stdlib.h>
 #include <cstdio>
@@ -22,6 +24,9 @@
 
 static ARM7TDMI * cpu = new ARM7TDMI();
 static Scheduler * scheduler = new Scheduler(cpu);
+
+static Context global_context;
+
 static Display * display = nullptr;
 
 static SDL_Window * window = nullptr;
@@ -50,7 +55,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 
     SDL_SetRenderScale(renderer, SCALE, SCALE);
 
-    display = new Display(renderer, &cpu->memory);
+    global_context.cpu = cpu;
+    global_context.memory = &cpu->memory;
+
+    display = new Display(renderer, &global_context, &cpu->memory);
+    
     cpu->skip_bios();
 
     if (argc > 1) {
@@ -123,18 +132,10 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     ticks_since_last_render += scheduler->passed_milliseconds;
     if (ticks_since_last_render > 1000/60) {
-        SDL_Log("%0x interrupt", cpu->read_word_from_memory(0x03FFFFFC));
-        // current_scanline %= SCREEN_HEIGHT;
-        // if (current_scanline == 0) {
-        //     memset(display->screen_buffers, 0xFF, sizeof(display->screen_buffers));
-        // }
-        
-        // display->update_scanline(current_scanline);
-
+        // SDL_Log("%0x interrupt", cpu->read_word_from_memory(0x03007FFC));
         display->render();
         ticks_since_last_render = 0;
     }
-    
     
     return SDL_APP_CONTINUE;
 }

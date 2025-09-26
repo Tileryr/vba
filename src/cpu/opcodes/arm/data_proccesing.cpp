@@ -213,11 +213,6 @@ void OpcodeDataProcess::run(ARM7TDMI * cpu) {
     u_int64_t result = calculate_instruction(&alu, instruction_type, rn_value, op2, cpu->cpsr.c);
 
     if (set_condition_codes) {
-        if (rd == REGISTER_PC) {
-            cpu->cpsr = cpu->current_register_set()->spsr;
-            return;
-        }
-
         set_psr_flags(&alu, &cpu->cpsr, result);
         if (operation_class(instruction_type) == OpcodeDataProcess::ARITHMETIC) {
             bool sub = (
@@ -229,6 +224,10 @@ void OpcodeDataProcess::run(ARM7TDMI * cpu) {
             );
 
             cpu->cpsr.v = get_overflow_flag(rn_value, op2, result, sub);
+        }
+
+        if (rd == REGISTER_PC) {
+            cpu->cpsr = cpu->current_register_set()->spsr;
         }
     }
 

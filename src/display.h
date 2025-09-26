@@ -6,6 +6,7 @@
 #include "src/scheduler.h"
 #include "src/memory.h"
 #include "src/utils.h"
+#include "src/context.h"
 
 #include "src/cpu/cpu_types.h"
 #include "src/cpu/bit_region.h"
@@ -37,7 +38,7 @@
 #define COLOR_TRANSPARENT 0xFFFF
 
 typedef struct Display {
-    Display(SDL_Renderer * renderer, Memory * memory);
+    Display(SDL_Renderer * renderer, Context * context, Memory * memory);
 
     struct DisplayControl {
         DisplayControl(Byte * memory_location);
@@ -175,6 +176,7 @@ typedef struct Display {
     TiledBackground tiled_backgrounds[4];
 
     SDL_Renderer * renderer;
+    Context * context;
     Memory * memory;
 
     BitRegion vcount;
@@ -187,9 +189,10 @@ typedef struct Display {
         BUFFER_BG1=2,
         BUFFER_BG2=3,
         BUFFER_BG3=4,
+        BUFFER_BACKGROUND_COLOR=5,
     };
 
-    HalfWord screen_buffers[5][SCREEN_WIDTH][SCREEN_HEIGHT];
+    HalfWord screen_buffers[6][SCREEN_WIDTH][SCREEN_HEIGHT];
 
     void update_scanline(int y);
 
