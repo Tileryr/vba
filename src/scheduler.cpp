@@ -49,11 +49,11 @@ void Scheduler::tick() {
             cpu->run_next_opcode();
             cycles_till_next_event -= cpu_passed_cycles;
             
-            for (int i = 0; i < 4; i++) {
-                Timer timer = timers[i];
-                if (timer.control.enabled.get() == 0 || timer.control.cascade.get() == 1) {continue;}
-                timer.pass_cycles(cpu_passed_cycles);
-            }
+            // for (int i = 0; i < 4; i++) {
+            //     Timer timer = timers[i];
+            //     if (timer.control.enabled.get() == 0 || timer.control.cascade.get() == 1) {continue;}
+            //     timer.pass_cycles(cpu_passed_cycles);
+            // }
         }
 
         move_events_forward(next_event.cycles_till_done);

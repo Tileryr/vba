@@ -401,6 +401,7 @@ void ARM7TDMI::thumb_opcode_conditional_branch(HalfWord opcode) {
 }
 
 void ARM7TDMI::thumb_opcode_software_interrupt(HalfWord opcode) {
+    SDL_Log("SWI - THUMB");
     run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
 }
 

@@ -57,7 +57,7 @@ ArmOpcodeType ARM7TDMI::decode_opcode_arm(Word opcode)
     if (Utils::read_bit_range(opcode, 25, 27) == 0b100) {
         return BLOCK_DATA_TRANSFER;
     }
-    
+    SDL_Log("PC: %0x", read_register(15));
     SDL_assert(false);
     return ALU;
 }
@@ -114,11 +114,11 @@ ThumbOpcodeType ARM7TDMI::decode_opcode_thumb(HalfWord opcode) {
     if (get_bitregion(12, 15) == 0b1100) {
         return MULTIPLE_LOAD_STORE;
     }
-    if (get_bitregion(12, 15) == 0b1101) {
-        return CONDITIONAL_BRANCH;
-    }
     if (get_bitregion(8,  15) == 0b11011111) {
         return SOFTWARE_INTERRUPT;
+    }
+    if (get_bitregion(12, 15) == 0b1101) {
+        return CONDITIONAL_BRANCH;
     }
     if (get_bitregion(11, 15) == 0b11100) {
         return UNCONDITIONAL_BRANCH;

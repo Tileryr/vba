@@ -1,6 +1,9 @@
 #ifndef MEMORY_INCLUDED
 #define MEMORY_INCLUDED
 
+#include <functional>
+#include <vector>
+
 #include "src/cpu/cpu_types.h"
 
 #define BIOS_SIZE 0x00004000
@@ -27,6 +30,17 @@ typedef struct Memory {
     Byte game_pak_rom[GAME_PAK_ROM_SIZE];
     Byte sram[SRAM_SIZE];
 
+    typedef struct AddressableRegion {
+        AddressableRegion(Word base_address, Word length, std::function<Byte(Byte, Byte)> write, std::function<Byte(Byte)> read);
+        Word base_address;
+        Word length;
+
+        std::function<Byte(Byte, Byte)> write;
+        std::function<Byte(Byte)> read;
+    } AddressableRegion;
+
+    std::vector<AddressableRegion> addressable_regions;
+    
     Word read_word_from_memory(Word address);
     HalfWord read_halfword_from_memory(Word address);
     Byte read_from_memory(Word address);
@@ -34,6 +48,13 @@ typedef struct Memory {
     void write_word_to_memory(Word address, Word value);
     void write_halfword_to_memory(Word address, HalfWord value);
     void write_to_memory(Word address, Byte value);
+
+    typedef struct MemoryPointer {
+        Byte * pointer;
+        bool valid;
+    } MemoryPointer;
+
+    MemoryPointer address_to_memory_pointer(Word address);
 
     static Word read_word_from_memory(Byte * memory, Word address);
     static HalfWord read_halfword_from_memory(Byte * memory, Word address);

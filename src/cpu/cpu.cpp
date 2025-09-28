@@ -245,7 +245,6 @@ void ARM7TDMI::run_exception(Exception exception_type) {
 void ARM7TDMI::start_interrupt(Interrupt interrupt) {
     if (cpsr.i) {return;}
     irq_manager.start_interrupt(interrupt);
-    SDL_Log("in: %0x", read_register(REGISTER_PC));
 
     run_exception(EXCEPTION_INTERRUPT);
 
@@ -290,11 +289,7 @@ void ARM7TDMI::return_from_interrupt() {
     .set_immediate_op2(0x4, 0)
     .get_product()
     .run(this);
-
-    SDL_Log("return: %0x", read_register(REGISTER_PC));
 }
-
-int repeats = 0;
 
 void ARM7TDMI::warn(const char * msg)
 {
@@ -304,42 +299,30 @@ void ARM7TDMI::warn(const char * msg)
 void ARM7TDMI::run_next_opcode()
 {   
     static bool print = false;
-    static Word current_irq_pointer;
 
     Word pc = read_register(REGISTER_PC);
-
-    if (pc == 0) {
-        return;
-    }
-
-    if (pc >= 0x080026e6 && pc <= 0x080026ea) {
-        // if (repeats > 100) {
-        //     return;
-        // }
-        if (read_register(3) == 0x3007484) {
-            SDL_Log("Break, %0x, %0x, pc: %0x", read_register(5), read_register(3), read_register(15));
-        }
-        
-        repeats++;
-    }
-
-    if (read_word_from_memory(0x03007FFC) != current_irq_pointer) {
-        current_irq_pointer = read_word_from_memory(0x03007FFC);
-        SDL_Log("interrupt pointer: %0x pc: %0x", current_irq_pointer, read_register(REGISTER_PC));
-    }
 
     if (pc == 0x138) {
         return_from_interrupt();
         return;
     }
     
+    if (pc < 0x01000000) {
+        SDL_TriggerBreakpoint();
+        return;
+    }
+
     if (cpsr.t == STATE_ARM) {
         Word opcode = read_word_from_memory(pc);
         ArmOpcodeType opcode_type = decode_opcode_arm(opcode);
 
         if (print) {
-            SDL_Log("ARM pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_arm(opcode_type).c_str(), read_register(0));
+            SDL_Log("ARM pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_arm(opcode_type).c_str(), read_register(13));
         }
+
+        // if (opcode == 0) {
+        //     SDL_TriggerBreakpoint();
+        // }
 
         Byte condition_code = Utils::read_bit_range(opcode, 28, 31);
         if (condition_field(condition_code) == false) {
@@ -368,6 +351,10 @@ void ARM7TDMI::run_next_opcode()
         bool pc_changed = pc != read_register(REGISTER_PC);
         if (!pc_changed) {
             write_register(REGISTER_PC, read_register(REGISTER_PC) + 4);
+        } else {
+            // if (read_register(REGISTER_PC) < 0x01000000) {
+            //     SDL_Log("STOPPED: PC: %0x", pc);
+            // }
         }
     } else {
         HalfWord opcode = read_halfword_from_memory(pc);

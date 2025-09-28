@@ -23,8 +23,10 @@ enum Interrupt {
 typedef struct IrqManager {
     IrqManager(Memory * memory);
 
-    BitRegion interrupt_info;
-    
+    BitRegion interrupt_enables;
+    BitRegion interrupt_info;    
+    BitRegion interrupt_master_enable;
+
     void start_interrupt(Interrupt interrupt_type);
 } IrqManager;
 

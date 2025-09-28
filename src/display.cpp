@@ -231,30 +231,54 @@ void Display::render_tiled_background_scanline(TiledBackground background, int s
 
     for (int screenblock_x = 0; screenblock_x < screenblock_width; screenblock_x++) {
         Word screenblock_index = background.control.base_screenblock.get() + (screenblock_y*screenblock_width + screenblock_x);
+        // SDL_Log("%d", screenblock_index);
         Word screenblock_base_address = 0x800*screenblock_index;
 
         for (int tile_x = 0; tile_x < 32; tile_x++) {
             Word screen_entry_index = (tile_y*32+tile_x);
 
             Word screen_entry_address = screenblock_base_address+(screen_entry_index*2);
+            screen_entry_address = 0xFA14;
+            if (screenblock_index == 31) {
+                SDL_Log("%0x", screen_entry_address);
+            }
+            
+
             TiledBackground::ScreenEntry screen_entry = TiledBackground::ScreenEntry(&memory->vram[screen_entry_address]);
 
             Word base_charblock = background.control.base_charblock.get();
             Word tile_index = screen_entry.tile_index.get();
 
+            // memory->write_halfword_to_memory(0x060008A0, 0x0FFF);
+            // SDL_Log("tile_index: %d", memory->vram[0x8A0]);
+
             for (int tile_pixel_x = 0; tile_pixel_x < 8; tile_pixel_x++) {
                 Word screen_x = tile_pixel_x + tile_x*8 + screenblock_x*256 + -background.h_scroll.get();
                 screen_x %= pixel_width;
 
-                HalfWord background_color = get_tile_pixel_4bpp(
-                    tile_pixel_x,
-                    tile_offset_y,
-                    tile_index,
-                    base_charblock,
-                    BG_PALETTE,
-                    screen_entry.palette_bank.get(),
-                    8
-                );
+                HalfWord background_color;
+                bool four_bpp = background.control.color_mode.get() == 0;
+                if (four_bpp) {
+                    background_color = get_tile_pixel_4bpp(
+                        tile_pixel_x,
+                        tile_offset_y,
+                        tile_index,
+                        base_charblock,
+                        BG_PALETTE,
+                        screen_entry.palette_bank.get(),
+                        8
+                    );
+                } else {
+                    background_color = get_tile_pixel_8bpp(
+                        tile_pixel_x,
+                        tile_offset_y,
+                        tile_index,
+                        base_charblock,
+                        BG_PALETTE,
+                        8
+                    );
+                }
+                
 
                 set_screen_pixel(screen_x, scanline, background_color, number_to_bg_buffer_type(background.number));
             }
@@ -263,7 +287,6 @@ void Display::render_tiled_background_scanline(TiledBackground background, int s
 }
 
 void Display::render_sprite_scanline(Sprite sprite, int y) {
-    // NEEDS 8BPP/4BPP;
     // NEEDS MOSIAC;
 
     if (sprite.attribute_0.object_mode.get() == 0b10) {
@@ -345,23 +368,35 @@ void Display::render_sprite_scanline(Sprite sprite, int y) {
     HalfWord tile_size_x = pixel_size_x / 8;
     HalfWord tile_size_y = pixel_size_y / 8;
     
-    auto get_pixel_4bpp = [&](Word x, Word y){
-        return get_tile_pixel_4bpp(
-            x, 
-            y, 
-            sprite.attribute_2.tile_index.get(), 
-            4, 
-            OBJ_PALETTE,
-            sprite.attribute_2.palette_bank.get(), 
-            pixel_size_x
-        );
+    auto get_pixel_color = [&](Word x, Word y){
+        if (sprite.attribute_0.color_mode.get() == 0) {
+            return get_tile_pixel_4bpp(
+                x, 
+                y, 
+                sprite.attribute_2.tile_index.get(), 
+                4, 
+                OBJ_PALETTE,
+                sprite.attribute_2.palette_bank.get(), 
+                pixel_size_x
+            );
+        } else {
+            return get_tile_pixel_8bpp(
+                x, 
+                y, 
+                sprite.attribute_2.tile_index.get(), 
+                4, 
+                OBJ_PALETTE,
+                pixel_size_x
+            );
+        }
     };
 
     if (affine) {
         Matrix<int16_t> transform_matrix = Matrix<int16_t>(2, 2);
         transform_matrix.for_each([&](Word x, Word y){
             Word index = (y*2+x+1);
-            transform_matrix.set(x, y, memory->oam[((4*index)-1)*2 + sprite.attribute_1.affine_index.get()*32]); 
+            
+            transform_matrix.set(x, y, Memory::read_halfword_from_memory(&memory->oam[0], ((4*index)-1)*2 + sprite.attribute_1.affine_index.get()*32)); 
         });
 
         int32_t half_sprite_width = pixel_size_x/2;
@@ -388,7 +423,7 @@ void Display::render_sprite_scanline(Sprite sprite, int y) {
             Word target_sprite_pixel_y = mapped_pixel_y+half_sprite_height;
             if (target_sprite_pixel_x < 0 || target_sprite_pixel_x >= pixel_size_x || target_sprite_pixel_y < 0 || target_sprite_pixel_y >= pixel_size_y) {continue;}
 
-            HalfWord mapped_pixel_color = get_pixel_4bpp(target_sprite_pixel_x, target_sprite_pixel_y);
+            HalfWord mapped_pixel_color = get_pixel_color(target_sprite_pixel_x, target_sprite_pixel_y);
 
             Word screen_x = base_x+x;
             Word screen_y = base_y+relative_y;
@@ -403,7 +438,7 @@ void Display::render_sprite_scanline(Sprite sprite, int y) {
                 mapped_x = flip(mapped_x, pixel_size_x/2);
             }
 
-            HalfWord pixel_color = get_pixel_4bpp(mapped_x, y_offset_from_base);
+            HalfWord pixel_color = get_pixel_color(mapped_x, y_offset_from_base);
 
             Word screen_x = sprite.attribute_1.x.get()+x;
             screen_x %= 512;
@@ -543,6 +578,10 @@ void Display::render() {
             Byte g = Utils::read_bit_range(color, 5,  9);
             Byte b = Utils::read_bit_range(color, 10, 14);
 
+            // if (color != 0b0111111111111111) {
+            //     SDL_Log("color: %b, y: %d", color, y);
+            // }
+            
             SDL_SetRenderDrawColor(renderer, r << 3, g << 3, b << 3, SDL_ALPHA_OPAQUE);
             SDL_RenderPoint(renderer, x, y);
         }
@@ -596,15 +635,19 @@ void Display::start_draw_loop(Scheduler * scheduler) {
         
         display_status.vblank.set(true);
         if (display_status.vblank_irq.get() == true) {
+            context->cpu->start_interrupt(INTERRUPT_VBLANK);
             // DO IRQ   
         }
     }
 
+    vcount.set(scanline);
+    
     if (display_status.vcount_irq.get() == true && scanline == display_status.vcount_setting.get()) {
+        context->cpu->start_interrupt(INTERRUPT_VCOUNT);
         // DO IRQ   
     }
     
-    vcount.set(scanline);
+    
 
     scheduler->schedule_event(HDRAW_CYCLE_LENGTH, [scheduler, this](){
         update_scanline(scanline);
