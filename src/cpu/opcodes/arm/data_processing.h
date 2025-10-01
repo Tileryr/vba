@@ -57,14 +57,14 @@ typedef struct OpcodeDataProcess {
 
     // Else (immediate_op_2)
     unsigned int immediate_ror_shift : 4;
-    unsigned int operand_2_immediate : 8;
+    unsigned int operand_2_immediate : 10; // PROBLEM 8 -> 10 or smth idk lolololololol
 
     CpuALU alu;
 
     OpcodeDataProcess();
     OpcodeDataProcess(Word opcode);
 
-    Word calculate_immediate_op2( Byte immediate, unsigned int ror_shift);
+    Word calculate_immediate_op2(Word immediate, unsigned int ror_shift);
     static u_int64_t calculate_instruction(CpuALU * alu, InstructionType instruction, Word rn, Word op2, bool c_flag);
     static Word shift_op2(CpuALU * alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag);
     static void set_psr_flags(CpuALU * alu, PSR * psr, u_int64_t result);
@@ -85,7 +85,7 @@ typedef struct OpcodeDataProcessingBuilder {
     OpcodeDataProcessingBuilder& set_destination_register(Word destination_register);
     OpcodeDataProcessingBuilder& set_source_register(Word source_register);
 
-    OpcodeDataProcessingBuilder& set_immediate_op2(Byte immediate, Word ror_shift);
+    OpcodeDataProcessingBuilder& set_immediate_op2(Word immediate, Word ror_shift);
     OpcodeDataProcessingBuilder& set_register_op2(Byte op2_register, Byte shift_type);
 
     OpcodeDataProcessingBuilder& set_register_op2_shift_register(Byte shift_register);

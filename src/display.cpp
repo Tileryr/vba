@@ -231,26 +231,21 @@ void Display::render_tiled_background_scanline(TiledBackground background, int s
 
     for (int screenblock_x = 0; screenblock_x < screenblock_width; screenblock_x++) {
         Word screenblock_index = background.control.base_screenblock.get() + (screenblock_y*screenblock_width + screenblock_x);
-        // SDL_Log("%d", screenblock_index);
         Word screenblock_base_address = 0x800*screenblock_index;
 
         for (int tile_x = 0; tile_x < 32; tile_x++) {
             Word screen_entry_index = (tile_y*32+tile_x);
 
             Word screen_entry_address = screenblock_base_address+(screen_entry_index*2);
-            screen_entry_address = 0xFA14;
-            if (screenblock_index == 31) {
-                SDL_Log("%0x", screen_entry_address);
-            }
-            
 
             TiledBackground::ScreenEntry screen_entry = TiledBackground::ScreenEntry(&memory->vram[screen_entry_address]);
 
             Word base_charblock = background.control.base_charblock.get();
             Word tile_index = screen_entry.tile_index.get();
 
-            // memory->write_halfword_to_memory(0x060008A0, 0x0FFF);
-            // SDL_Log("tile_index: %d", memory->vram[0x8A0]);
+            // if (tile_index != 0) {
+            //     SDL_Log("tile_index: %d %0x", tile_index, screen_entry_address);
+            // }
 
             for (int tile_pixel_x = 0; tile_pixel_x < 8; tile_pixel_x++) {
                 Word screen_x = tile_pixel_x + tile_x*8 + screenblock_x*256 + -background.h_scroll.get();
@@ -279,6 +274,9 @@ void Display::render_tiled_background_scanline(TiledBackground background, int s
                     );
                 }
                 
+                // if (background_color != COLOR_TRANSPARENT) {
+                //     SDL_Log("%b", background_color);
+                // }
 
                 set_screen_pixel(screen_x, scanline, background_color, number_to_bg_buffer_type(background.number));
             }
@@ -466,9 +464,9 @@ HalfWord Display::get_tile_pixel_4bpp(Word x, Word y, Word tile_base, Word charb
     Word x_offset = x % 8;
     Word y_offset = y % 8;
 
-    Byte palette_index;
-    palette_index = memory->vram[tile_start_address + (x_offset/2) + (y_offset * 4)];
-
+    Word palette_index_address = tile_start_address + (x_offset/2) + (y_offset * 4);
+    Byte palette_index = memory->vram[palette_index_address];
+    
     if (x % 2 == 1) {
         palette_index = (palette_index >> 4) & 0xF;
     } else {
@@ -507,6 +505,7 @@ HalfWord Display::get_tile_pixel_8bpp(Word x, Word y, Word tile_base, Word charb
 }
 
 void Display::render() {
+    // SDL_Log("00600898C: 0x%0x", memory->read_word_from_memory(0x00600898C));
     SDL_RenderClear(renderer);
 
     bool window_0_active = display_control.display_window_0.get();

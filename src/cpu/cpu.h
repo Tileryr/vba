@@ -26,8 +26,6 @@ enum Exception {
     EXCEPTION_FAST_INTERRUPT
 };
 
-
-
 typedef struct ARM7TDMI {
     public:
         const Endian endian_type = ENDIAN_LITTLE;
@@ -89,6 +87,7 @@ typedef struct ARM7TDMI {
         void thumb_opcode_unconditional_branch(HalfWord opcode);
         void thumb_opcode_long_branch_with_link(HalfWord opcode);
         
+        void emulate_software_interrupt(Word opcode);
     public:
         ARM7TDMI();
 

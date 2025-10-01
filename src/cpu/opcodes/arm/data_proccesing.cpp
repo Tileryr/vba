@@ -24,12 +24,11 @@ OpcodeDataProcess::OpcodeDataProcess(Word opcode)
     operand_2_immediate = Utils::read_bit_range(opcode, 0, 7);
 }
 
-Word OpcodeDataProcess::calculate_immediate_op2( Byte immediate, unsigned int ror_shift)
+Word OpcodeDataProcess::calculate_immediate_op2(Word immediate, unsigned int ror_shift)
 {
-        Word zero_extended_immediate = immediate & 0xFF;
-        Word rotated_immediate = alu.rotate_right(zero_extended_immediate, ror_shift);
+    Word rotated_immediate = alu.rotate_right(immediate, ror_shift);
 
-        return rotated_immediate;
+    return rotated_immediate;
 }
 
 Word OpcodeDataProcess::shift_op2(CpuALU * alu, Word op2, Byte shift_amount, BitShiftType bit_shift_type, bool c_flag)
@@ -251,7 +250,7 @@ OpcodeDataProcessingBuilder& OpcodeDataProcessingBuilder::set_source_register(Wo
     return *this;
 }
 
-OpcodeDataProcessingBuilder& OpcodeDataProcessingBuilder::set_immediate_op2(Byte immediate, Word ror_shift) {
+OpcodeDataProcessingBuilder& OpcodeDataProcessingBuilder::set_immediate_op2(Word immediate, Word ror_shift) {
     product.use_immediate_operand_2 = true;
     product.operand_2_immediate = immediate;
     product.immediate_ror_shift = ror_shift;

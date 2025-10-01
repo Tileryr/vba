@@ -45,27 +45,7 @@ void ARM7TDMI::arm_opcode_branch_exchange(Word opcode)
 void ARM7TDMI::arm_opcode_software_interrupt(Word opcode)
 {
     Word comment_field = Utils::read_bit_range(opcode, 0, 23);
-    SDL_Log("SWI, -pc: %0x %0x", read_register(REGISTER_PC), comment_field);
-    switch (comment_field)
-    {
-        case 0x20000: { // HALT
-
-        }
-        case 0x60000: { // DIVISION
-            int32_t number = read_register(0);
-            int32_t denom = read_register(1);
-
-            write_register(0, number/denom);
-            write_register(1, number%denom);
-            write_register(3, abs(number/denom));
-            break;
-        }
-        default:
-            SDL_TriggerBreakpoint();
-            run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
-            break;
-    }
-    
+    emulate_software_interrupt(comment_field>>16);
 }
 
 void ARM7TDMI::arm_opcode_undefined_intruction(Word opcode)

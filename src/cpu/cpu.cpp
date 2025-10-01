@@ -299,7 +299,6 @@ void ARM7TDMI::warn(const char * msg)
 void ARM7TDMI::run_next_opcode()
 {   
     static bool print = false;
-
     Word pc = read_register(REGISTER_PC);
 
     if (pc == 0x138) {
@@ -308,7 +307,7 @@ void ARM7TDMI::run_next_opcode()
     }
     
     if (pc < 0x01000000) {
-        SDL_TriggerBreakpoint();
+        // SDL_TriggerBreakpoint();
         return;
     }
 
@@ -317,12 +316,8 @@ void ARM7TDMI::run_next_opcode()
         ArmOpcodeType opcode_type = decode_opcode_arm(opcode);
 
         if (print) {
-            SDL_Log("ARM pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_arm(opcode_type).c_str(), read_register(13));
+            SDL_Log("ARM pc: %08x, opcode: %08x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_arm(opcode_type).c_str(), read_register(0));
         }
-
-        // if (opcode == 0) {
-        //     SDL_TriggerBreakpoint();
-        // }
 
         Byte condition_code = Utils::read_bit_range(opcode, 28, 31);
         if (condition_field(condition_code) == false) {
@@ -361,7 +356,7 @@ void ARM7TDMI::run_next_opcode()
         ThumbOpcodeType opcode_type = decode_opcode_thumb(opcode);
 
         if (print) {
-            SDL_Log("THUMB pc: %08x, opcode: %04x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_thumb(opcode_type).c_str(), read_register(0));
+            SDL_Log("THUMB pc: %08x, opcode: %04x, type: %s, register: %08x \n", pc, opcode, dissassemble_opcode_thumb(opcode_type).c_str(), read_register(7));
         }
 
         switch (opcode_type)

@@ -319,6 +319,10 @@ void ARM7TDMI::thumb_opcode_load_address(HalfWord opcode) {
     Byte source_register = sp ? REGISTER_SP : REGISTER_PC;
     Word immediate = word_8 << 2;
     
+    if (immediate == 0x128) {
+        SDL_Log("%b", immediate);
+    }
+
     OpcodeDataProcessingBuilder(OpcodeDataProcess::ADD, false)
     .set_destination_register(destination_register)
     .set_source_register(source_register)
@@ -401,8 +405,9 @@ void ARM7TDMI::thumb_opcode_conditional_branch(HalfWord opcode) {
 }
 
 void ARM7TDMI::thumb_opcode_software_interrupt(HalfWord opcode) {
-    SDL_Log("SWI - THUMB");
-    run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
+    emulate_software_interrupt(Utils::read_bit_range(opcode, 0, 7));
+    // SDL_Log("SWI - THUMB");
+    // run_exception(EXCEPTION_SOFTWARE_INTERRUPT);
 }
 
 void ARM7TDMI::thumb_opcode_unconditional_branch(HalfWord opcode) {
